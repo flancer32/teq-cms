@@ -1,0 +1,52 @@
+{
+  "name": "@flancer32/teq-cms",
+  "version": "0.1.0",
+  "description": "CMS plugin for the Tequila Framework: renders multilingual server-side Mustache templates via web requests.",
+  "type": "module",
+  "main": "index.js",
+  "keywords": [
+    "teqfw",
+    "tequila framework",
+    "cms",
+    "mustache",
+    "ssr",
+    "localization",
+    "template engine",
+    "web"
+  ],
+  "homepage": "https://github.com/flancer32/teq-cms#readme",
+  "bugs": {
+    "url": "https://github.com/flancer32/teq-cms/issues"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Alex Gusev",
+    "email": "alex@flancer64.com",
+    "url": "https://github.com/flancer64"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flancer32/teq-cms.git"
+  },
+  "scripts": {
+    "eslint": "./node_modules/.bin/eslint ./src/",
+    "test:unit": "./node_modules/.bin/_mocha './test/unit/**/*.test.mjs' --recursive"
+  },
+  "dependencies": {
+    "@flancer32/teq-tmpl": "git+ssh://git@github.com:flancer32/teq-tmpl.git",
+    "@flancer32/teq-web": "git+ssh://git@github.com:flancer32/teq-web.git"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.25.0",
+    "eslint": "^9.25.0",
+    "eslint-plugin-jsdoc": "^50.6.8",
+    "mocha": "^11.3.0"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/sponsors/teqfw"
+  }
+}
