@@ -13,6 +13,7 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
      * @param {Fl32_Web_Back_Helper_Respond} respond
      * @param {Fl32_Web_Back_Dto_Handler_Info} dtoInfo
      * @param {Fl32_Tmpl_Back_Act_File_Find} actTmplFind
+     * @param {Fl32_Tmpl_Back_Config} cfgTmpl
      * @param {Fl32_Tmpl_Back_Service_Render} servTmplRender
      * @param {Fl32_Cms_Back_Helper_Cast} cast
      * @param {typeof Fl32_Web_Back_Enum_Stage} STAGE
@@ -27,6 +28,7 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
             Fl32_Web_Back_Helper_Respond$: respond,
             Fl32_Web_Back_Dto_Handler_Info$: dtoInfo,
             Fl32_Tmpl_Back_Act_File_Find$: actTmplFind,
+            Fl32_Tmpl_Back_Config$: cfgTmpl,
             Fl32_Tmpl_Back_Service_Render$: servTmplRender,
             Fl32_Cms_Back_Helper_Cast$: cast,
             Fl32_Web_Back_Enum_Stage$: STAGE,
@@ -154,14 +156,18 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
          * @param {string} args.defaultLocale - Fallback locale.
          * @param {boolean} args.localeInUrl - Whether URL contains locale.
          * @param {string} args.rootPath - Application root path.
+         * @param {string} args.tmplEngine - Template engine for rendering (mustache|nunjucks).
          * @throws {Error} If already initialized.
          * @returns {Promise<void>}
          */
-        this.init = async function ({allowedLocales, defaultLocale, localeInUrl, rootPath}) {
+        this.init = async function ({allowedLocales, defaultLocale, localeInUrl, rootPath, tmplEngine}) {
             if (_isInit) {
                 throw new Error('Fl32_Cms_Back_Config has already been initialized.');
             }
+            // configure deps
+            cfgTmpl.init({engine: tmplEngine});
 
+            // configure itself
             _allowedLocales = cast.array(allowedLocales, cast.string);
             _defaultLocale = cast.string(defaultLocale);
             _localeInUrl = cast.bool(localeInUrl);
