@@ -16,6 +16,7 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
      * @param {Fl32_Tmpl_Back_Config} cfgTmpl
      * @param {Fl32_Tmpl_Back_Service_Render} servTmplRender
      * @param {Fl32_Cms_Back_Helper_Cast} cast
+     * @param {Fl32_Cms_Back_Api_Adapter} adapter
      * @param {typeof Fl32_Web_Back_Enum_Stage} STAGE
      */
     constructor(
@@ -31,6 +32,7 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
             Fl32_Tmpl_Back_Config$: cfgTmpl,
             Fl32_Tmpl_Back_Service_Render$: servTmplRender,
             Fl32_Cms_Back_Helper_Cast$: cast,
+            Fl32_Cms_Back_Api_Adapter$: adapter,
             Fl32_Web_Back_Enum_Stage$: STAGE,
         }
     ) {
@@ -126,10 +128,14 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
                     cleanPath = parsed.cleanPath;
                 }
 
+                // TODO: need to locate a template in the filesystem
+                const {data, options} = await adapter.getRenderData({req});
                 const {resultCode, content} = await servTmplRender.perform({
                     type: 'web',
                     name: cleanPath,
                     locales: {user: locale, app: _defaultLocale},
+                    data,
+                    options,
                 });
 
                 if (content) {
