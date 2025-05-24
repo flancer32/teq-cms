@@ -37,7 +37,7 @@ export default class Fl32_Cms_Back_Config {
 
         /**
          * Initialize CMS localization and rendering settings.
-         * Call once during startup to configure locales, fallback, root path and template engine.
+         * Call once during startup to configure locales, fallback, root path, and template engine.
          *
          * @param {object} config
          * @param {string[]} config.allowedLocales
