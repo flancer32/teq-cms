@@ -1,6 +1,5 @@
 /**
- * CMS template handler for web requests.
- * @implements Fl32_Web_Back_Api_Handler
+ * CMS template handler for web requests implementing Fl32_Web_Back_Api_Handler.
  */
 export default class Fl32_Cms_Back_Web_Handler_Template {
     /* eslint-disable jsdoc/require-param-description,jsdoc/check-param-names */
@@ -13,9 +12,8 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
      * @param {Fl32_Web_Back_Helper_Respond} respond
      * @param {Fl32_Web_Back_Dto_Handler_Info} dtoInfo
      * @param {Fl32_Tmpl_Back_Act_File_Find} actTmplFind
-     * @param {Fl32_Tmpl_Back_Config} cfgTmpl
+     * @param {Fl32_Tmpl_Back_Service_Load} servTmplLoad
      * @param {Fl32_Tmpl_Back_Service_Render} servTmplRender
-     * @param {Fl32_Cms_Back_Helper_Cast} cast
      * @param {Fl32_Cms_Back_Api_Adapter} adapter
      * @param {typeof Fl32_Web_Back_Enum_Stage} STAGE
      */
@@ -29,9 +27,8 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
             Fl32_Web_Back_Helper_Respond$: respond,
             Fl32_Web_Back_Dto_Handler_Info$: dtoInfo,
             Fl32_Tmpl_Back_Act_File_Find$: actTmplFind,
-            Fl32_Tmpl_Back_Config$: cfgTmpl,
+            Fl32_Tmpl_Back_Service_Load$: servTmplLoad,
             Fl32_Tmpl_Back_Service_Render$: servTmplRender,
-            Fl32_Cms_Back_Helper_Cast$: cast,
             Fl32_Cms_Back_Api_Adapter$: adapter,
             Fl32_Web_Back_Enum_Stage$: STAGE,
         }
@@ -49,7 +46,6 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
         } = H2;
 
         /**
-         * Handler registration info.
          * @type {Fl32_Web_Back_Dto_Handler_Info.Dto}
          */
         const _info = dtoInfo.create();
@@ -58,34 +54,33 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
         _info.before = ['Fl32_Web_Back_Handler_Static'];
         Object.freeze(_info);
 
-        /** @type {string[]} Supported locale codes. */
+        /** @type {string[]} */
         let _allowedLocales;
 
-        /** @type {string} Fallback locale. */
+        /** @type {string} */
         let _defaultLocale;
 
-        /** @type {boolean} Initialization flag. */
+        /** @type {boolean} */
         let _isInit = false;
 
-        /** @type {boolean} Whether URL contains locale segment. */
+        /** @type {boolean} */
         let _localeInUrl;
 
-        /** @type {string} Application root directory path. */
+        /** @type {string} */
         let _rootPath;
 
         /**
-         * Default filenames for directory requests.
-         * @type {string[]}
+         * @type {string}
          */
-        const _defaultFiles = ['index.html', 'index.htm', 'index.txt'];
+        const _INDEX = 'index.html';
 
         // FUNCS
 
         /**
          * Extracts locale from URL path if valid.
-         * @param {string} urlPath - Decoded URL path.
-         * @param {string[]} allowedLocales - Supported locales.
-         * @param {string} defaultLocale - Fallback locale.
+         * @param {string} urlPath
+         * @param {string[]} allowedLocales
+         * @param {string} defaultLocale
          * @returns {{ locale: string, cleanPath: string }}
          */
         function extractLocaleFromUrl(urlPath, allowedLocales = [], defaultLocale) {
@@ -106,46 +101,47 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
             }
         }
 
+        function extractTemplatePath(cleanPath) {
+            let norm = cleanPath.replace(/^\/+|\/+$/g, '');
+            if (norm === '') {
+                return _INDEX;
+            }
+            if (cleanPath.endsWith('/')) {
+                return `${norm}/${_INDEX}`;
+            }
+            return norm;
+        }
+
         // MAIN
 
         /**
          * Handles request by serving template content.
          * @param {module:http.IncomingMessage|module:http2.Http2ServerRequest} req
          * @param {module:http.ServerResponse|module:http2.Http2ServerResponse} res
-         * @returns {Promise<boolean>} True if handled successfully.
+         * @returns {Promise<boolean>}
          */
         this.handle = async function (req, res) {
             if (!respond.isWritable(res)) return false;
 
             try {
-                const urlPath = decodeURIComponent(req.url.split('?')[0]);
-                let locale = _defaultLocale;
-                let cleanPath = urlPath;
+                const {target, data, options} = await adapter.getRenderData({req});
 
-                if (_localeInUrl) {
-                    const parsed = extractLocaleFromUrl(urlPath, _allowedLocales, _defaultLocale);
-                    locale = parsed.locale;
-                    cleanPath = parsed.cleanPath;
-                }
-
-                // TODO: need to locate a template in the filesystem
-                const {data, options} = await adapter.getRenderData({req});
-                const {resultCode, content} = await servTmplRender.perform({
-                    type: 'web',
-                    name: cleanPath,
-                    locales: {user: locale, app: _defaultLocale},
-                    data,
-                    options,
-                });
-
-                if (content) {
-                    const bodyBuffer = Buffer.from(content, 'utf-8');
-                    const headers = {
-                        [HTTP2_HEADER_CONTENT_ENCODING]: 'utf-8',
-                        [HTTP2_HEADER_CONTENT_LENGTH]: bodyBuffer.length,
-                    };
-                    respond.code200_Ok({res, headers, body: content});
-                    return true;
+                const {resultCode, template} = await servTmplLoad.perform({target});
+                if (template) {
+                    const {resultCode, content} = await servTmplRender.perform({
+                        template,
+                        data,
+                        options,
+                    });
+                    if (content) {
+                        const bodyBuffer = Buffer.from(content, 'utf-8');
+                        const headers = {
+                            [HTTP2_HEADER_CONTENT_ENCODING]: 'utf-8',
+                            [HTTP2_HEADER_CONTENT_LENGTH]: bodyBuffer.length,
+                        };
+                        respond.code200_Ok({res, headers, body: content});
+                        return true;
+                    }
                 } else {
                     return false;
                 }
@@ -156,36 +152,6 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
         };
 
         /**
-         * Initializes handler with configuration.
-         * @param {object} args - Configuration.
-         * @param {string[]} args.allowedLocales - Supported locales.
-         * @param {string} args.defaultLocale - Fallback locale.
-         * @param {boolean} args.localeInUrl - Whether URL contains locale.
-         * @param {string} args.rootPath - Application root path.
-         * @param {string} args.tmplEngine - Template engine for rendering (mustache|nunjucks).
-         * @throws {Error} If already initialized.
-         * @returns {Promise<void>}
-         */
-        this.init = async function ({allowedLocales, defaultLocale, localeInUrl, rootPath, tmplEngine}) {
-            if (_isInit) {
-                throw new Error('Fl32_Cms_Back_Config has already been initialized.');
-            }
-            // configure deps
-            cfgTmpl.init({engine: tmplEngine});
-
-            // configure itself
-            _allowedLocales = cast.array(allowedLocales, cast.string);
-            _defaultLocale = cast.string(defaultLocale);
-            _localeInUrl = cast.bool(localeInUrl);
-            _rootPath = path.resolve(cast.string(rootPath));
-            actTmplFind.init({root: _rootPath});
-
-            _isInit = true;
-            logger.info(`CMS files root: ${path.join(_rootPath, 'tmpl')}`);
-        };
-
-        /**
-         * Returns handler registration info.
          * @returns {Fl32_Web_Back_Dto_Handler_Info.Dto}
          */
         this.getRegistrationInfo = () => _info;

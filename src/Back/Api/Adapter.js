@@ -21,12 +21,17 @@ export default class Fl32_Cms_Back_Api_Adapter {
      *
      * @param {object} args - Parameters object.
      * @param {import('node:http').IncomingMessage | import('node:http2').Http2ServerRequest} args.req - The HTTP(S) request object.
-     * @returns {Promise<{data: object, options: object}>} - Data to be passed to the template engine.
-     *   - `data`: object with variables used in the template.
-     *   - `options`: rendering options (e.g., template name, layout name, localization settings).
+     * @returns {Promise<Fl32_Cms_Back_Api_Adapter.RenderData>} Rendering context for the template engine.
      * @throws {Error} If the method is not implemented by the application.
      */
     async getRenderData({req}) {
         throw new Error('Method not implemented');
     }
 }
+
+/**
+ * @typedef {object} Fl32_Cms_Back_Api_Adapter.RenderData
+ * @property {object} data - Variables used in the template (e.g., page metadata, content blocks, user info).
+ * @property {object} options - Template engine options (e.g., layout, partials, flags).
+ * @property {Fl32_Tmpl_Back_Dto_Target.Dto} target - Render target metadata including template path, type, and localization context.
+ */
