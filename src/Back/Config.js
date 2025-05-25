@@ -57,6 +57,8 @@ export default class Fl32_Cms_Back_Config {
 
             // configure the deps
             configTmpl.init({
+                allowedLocales,
+                defaultLocale,
                 engine: tmplEngine,
                 rootPath: _rootPath,
             });

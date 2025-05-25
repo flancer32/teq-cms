@@ -63,6 +63,7 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
                     }
 
                     const {resultCode, content} = await servTmplRender.perform({
+                        target,
                         template,
                         data,
                         options,
