@@ -46,6 +46,9 @@
     "eslint-plugin-jsdoc": "^50.6.8",
     "mocha": "^11.3.0"
   },
+  "overrides": {
+    "whatwg-url": "13.0.0"
+  },
   "engines": {
     "node": ">=22"
   },

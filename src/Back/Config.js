@@ -1,14 +1,13 @@
 /**
- * CMS localization and rendering configuration service.
- *
- * Holds global settings for locales, fallback locale, template engine, and application root path.
- * Must be initialized once during bootstrap.
+ * CMS localization, rendering, and AI API configuration service.
+ * Holds global settings for locales, template engine, and OpenAI-compatible API parameters.
+ * Must be initialized once during application bootstrap.
  */
 export default class Fl32_Cms_Back_Config {
     /* eslint-disable jsdoc/require-param-description,jsdoc/check-param-names */
     /**
-     * @param {Fl32_Cms_Back_Helper_Cast} cast
-     * @param {Fl32_Tmpl_Back_Config} configTmpl
+     * @param {Fl32_Cms_Back_Helper_Cast} cast - Type casting helper
+     * @param {Fl32_Tmpl_Back_Config} configTmpl - Template engine configuration
      */
     constructor(
         {
@@ -16,49 +15,120 @@ export default class Fl32_Cms_Back_Config {
             Fl32_Tmpl_Back_Config$: configTmpl,
         }
     ) {
-        /* eslint-enable jsdoc/require-param-description,jsdoc/check-param-names */
+        /* eslint-enable jsdoc/check-param-names */
 
         // VARS
 
-        /** @type {string[]} Supported locale codes. */
-        let _allowedLocales;
+        /**
+         * Base URL of the OpenAI-compatible API.
+         * Example: https://api.openai.com/v1 or https://api.deepseek.com/v1
+         * @type {string}
+         */
+        let _aiApiBaseUrl;
 
-        /** @type {string} Fallback locale when no valid user locale found. */
-        let _defaultLocale;
+        /**
+         * API key for OpenAI-compatible provider.
+         * Should be kept secret and provided via environment variables.
+         * @type {string}
+         */
+        let _aiApiKey;
 
-        /** @type {boolean} True if config initialized. */
+        /**
+         * Name of the AI model to use.
+         * Example: gpt-4, gpt-4o, deepseek-chat
+         * @type {string}
+         */
+        let _aiApiModel;
+
+        /**
+         * Optional organization ID (used by OpenAI).
+         * Can be null for other providers.
+         * @type {string|null}
+         */
+        let _aiApiOrg;
+
+        /**
+         * Indicates whether the configuration has already been initialized.
+         * Prevents reinitialization.
+         * @type {boolean}
+         */
         let _isInit = false;
 
-        /** @type {string} Absolute path to application root. */
+        /**
+         * Supported locale codes.
+         * Example: ['en', 'ru']
+         * @type {string[]}
+         */
+        let _localeAllowed;
+
+        /**
+         * Base locale for internal translation workflows.
+         * Used as a source language for AI localization.
+         * @type {string}
+         */
+        let _localeBaseTranslate;
+
+        /**
+         * Base locale for rendering static web content.
+         * Example: 'en' or 'ru'
+         * @type {string}
+         */
+        let _localeBaseWeb;
+
+        /**
+         * Absolute path to the application root directory.
+         * Used as a base for resolving content and template paths.
+         * @type {string}
+         */
         let _rootPath;
 
 
         // MAIN
 
         /**
-         * Initialize CMS localization and rendering settings.
-         * Call once during startup to configure locales, fallback, root path, and template engine.
+         * Initialize CMS localization, rendering, and AI API settings.
          *
-         * @param {object} config
-         * @param {string[]} config.allowedLocales
-         * @param {string} config.defaultLocale
-         * @param {string} config.rootPath
-         * @param {string} config.tmplEngine
+         * @param {object} args - Configuration arguments
+         * @param {string} args.aiApiBaseUrl - API base URL
+         * @param {string} args.aiApiKey - Secret API key
+         * @param {string} args.aiApiModel - Model name
+         * @param {string} [args.aiApiOrg] - Optional organization ID
+         * @param {string[]} args.localeAllowed - Supported locale codes
+         * @param {string} args.localeBaseTranslate - Source locale for translation
+         * @param {string} args.localeBaseWeb - Default locale for rendering
+         * @param {string} args.rootPath - Application root directory
+         * @param {string} args.tmplEngine - Template engine name
          * @throws {Error} If initialized more than once
          */
-        this.init = function ({allowedLocales, defaultLocale, rootPath, tmplEngine} = {}) {
+        this.init = function (args) {
             if (_isInit) {
                 throw new Error('Fl32_Cms_Back_Config has already been initialized.');
             }
 
-            _allowedLocales = cast.array(allowedLocales, cast.string);
-            _defaultLocale = cast.string(defaultLocale);
+            const {
+                aiApiBaseUrl,
+                aiApiKey,
+                aiApiModel,
+                aiApiOrg,
+                localeAllowed,
+                localeBaseTranslate,
+                localeBaseWeb,
+                rootPath,
+                tmplEngine,
+            } = args;
+
+            _aiApiBaseUrl = cast.string(aiApiBaseUrl);
+            _aiApiKey = cast.string(aiApiKey);
+            _aiApiModel = cast.string(aiApiModel);
+            _aiApiOrg = aiApiOrg ? cast.string(aiApiOrg) : null;
+            _localeAllowed = cast.array(localeAllowed, cast.string);
+            _localeBaseTranslate = cast.string(localeBaseTranslate);
+            _localeBaseWeb = cast.string(localeBaseWeb);
             _rootPath = cast.string(rootPath);
 
-            // configure the deps
             configTmpl.init({
-                allowedLocales,
-                defaultLocale,
+                allowedLocales: _localeAllowed,
+                defaultLocale: _localeBaseWeb,
                 engine: tmplEngine,
                 rootPath: _rootPath,
             });
@@ -66,20 +136,47 @@ export default class Fl32_Cms_Back_Config {
             _isInit = true;
         };
 
-        /**
-         * @returns {string[]} Supported locales
-         */
-        this.getAllowedLocales = () => _allowedLocales;
+
+        // GETTERS
 
         /**
-         * @returns {string} Fallback locale
+         * @returns {string} API base URL
          */
-        this.getDefaultLocale = () => _defaultLocale;
+        this.getAiApiBaseUrl = () => _aiApiBaseUrl;
 
         /**
-         * @returns {string} Application root path
+         * @returns {string} Secret API key
+         */
+        this.getAiApiKey = () => _aiApiKey;
+
+        /**
+         * @returns {string} AI model name
+         */
+        this.getAiApiModel = () => _aiApiModel;
+
+        /**
+         * @returns {string|null} Optional organization ID
+         */
+        this.getAiApiOrg = () => _aiApiOrg;
+
+        /**
+         * @returns {string[]} Supported locale codes
+         */
+        this.getLocaleAllowed = () => _localeAllowed;
+
+        /**
+         * @returns {string} Default locale for translation.
+         */
+        this.getLocaleBaseTranslate = () => _localeBaseTranslate;
+
+        /**
+         * @returns {string} Default locale for rendering
+         */
+        this.getLocaleBaseWeb = () => _localeBaseWeb;
+
+        /**
+         * @returns {string} Absolute application root path
          */
         this.getRootPath = () => _rootPath;
-
     }
 }

@@ -1,5 +1,6 @@
 /**
  * CMS template handler for web requests implementing Fl32_Web_Back_Api_Handler.
+ * @implements Fl32_Web_Back_Api_Handler
  */
 export default class Fl32_Cms_Back_Web_Handler_Template {
     /* eslint-disable jsdoc/require-param-description,jsdoc/check-param-names */
@@ -52,10 +53,10 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
                 const {resultCode, template} = await servTmplLoad.perform({target});
                 if (template) {
                     const url = req.url || '';
-                    const hasLocale = config.getAllowedLocales().some(loc => url === `/${loc}` || url.startsWith(`/${loc}/`));
+                    const hasLocale = config.getLocaleAllowed().some(loc => url === `/${loc}` || url.startsWith(`/${loc}/`));
 
                     if (!hasLocale) {
-                        const loc = target.locales.user ?? config.getDefaultLocale();
+                        const loc = target.locales.user ?? config.getLocaleBaseWeb();
                         const newLoc = url.startsWith('/') ? `/${loc}${url}` : `/${loc}/${url}`;
                         res.writeHead(HTTP_STATUS_FOUND, {location: newLoc});
                         res.end();

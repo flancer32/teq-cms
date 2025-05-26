@@ -41,14 +41,14 @@ export default class Fl32_Cms_Back_Helper_Web {
          * @returns {string}
          */
         function resolveFromAcceptLanguage(header) {
-            const allowed = config.getAllowedLocales();
+            const allowed = config.getLocaleAllowed();
             const accepted = parseAcceptLanguage(header);
             for (const lang of accepted) {
                 if (allowed.includes(lang)) return lang;
                 const short = lang.split('-')[0];
                 if (allowed.includes(short)) return short;
             }
-            return config.getDefaultLocale;
+            return config.getLocaleBaseWeb;
         }
 
         /**
@@ -59,7 +59,7 @@ export default class Fl32_Cms_Back_Helper_Web {
         function extractFromUrlPath(path) {
             const trimmed = path.replace(/^\/+|\/+$/g, '');
             const first = trimmed.split('/')[0];
-            if (config.getAllowedLocales().includes(first)) return first;
+            if (config.getLocaleAllowed().includes(first)) return first;
             return null;
         }
 

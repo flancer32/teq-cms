@@ -1,17 +1,42 @@
 #!/usr/bin/env node
 'use strict';
+import dotenv from 'dotenv';
 import {dirname, join} from 'node:path';
+import {existsSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import Container from '@teqfw/di';
 
 // VARS
 /* Resolve a path to the root folder. */
-const url = new URL(import.meta.url);
-const script = fileURLToPath(url);
-const root = dirname(script);
-const node = join(root, 'node_modules');
+const root = findProjectRoot();
+dotenv.config({path: join(root, '.env')});
+
+// FUNCS
+/**
+ * Find the nearest folder containing node_modules.
+ * @returns {string|undefined}
+ */
+function findProjectRoot() {
+    let dir = dirname(fileURLToPath(import.meta.url));
+    while (dir !== dirname(dir)) {
+        if (existsSync(join(dir, 'node_modules'))) return dir;
+        dir = dirname(dir);
+    }
+}
 
 // MAIN
-// Create a new instance of the container
-const container = new Container();
-debugger
+if (root) {
+    const node = join(root, 'node_modules');
+    // Create a new instance of the container
+    const container = new Container();
+    // Get the resolver from the container
+    const resolver = container.getResolver();
+    // set up the namespaces for the deps
+    resolver.addNamespaceRoot('Fl32_Cms_', join(node, '@flancer32', 'teq-cms', 'src'));
+    resolver.addNamespaceRoot('Fl32_Tmpl_', join(node, '@flancer32', 'teq-tmpl', 'src'));
+    /** @type {Fl32_Cms_Back_Cli_Command} */
+    const command = await container.get('Fl32_Cms_Back_Cli_Command$');
+    await command.run(root, process.argv);
+} else {
+    console.error('Could not find the `./node_modules/` folder in the project root. Please install the application dependencies.');
+}
