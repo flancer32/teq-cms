@@ -106,5 +106,6 @@ export default class Fl32_Cms_Back_Store_Db_Translate {
             await fs.writeFile(FILE, json, 'utf-8');
             logger.info(`Saved translations DB: ${FILE}`);
         };
+
     }
 }
