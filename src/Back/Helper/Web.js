@@ -48,7 +48,7 @@ export default class Fl32_Cms_Back_Helper_Web {
                 const short = lang.split('-')[0];
                 if (allowed.includes(short)) return short;
             }
-            return config.getLocaleBaseWeb;
+            return config.getLocaleBaseWeb();
         }
 
         /**
