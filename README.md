@@ -18,7 +18,7 @@ Pages are rendered on request using locale-specific templates from the server fi
 
 ## Requirements
 
-- Node.js >= 22
+- Node.js >= 20
 - Tequila Framework (`teqfw`)
 - Plugins: `@flancer32/teq-web`, `@flancer32/teq-tmpl`
 
