@@ -43,7 +43,9 @@
     "@eslint/js": "^9.25.0",
     "eslint": "^9.25.0",
     "eslint-plugin-jsdoc": "^50.6.8",
-    "mocha": "^11.3.0"
+    "mocha": "^11.3.0",
+    "dotenv": "^16.4.5",
+    "nunjucks": "^3.2.4"
   },
   "overrides": {
     "whatwg-url": "13.0.0"
