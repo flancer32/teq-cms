@@ -70,13 +70,13 @@ export default class Fl32_Cms_Back_Di_Adapter {
                 });
 
                 data = {
-                    client: {
-                        ip: req.socket?.remoteAddress || '',
-                        ua: req.headers['user-agent'] || '',
-                        lang: req.headers['accept-language'] || '',
-                    },
+                    ip: req.socket?.remoteAddress || '',
+                    ua: req.headers['user-agent'] || '',
+                    lang: req.headers['accept-language'] || '',
                     locale,
-                    localeAllowed,
+                    lang1: localeAllowed[0] || '',
+                    lang2: localeAllowed[1] || '',
+                    lang3: localeAllowed[2] || '',
                 };
 
                 options = {};
