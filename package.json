@@ -35,7 +35,7 @@
     "teq-cms": "./bin/teq-cms.js"
   },
   "dependencies": {
-    "@flancer32/teq-tmpl": "^0.1.0",
+    "@flancer32/teq-tmpl": "^0.2.0",
     "@flancer32/teq-web": "^0.1.0",
     "openai": "^4.103.0"
   },

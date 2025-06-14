@@ -8,7 +8,7 @@
  *
  * The plugin interacts with this interface only, without knowledge of the implementation.
  *
- * @interface Fl32_Cms_Back_Api_Adapter
+ * @interface
  */
 export default class Fl32_Cms_Back_Api_Adapter {
     /* eslint-disable no-unused-vars */
