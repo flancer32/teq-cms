@@ -1,6 +1,23 @@
-{% extends "layout.html" %}
-{% block content %}
-<h1>Acerca de</h1>
-<p>Página de demostración en español.</p>
-<p><a href="/es/">Inicio</a></p>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="{{ locale }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acerca - TeqCMS Demo</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="icon" href="/favicon.ico">
+</head>
+<body>
+<header>
+  <nav>
+    <a href="/{{ locale }}/">Inicio</a>
+    <a href="/{{ locale }}/about.html">Acerca</a>
+  </nav>
+</header>
+<main>
+  <h1>Acerca de</h1>
+  <p>Página de demostración de TeqCMS.</p>
+  <p>Idiomas disponibles: {{ localeAllowed }}</p>
+</main>
+</body>
+</html>

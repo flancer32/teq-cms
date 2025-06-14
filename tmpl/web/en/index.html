@@ -1,6 +1,24 @@
-{% extends "layout.html" %}
-{% block content %}
-<h1>Welcome</h1>
-<p>This is the English homepage.</p>
-<p><a href="/en/about.html">About</a> | <a href="/raw.html">Raw HTML</a></p>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="{{ locale }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TeqCMS Demo</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="icon" href="/favicon.ico">
+</head>
+<body>
+<header>
+  <nav>
+    <a href="/{{ locale }}/">Home</a>
+    <a href="/{{ locale }}/about.html">About</a>
+  </nav>
+</header>
+<main>
+  <h1>Welcome</h1>
+  <p>Your locale: {{ locale }}</p>
+  <p>Your IP: {{ client.ip }}</p>
+  <p>Your browser: {{ client.ua }}</p>
+</main>
+</body>
+</html>

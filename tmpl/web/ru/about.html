@@ -1,6 +1,23 @@
-{% extends "layout.html" %}
-{% block content %}
-<h1>О проекте</h1>
-<p>Демонстрационная страница на русском.</p>
-<p><a href="/ru/">Главная</a></p>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="{{ locale }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>О проекте - TeqCMS Demo</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="icon" href="/favicon.ico">
+</head>
+<body>
+<header>
+  <nav>
+    <a href="/{{ locale }}/">Главная</a>
+    <a href="/{{ locale }}/about.html">О нас</a>
+  </nav>
+</header>
+<main>
+  <h1>О проекте</h1>
+  <p>Демонстрационная страница TeqCMS.</p>
+  <p>Доступные языки: {{ localeAllowed }}</p>
+</main>
+</body>
+</html>
