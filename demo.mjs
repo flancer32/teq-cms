@@ -14,6 +14,8 @@ import Replace from '@teqfw/di/src/Pre/Replace.js';
 // Paths
 const root = dirname(fileURLToPath(import.meta.url));
 const node = join(root, 'node_modules');
+const rootCms = process.env.TEQ_CMS_ROOT || root;
+const rootWeb = join(rootCms, 'web');
 
 // Create and configure the DI container
 const container = new Container();
@@ -43,7 +45,7 @@ config.init(
         localeAllowed: process.env.TEQ_CMS_LOCALE_ALLOWED?.split(',') || ['en', 'es', 'ru'],
         localeBaseTranslate: process.env.TEQ_CMS_LOCALE_BASE_TRANSLATE || 'ru',
         localeBaseWeb: process.env.TEQ_CMS_LOCALE_BASE_DISPLAY || 'en',
-        rootPath: root,
+        rootPath: rootCms,
         tmplEngine: process.env.TEQ_CMS_TMPL_ENGINE,
     }
 );
@@ -58,7 +60,7 @@ const handStatic = await container.get('Fl32_Web_Back_Handler_Static$');
 /** @type {Fl32_Cms_Back_Web_Handler_Template} */
 const handTmpl = await container.get('Fl32_Cms_Back_Web_Handler_Template$');
 
-await handStatic.init({rootPath: join(root, 'web')});
+await handStatic.init({rootPath: rootWeb});
 
 dispatcher.addHandler(handLog);
 dispatcher.addHandler(handStatic);
