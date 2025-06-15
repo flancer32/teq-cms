@@ -10,6 +10,7 @@ import Container from '@teqfw/di';
 /* Resolve a path to the root folder. */
 const root = findProjectRoot();
 dotenv.config({path: join(root, '.env')});
+const rootCms = process.env.TEQ_CMS_TMPL_ROOT || root;
 
 // FUNCS
 /**
@@ -36,7 +37,7 @@ if (root) {
     resolver.addNamespaceRoot('Fl32_Tmpl_', join(node, '@flancer32', 'teq-tmpl', 'src'));
     /** @type {Fl32_Cms_Back_Cli_Command} */
     const command = await container.get('Fl32_Cms_Back_Cli_Command$');
-    await command.run(root, process.argv);
+    await command.run(rootCms, process.argv);
 } else {
     console.error('Could not find the `./node_modules/` folder in the project root. Please install the application dependencies.');
 }
