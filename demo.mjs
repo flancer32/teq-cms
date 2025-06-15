@@ -14,8 +14,8 @@ import Replace from '@teqfw/di/src/Pre/Replace.js';
 // Paths
 const root = dirname(fileURLToPath(import.meta.url));
 const node = join(root, 'node_modules');
-const rootCms = process.env.TEQ_CMS_TMPL_ROOT || root;
-const rootWeb = process.env.TEQ_CMS_WEB_ROOT || join(root, 'web');
+const rootCms = process.env.TEQ_CMS_ROOT || root;
+const rootWeb = join(rootCms, 'web');
 
 // Create and configure the DI container
 const container = new Container();

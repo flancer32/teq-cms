@@ -10,7 +10,7 @@ import Container from '@teqfw/di';
 /* Resolve a path to the root folder. */
 const root = findProjectRoot();
 dotenv.config({path: join(root, '.env')});
-const rootCms = process.env.TEQ_CMS_TMPL_ROOT || root;
+const rootCms = process.env.TEQ_CMS_ROOT || root;
 
 // FUNCS
 /**
