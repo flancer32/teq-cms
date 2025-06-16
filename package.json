@@ -29,13 +29,13 @@
   },
   "scripts": {
     "eslint": "./node_modules/.bin/eslint ./src/",
-    "test:unit": "./node_modules/.bin/_mocha './test/unit/**/*.test.mjs' --recursive"
+    "test": "node --test $(find ./test/unit -name '*.test.mjs')"
   },
   "bin": {
     "teq-cms": "./bin/teq-cms.js"
   },
   "dependencies": {
-    "@flancer32/teq-tmpl": "^0.2.0",
+    "@flancer32/teq-tmpl": "^0.2.1",
     "@flancer32/teq-web": "^0.1.0",
     "openai": "^4.103.0"
   },

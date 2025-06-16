@@ -4,17 +4,13 @@
 export default class Fl32_Cms_Back_Cli_Command {
     /* eslint-disable jsdoc/require-param-description,jsdoc/check-param-names */
     /**
-     * @param {Fl32_Cms_Back_Logger} logger
      * @param {Fl32_Cms_Back_Config} config
-     * @param {Fl32_Cms_Back_Gate_OpenAI} gateOpenAI
      * @param {Fl32_Cms_Back_Cli_Command_Translate} cmdTranslate
      * @param {Fl32_Cms_Back_Cli_Command_Web} cmdWeb
      */
     constructor(
         {
-            Fl32_Cms_Back_Logger$: logger,
             Fl32_Cms_Back_Config$: config,
-            Fl32_Cms_Back_Gate_OpenAI$: gateOpenAI,
             Fl32_Cms_Back_Cli_Command_Translate$: cmdTranslate,
             Fl32_Cms_Back_Cli_Command_Web$: cmdWeb,
         }
@@ -30,9 +26,9 @@ export default class Fl32_Cms_Back_Cli_Command {
                 aiApiKey: process.env.TEQ_CMS_AI_API_KEY,
                 aiApiModel: process.env.TEQ_CMS_AI_API_MODEL,
                 aiApiOrg: process.env.TEQ_CMS_AI_API_ORG,
-                localeAllowed: process.env.TEQ_CMS_LOCALE_ALLOWED.split(','),
-                localeBaseTranslate: process.env.TEQ_CMS_LOCALE_BASE_TRANSLATE,
-                localeBaseWeb: process.env.TEQ_CMS_LOCALE_BASE_DISPLAY,
+                localeAllowed: process.env.TEQ_CMS_LOCALE_ALLOWED?.split(',') || ['en', 'es', 'ru'],
+                localeBaseTranslate: process.env.TEQ_CMS_LOCALE_BASE_TRANSLATE || 'ru',
+                localeBaseWeb: process.env.TEQ_CMS_LOCALE_BASE_DISPLAY || 'en',
                 rootPath: root,
                 tmplEngine: process.env.TEQ_CMS_TMPL_ENGINE,
             });
