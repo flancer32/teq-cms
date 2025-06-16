@@ -20,6 +20,8 @@ export default class Fl32_Cms_Back_Di_Adapter {
         {
             Fl32_Cms_Back_Config$: config,
             Fl32_Tmpl_Back_Dto_Target$: dtoTmplTarget,
+            'node:fs': fs,
+            'node:path': path,
         }
     ) {
         // FUNCS
@@ -42,11 +44,39 @@ export default class Fl32_Cms_Back_Di_Adapter {
             }
         }
 
-        function buildTemplatePath(cleanPath) {
+        const {promises, constants} = fs;
+        const {access} = promises;
+        const {join, extname} = path;
+
+        async function resolveTemplateName(baseDir, cleanPath) {
             const trimmed = cleanPath.replace(/^\/+|\/+$/g, '');
-            if (trimmed === '') return 'index.html';
-            if (cleanPath.endsWith('/')) return `${trimmed}/index.html`;
-            return trimmed;
+            const ext = extname(trimmed);
+
+            if (ext && ext !== '.html') return trimmed;
+
+            if (ext === '.html') {
+                try {
+                    await access(join(baseDir, trimmed), constants.R_OK);
+                    return trimmed;
+                } catch {
+                    return undefined;
+                }
+            }
+
+            const first = trimmed ? join(trimmed, 'index.html') : 'index.html';
+            const second = trimmed ? `${trimmed}.html` : 'index.html';
+
+            try {
+                await access(join(baseDir, first), constants.R_OK);
+                return first;
+            } catch {}
+
+            try {
+                await access(join(baseDir, second), constants.R_OK);
+                return second;
+            } catch {}
+
+            return undefined;
         }
 
         // MAIN
@@ -58,7 +88,10 @@ export default class Fl32_Cms_Back_Di_Adapter {
                 const localeBaseWeb = config.getLocaleBaseWeb();
                 const rawPath = decodeURIComponent(req.url?.split('?')[0] || '');
                 const {cleanPath, locale} = extractLocaleFromUrl(rawPath, localeAllowed, localeBaseWeb);
-                const tmplPath = buildTemplatePath(cleanPath);
+                const root = config.getRootPath();
+                const baseDir = join(root, 'tmpl', 'web', localeBaseWeb);
+                const tmplPath = await resolveTemplateName(baseDir, cleanPath);
+                if (!tmplPath) throw new Error('no tmpl');
 
                 target = dtoTmplTarget.create({
                     type: 'web',
