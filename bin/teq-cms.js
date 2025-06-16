@@ -5,6 +5,7 @@ import {dirname, join} from 'node:path';
 import {existsSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import Container from '@teqfw/di';
+import Replace from '@teqfw/di/src/Pre/Replace.js';
 
 // VARS
 /* Resolve a path to the root folder. */
@@ -35,6 +36,12 @@ if (root) {
     // set up the namespaces for the deps
     resolver.addNamespaceRoot('Fl32_Cms_', join(node, '@flancer32', 'teq-cms', 'src'));
     resolver.addNamespaceRoot('Fl32_Tmpl_', join(node, '@flancer32', 'teq-tmpl', 'src'));
+    resolver.addNamespaceRoot('Fl32_Web_', join(node, '@flancer32', 'teq-web', 'src'));
+
+    const replace = new Replace();
+    replace.add('Fl32_Cms_Back_Api_Adapter', 'Fl32_Cms_Back_Di_Adapter');
+    replace.add('Fl32_Tmpl_Back_Api_Adapter', 'Fl32_Tmpl_Back_Di_Adapter');
+    container.getPreProcessor().addChunk(replace);
     /** @type {Fl32_Cms_Back_Cli_Command} */
     const command = await container.get('Fl32_Cms_Back_Cli_Command$');
     await command.run(rootCms, process.argv);
