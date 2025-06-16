@@ -8,6 +8,7 @@ export default class Fl32_Cms_Back_Cli_Command {
      * @param {Fl32_Cms_Back_Config} config
      * @param {Fl32_Cms_Back_Gate_OpenAI} gateOpenAI
      * @param {Fl32_Cms_Back_Cli_Command_Translate} cmdTranslate
+     * @param {Fl32_Cms_Back_Cli_Command_Web} cmdWeb
      */
     constructor(
         {
@@ -15,6 +16,7 @@ export default class Fl32_Cms_Back_Cli_Command {
             Fl32_Cms_Back_Config$: config,
             Fl32_Cms_Back_Gate_OpenAI$: gateOpenAI,
             Fl32_Cms_Back_Cli_Command_Translate$: cmdTranslate,
+            Fl32_Cms_Back_Cli_Command_Web$: cmdWeb,
         }
     ) {
         /* eslint-enable jsdoc/require-param-description,jsdoc/check-param-names */
@@ -40,6 +42,9 @@ export default class Fl32_Cms_Back_Cli_Command {
                 case CMD.TRANSLATE:
                     await cmdTranslate.exec();
                     break;
+                case CMD.WEB:
+                    await cmdWeb.exec();
+                    break;
                 default:
                     console.log('Unknown command:', cmd);
                     process.exit(1);
@@ -52,4 +57,5 @@ export default class Fl32_Cms_Back_Cli_Command {
 
 const CMD = {
     TRANSLATE: 'translate',
+    WEB: 'web',
 };
