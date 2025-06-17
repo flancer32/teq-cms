@@ -8,11 +8,13 @@ export default class Fl32_Cms_Back_Config {
     /**
      * @param {Fl32_Cms_Back_Helper_Cast} cast - Type casting helper
      * @param {Fl32_Tmpl_Back_Config} configTmpl - Template engine configuration
+     * @param {Fl32_Web_Back_Server_Config} serverConfigFactory
      */
     constructor(
         {
             Fl32_Cms_Back_Helper_Cast$: cast,
             Fl32_Tmpl_Back_Config$: configTmpl,
+            Fl32_Web_Back_Server_Config$: serverConfigFactory,
         }
     ) {
         /* eslint-enable jsdoc/check-param-names */
@@ -82,6 +84,12 @@ export default class Fl32_Cms_Back_Config {
          */
         let _rootPath;
 
+        /**
+         * DTO with web server configuration built from environment.
+         * @type {Fl32_Web_Back_Server_Config.Dto}
+         */
+        let _webConfigDto;
+
 
         // MAIN
 
@@ -133,6 +141,18 @@ export default class Fl32_Cms_Back_Config {
                 rootPath: _rootPath,
             });
 
+            const port = cast.int(process.env.TEQ_CMS_SERVER_PORT);
+            const type = cast.string(process.env.TEQ_CMS_SERVER_TYPE);
+            const cert = cast.string(process.env.TEQ_CMS_TLS_CERT);
+            const key = cast.string(process.env.TEQ_CMS_TLS_KEY);
+            const ca = cast.string(process.env.TEQ_CMS_TLS_CA);
+
+            _webConfigDto = serverConfigFactory.create({
+                port,
+                type,
+                tls: cert && key ? {cert, key, ca} : undefined,
+            });
+
             _isInit = true;
         };
 
@@ -178,5 +198,10 @@ export default class Fl32_Cms_Back_Config {
          * @returns {string} Absolute application root path
          */
         this.getRootPath = () => _rootPath;
+
+        /**
+         * @returns {Fl32_Web_Back_Server_Config.Dto}
+         */
+        this.getWebServerConfigDto = () => _webConfigDto;
     }
 }

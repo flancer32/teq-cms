@@ -10,7 +10,6 @@ export default class Fl32_Cms_Back_Cli_Command_Web {
      * @param {Fl32_Web_Back_Handler_Pre_Log} handLog
      * @param {Fl32_Web_Back_Handler_Static} handStatic
      * @param {Fl32_Cms_Back_Web_Handler_Template} handTmpl
-     * @param {Fl32_Web_Back_Server_Config} dtoConfigWeb
      * @param {Fl32_Web_Back_Server} server
      */
     constructor({
@@ -20,7 +19,6 @@ export default class Fl32_Cms_Back_Cli_Command_Web {
         Fl32_Web_Back_Handler_Pre_Log$: handLog,
         Fl32_Web_Back_Handler_Static$: handStatic,
         Fl32_Cms_Back_Web_Handler_Template$: handTmpl,
-        Fl32_Web_Back_Server_Config$: dtoConfigWeb,
         Fl32_Web_Back_Server$: server,
     }) {
         /* eslint-enable jsdoc/require-param-description,jsdoc/check-param-names */
@@ -34,10 +32,7 @@ export default class Fl32_Cms_Back_Cli_Command_Web {
             dispatcher.addHandler(handStatic);
             dispatcher.addHandler(handTmpl);
 
-            const cfg = dtoConfigWeb.create({
-                port: process.env.PORT,
-                type: 'http',
-            });
+            const cfg = config.getWebServerConfigDto();
             await server.start(cfg);
         };
     }
