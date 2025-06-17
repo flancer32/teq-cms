@@ -38,6 +38,7 @@ export default class Fl32_Cms_Back_Cli_Command {
                 tlsCa: process.env.TEQ_CMS_TLS_CA,
             });
 
+            // analyze arguments and run a command
             const cmd = argv[2];
             switch (cmd) {
                 case CMD.TRANSLATE:

@@ -34,7 +34,9 @@ if (root) {
     // Get the resolver from the container
     const resolver = container.getResolver();
     // set up the namespaces for the deps
-    resolver.addNamespaceRoot('Fl32_Cms_', join(root, 'src'));
+    const nodeCms = join(node, '@flancer32', 'teq-cms');
+    const pathCms = existsSync(join(nodeCms, 'src')) ? join(nodeCms, 'src') : join(root, 'src');
+    resolver.addNamespaceRoot('Fl32_Cms_', pathCms);
     resolver.addNamespaceRoot('Fl32_Tmpl_', join(node, '@flancer32', 'teq-tmpl', 'src'));
     resolver.addNamespaceRoot('Fl32_Web_', join(node, '@flancer32', 'teq-web', 'src'));
 
