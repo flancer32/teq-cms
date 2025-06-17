@@ -81,6 +81,37 @@ export default class Fl32_Cms_Back_Helper_File {
         };
 
         /**
+         * Resolves a template name relative to a base directory.
+         *
+         * @param {object} args
+         * @param {string} args.baseDir - Directory used as base for resolution
+         * @param {string} args.cleanPath - Clean path extracted from URL
+         * @returns {Promise<string|undefined>} Resolved template name or undefined
+         */
+        this.resolveTemplateName = async function ({baseDir, cleanPath}) {
+            const trimmed = (cleanPath ?? '').replace(/^\/+|\/+$/g, '');
+
+            try {
+                await access(join(baseDir, trimmed), constants.R_OK);
+                return trimmed;
+            } catch {}
+
+            const indexVariant = join(trimmed, 'index.html');
+            try {
+                await access(join(baseDir, indexVariant), constants.R_OK);
+                return indexVariant;
+            } catch {}
+
+            const htmlVariant = trimmed ? `${trimmed}.html` : 'index.html';
+            try {
+                await access(join(baseDir, htmlVariant), constants.R_OK);
+                return htmlVariant;
+            } catch {}
+
+            return undefined;
+        };
+
+        /**
          * Writes UTF-8 string to file.
          * @param {object} args
          * @param {string} args.path - Full path to the file

@@ -62,6 +62,7 @@ describe('Fl32_Cms_Back_Di_Replace_Adapter', () => {
 
     it('should pass through non-html file', async () => {
         const Adapter = await container.get('Fl32_Cms_Back_Di_Replace_Adapter$');
+        accessiblePaths = ['/abs/app/root/tmpl/web/en/style.css'];
 
         const result = await Adapter.getRenderData({
             req: {url: '/style.css', headers: {}, socket: {}},
