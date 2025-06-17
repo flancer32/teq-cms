@@ -92,20 +92,26 @@ export default class Fl32_Cms_Back_Helper_File {
             const trimmed = (cleanPath ?? '').replace(/^\/+|\/+$/g, '');
 
             try {
-                await access(join(baseDir, trimmed), constants.R_OK);
-                return trimmed;
+                const fullPath = join(baseDir, trimmed);
+                await access(fullPath, constants.R_OK);
+                const statRes = await stat(fullPath);
+                if (statRes.isFile()) return trimmed;
             } catch {}
 
             const indexVariant = join(trimmed, 'index.html');
             try {
-                await access(join(baseDir, indexVariant), constants.R_OK);
-                return indexVariant;
+                const fullPath = join(baseDir, indexVariant);
+                await access(fullPath, constants.R_OK);
+                const statRes = await stat(fullPath);
+                if (statRes.isFile()) return indexVariant;
             } catch {}
 
             const htmlVariant = trimmed ? `${trimmed}.html` : 'index.html';
             try {
-                await access(join(baseDir, htmlVariant), constants.R_OK);
-                return htmlVariant;
+                const fullPath = join(baseDir, htmlVariant);
+                await access(fullPath, constants.R_OK);
+                const statRes = await stat(fullPath);
+                if (statRes.isFile()) return htmlVariant;
             } catch {}
 
             return undefined;
