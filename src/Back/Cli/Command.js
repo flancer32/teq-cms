@@ -33,6 +33,7 @@ export default class Fl32_Cms_Back_Cli_Command {
                 tmplEngine: process.env.TEQ_CMS_TMPL_ENGINE,
             });
 
+            // analyze arguments and run a command
             const cmd = argv[2];
             switch (cmd) {
                 case CMD.TRANSLATE:
