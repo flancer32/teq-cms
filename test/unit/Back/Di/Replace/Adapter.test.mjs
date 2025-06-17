@@ -8,6 +8,8 @@ describe('Fl32_Cms_Back_Di_Replace_Adapter', () => {
 
     /** @type {string[]} */
     let accessiblePaths = [];
+    /** @type {Record<string, boolean>} */
+    let fileStatuses = {};
 
     // Register mocks
     container.register('node:fs', {
@@ -16,6 +18,10 @@ describe('Fl32_Cms_Back_Di_Replace_Adapter', () => {
                 if (!accessiblePaths.includes(p)) {
                     throw new Error('ENOENT');
                 }
+            },
+            stat: async (p) => {
+                if (p in fileStatuses) return {isFile: () => fileStatuses[p]};
+                throw new Error('ENOENT');
             },
         },
         constants: {
@@ -41,6 +47,7 @@ describe('Fl32_Cms_Back_Di_Replace_Adapter', () => {
     it('should resolve index.html in folder path', async () => {
         const Adapter = await container.get('Fl32_Cms_Back_Di_Replace_Adapter$');
         accessiblePaths = ['/abs/app/root/tmpl/web/en/path/to/index.html'];
+        fileStatuses = {'/abs/app/root/tmpl/web/en/path/to/index.html': true};
 
         const result = await Adapter.getRenderData({
             req: {url: '/ru/path/to/', headers: {}, socket: {}},
@@ -52,6 +59,7 @@ describe('Fl32_Cms_Back_Di_Replace_Adapter', () => {
     it('should resolve clean .html file', async () => {
         const Adapter = await container.get('Fl32_Cms_Back_Di_Replace_Adapter$');
         accessiblePaths = ['/abs/app/root/tmpl/web/en/about.html'];
+        fileStatuses = {'/abs/app/root/tmpl/web/en/about.html': true};
 
         const result = await Adapter.getRenderData({
             req: {url: '/ru/about.html', headers: {}, socket: {}},
@@ -63,6 +71,7 @@ describe('Fl32_Cms_Back_Di_Replace_Adapter', () => {
     it('should pass through non-html file', async () => {
         const Adapter = await container.get('Fl32_Cms_Back_Di_Replace_Adapter$');
         accessiblePaths = ['/abs/app/root/tmpl/web/en/style.css'];
+        fileStatuses = {'/abs/app/root/tmpl/web/en/style.css': true};
 
         const result = await Adapter.getRenderData({
             req: {url: '/style.css', headers: {}, socket: {}},
@@ -74,6 +83,7 @@ describe('Fl32_Cms_Back_Di_Replace_Adapter', () => {
     it('should return undefined for missing template', async () => {
         const Adapter = await container.get('Fl32_Cms_Back_Di_Replace_Adapter$');
         accessiblePaths = [];
+        fileStatuses = {};
 
         const result = await Adapter.getRenderData({
             req: {url: '/ru/missing/page', headers: {}, socket: {}},
