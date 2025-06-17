@@ -85,7 +85,7 @@ export default class Fl32_Cms_Back_Config {
         let _rootPath;
 
         /**
-         * DTO with web server configuration built from environment.
+         * DTO with web server configuration built from provided parameters.
          * @type {Fl32_Web_Back_Server_Config.Dto}
          */
         let _webConfigDto;
@@ -106,6 +106,11 @@ export default class Fl32_Cms_Back_Config {
          * @param {string} args.localeBaseWeb - Default locale for rendering
          * @param {string} args.rootPath - Application root directory
          * @param {string} args.tmplEngine - Template engine name
+         * @param {number} args.serverPort - Web server port
+         * @param {string} args.serverType - Type of the web server
+         * @param {string} args.tlsCert - Path to TLS certificate
+         * @param {string} args.tlsKey - Path to TLS private key
+         * @param {string} [args.tlsCa] - Optional path to TLS CA certificate
          * @throws {Error} If initialized more than once
          */
         this.init = function (args) {
@@ -123,6 +128,11 @@ export default class Fl32_Cms_Back_Config {
                 localeBaseWeb,
                 rootPath,
                 tmplEngine,
+                serverPort,
+                serverType,
+                tlsCert,
+                tlsKey,
+                tlsCa,
             } = args;
 
             _aiApiBaseUrl = cast.string(aiApiBaseUrl);
@@ -141,11 +151,11 @@ export default class Fl32_Cms_Back_Config {
                 rootPath: _rootPath,
             });
 
-            const port = cast.int(process.env.TEQ_CMS_SERVER_PORT);
-            const type = cast.string(process.env.TEQ_CMS_SERVER_TYPE);
-            const cert = cast.string(process.env.TEQ_CMS_TLS_CERT);
-            const key = cast.string(process.env.TEQ_CMS_TLS_KEY);
-            const ca = cast.string(process.env.TEQ_CMS_TLS_CA);
+            const port = cast.int(serverPort);
+            const type = cast.string(serverType);
+            const cert = cast.string(tlsCert);
+            const key = cast.string(tlsKey);
+            const ca = cast.string(tlsCa);
 
             _webConfigDto = serverConfigFactory.create({
                 port,
