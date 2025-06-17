@@ -75,5 +75,32 @@ export default class Fl32_Cms_Back_Helper_Web {
             if (fromUrl) return fromUrl;
             return resolveFromAcceptLanguage(req.headers[HTTP2_HEADER_ACCEPT_LANGUAGE]);
         };
+
+        /**
+         * Extracts locale and clean path from a URL path string.
+         *
+         * @param {object} args
+         * @param {string} args.path - Raw URL path
+         * @param {string[]} args.allowedLocales - List of supported locales
+         * @param {string} args.fallbackLocale - Locale used when none found in path
+         * @returns {{locale: string, cleanPath: string}}
+         */
+        this.extractRoutingInfo = function ({path, allowedLocales, fallbackLocale}) {
+            const trimmed = (path ?? '').replace(/^\/+|\/+$/g, '');
+            const segments = trimmed.split('/');
+            const first = segments[0];
+
+            if (allowedLocales.includes(first)) {
+                return {
+                    locale: first,
+                    cleanPath: '/' + segments.slice(1).join('/'),
+                };
+            }
+
+            return {
+                locale: fallbackLocale,
+                cleanPath: path ?? '',
+            };
+        };
     }
 }
