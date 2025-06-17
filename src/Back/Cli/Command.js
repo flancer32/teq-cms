@@ -31,6 +31,11 @@ export default class Fl32_Cms_Back_Cli_Command {
                 localeBaseWeb: process.env.TEQ_CMS_LOCALE_BASE_DISPLAY || 'en',
                 rootPath: root,
                 tmplEngine: process.env.TEQ_CMS_TMPL_ENGINE,
+                serverPort: process.env.TEQ_CMS_SERVER_PORT || 3000,
+                serverType: process.env.TEQ_CMS_SERVER_TYPE || 'http',
+                tlsCert: process.env.TEQ_CMS_TLS_CERT,
+                tlsKey: process.env.TEQ_CMS_TLS_KEY,
+                tlsCa: process.env.TEQ_CMS_TLS_CA,
             });
 
             // analyze arguments and run a command
