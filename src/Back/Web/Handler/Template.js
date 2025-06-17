@@ -56,6 +56,7 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
                     const hasLocale = config.getLocaleAllowed().some(loc => url === `/${loc}` || url.startsWith(`/${loc}/`));
 
                     if (!hasLocale) {
+                        // TODO: move this code to Fl32_Web_Back_Helper_Respond
                         const loc = target.locales.user ?? config.getLocaleBaseWeb();
                         const newLoc = url.startsWith('/') ? `/${loc}${url}` : `/${loc}/${url}`;
                         res.writeHead(HTTP_STATUS_FOUND, {location: newLoc});
