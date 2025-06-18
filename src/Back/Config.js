@@ -221,7 +221,7 @@ export default class Fl32_Cms_Back_Config {
         /**
          * @returns {string} Base URL used for canonical links
          */
-        this.getBaseUrl = () => _baseUrl || '';
+        this.getBaseUrl = () => _baseUrl;
 
         /**
          * @returns {Fl32_Web_Back_Server_Config.Dto}
