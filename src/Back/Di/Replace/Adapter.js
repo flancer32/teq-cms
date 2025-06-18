@@ -62,14 +62,23 @@ export default class Fl32_Cms_Back_Di_Replace_Adapter {
                         },
                     });
 
+                    const host = req.headers.host;
+                    const baseUrl = `//${host}`;
+
+                    const canonicalUrl = `${baseUrl}/${localeBaseWeb}/${tmplPath}`;
+                    const alternateUrls = {};
+                    for (const loc of localeAllowed) {
+                        alternateUrls[loc] = `${baseUrl}/${loc}/${tmplPath}`;
+                    }
+
                     data = {
                         ip: req.socket?.remoteAddress || '',
                         ua: req.headers['user-agent'] || '',
                         lang: req.headers['accept-language'] || '',
                         locale,
-                        lang1: localeAllowed[0] || '',
-                        lang2: localeAllowed[1] || '',
-                        lang3: localeAllowed[2] || '',
+                        allowedLocales: localeAllowed,
+                        canonicalUrl,
+                        alternateUrls,
                     };
 
                     options = {};
