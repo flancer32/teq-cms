@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.4.0] - 2025-06-18
+- Added base URL configuration for generating canonical links.
+- Added canonical and alternate link tags for localized pages.
+
 ## [0.3.0] - 2025-06-18
 - Added canonical and alternate link tags for localized pages using schemeless URLs.
 - Refactored routing logic into helpers and added unit tests.
