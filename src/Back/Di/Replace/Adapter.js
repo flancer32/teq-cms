@@ -15,6 +15,7 @@ export default class Fl32_Cms_Back_Di_Replace_Adapter {
     /**
      * @param {typeof import('node:fs')} fs
      * @param {typeof import('node:path')} path
+     * @param {Fl32_Cms_Back_Logger} logger
      * @param {Fl32_Cms_Back_Config} config
      * @param {Fl32_Tmpl_Back_Dto_Target} dtoTmplTarget
      * @param {Fl32_Cms_Back_Helper_Web} helpWeb
@@ -24,6 +25,7 @@ export default class Fl32_Cms_Back_Di_Replace_Adapter {
         {
             'node:fs': fs,
             'node:path': path,
+            Fl32_Cms_Back_Logger$: logger,
             Fl32_Cms_Back_Config$: config,
             Fl32_Tmpl_Back_Dto_Target$: dtoTmplTarget,
             Fl32_Cms_Back_Helper_Web$: helpWeb,
@@ -62,7 +64,8 @@ export default class Fl32_Cms_Back_Di_Replace_Adapter {
                         },
                     });
 
-                    const baseUrl = config.getBaseUrl().replace(/\/+$/, '');
+                    const rawBaseUrl = config.getBaseUrl();
+                    const baseUrl = (rawBaseUrl || `//${req.headers.host || 'localhost'}`).replace(/\/+$/, '');
 
                     const canonicalUrl = `${baseUrl}/${localeBaseWeb}/${tmplPath}`;
                     const alternateUrls = {};
@@ -82,7 +85,8 @@ export default class Fl32_Cms_Back_Di_Replace_Adapter {
 
                     options = {};
                 }
-            } catch {
+            } catch (e) {
+                logger.error(e);
                 target = data = options = undefined;
             }
             return {target, data, options};
