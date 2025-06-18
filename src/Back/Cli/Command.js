@@ -26,6 +26,7 @@ export default class Fl32_Cms_Back_Cli_Command {
                 aiApiKey: process.env.TEQ_CMS_AI_API_KEY,
                 aiApiModel: process.env.TEQ_CMS_AI_API_MODEL,
                 aiApiOrg: process.env.TEQ_CMS_AI_API_ORG,
+                baseUrl: process.env.TEQ_CMS_BASE_URL,
                 localeAllowed: process.env.TEQ_CMS_LOCALE_ALLOWED?.split(',') || ['en', 'es', 'ru'],
                 localeBaseTranslate: process.env.TEQ_CMS_LOCALE_BASE_TRANSLATE || 'ru',
                 localeBaseWeb: process.env.TEQ_CMS_LOCALE_BASE_DISPLAY || 'en',

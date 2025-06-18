@@ -62,8 +62,7 @@ export default class Fl32_Cms_Back_Di_Replace_Adapter {
                         },
                     });
 
-                    const host = req.headers.host;
-                    const baseUrl = `//${host}`;
+                    const baseUrl = config.getBaseUrl().replace(/\/+$/, '');
 
                     const canonicalUrl = `${baseUrl}/${localeBaseWeb}/${tmplPath}`;
                     const alternateUrls = {};
