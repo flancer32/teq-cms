@@ -50,6 +50,13 @@ export default class Fl32_Cms_Back_Config {
         let _aiApiOrg;
 
         /**
+         * Base URL for canonical and alternate links.
+         * Example: https://cms.teqfw.com
+         * @type {string}
+         */
+        let _baseUrl;
+
+        /**
          * Indicates whether the configuration has already been initialized.
          * Prevents reinitialization.
          * @type {boolean}
@@ -123,6 +130,7 @@ export default class Fl32_Cms_Back_Config {
                 aiApiKey,
                 aiApiModel,
                 aiApiOrg,
+                baseUrl,
                 localeAllowed,
                 localeBaseTranslate,
                 localeBaseWeb,
@@ -143,6 +151,7 @@ export default class Fl32_Cms_Back_Config {
             _localeBaseTranslate = cast.string(localeBaseTranslate);
             _localeBaseWeb = cast.string(localeBaseWeb);
             _rootPath = cast.string(rootPath);
+            _baseUrl = cast.string(baseUrl);
 
             configTmpl.init({
                 allowedLocales: _localeAllowed,
@@ -208,6 +217,11 @@ export default class Fl32_Cms_Back_Config {
          * @returns {string} Absolute application root path
          */
         this.getRootPath = () => _rootPath;
+
+        /**
+         * @returns {string} Base URL used for canonical links
+         */
+        this.getBaseUrl = () => _baseUrl || '';
 
         /**
          * @returns {Fl32_Web_Back_Server_Config.Dto}

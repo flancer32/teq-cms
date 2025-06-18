@@ -38,6 +38,7 @@ describe('Fl32_Cms_Back_Di_Replace_Adapter', () => {
         getLocaleAllowed: () => ['en', 'ru'],
         getLocaleBaseWeb: () => 'en',
         getRootPath: () => '/abs/app/root',
+        getBaseUrl: () => 'https://mock.site',
     });
 
     container.register('Fl32_Tmpl_Back_Dto_Target$', {
@@ -50,16 +51,19 @@ describe('Fl32_Cms_Back_Di_Replace_Adapter', () => {
         fileStatuses = {'/abs/app/root/tmpl/web/en/path/to/index.html': true};
 
         const result = await Adapter.getRenderData({
-            req: {url: '/ru/path/to/', headers: {host: 'site.tst'}, socket: {}},
+            req: {url: '/ru/path/to/', headers: {}, socket: {}},
         });
 
         assert.strictEqual(result.target.name, 'path/to/index.html');
-        assert.strictEqual(result.data.canonicalUrl, '//site.tst/en/path/to/index.html');
+        assert.strictEqual(result.data.canonicalUrl, 'https://mock.site/en/path/to/index.html');
         assert.deepStrictEqual(result.data.alternateUrls, {
-            en: '//site.tst/en/path/to/index.html',
-            ru: '//site.tst/ru/path/to/index.html',
+            en: 'https://mock.site/en/path/to/index.html',
+            ru: 'https://mock.site/ru/path/to/index.html',
         });
         assert.deepStrictEqual(result.data.allowedLocales, ['en', 'ru']);
+        assert.ok(!('lang1' in result.data));
+        assert.ok(!('lang2' in result.data));
+        assert.ok(!('lang3' in result.data));
     });
 
     it('should resolve clean .html file', async () => {
@@ -68,7 +72,7 @@ describe('Fl32_Cms_Back_Di_Replace_Adapter', () => {
         fileStatuses = {'/abs/app/root/tmpl/web/en/about.html': true};
 
         const result = await Adapter.getRenderData({
-            req: {url: '/ru/about.html', headers: {host: 'site.tst'}, socket: {}},
+            req: {url: '/ru/about.html', headers: {}, socket: {}},
         });
 
         assert.strictEqual(result.target.name, 'about.html');
@@ -80,14 +84,14 @@ describe('Fl32_Cms_Back_Di_Replace_Adapter', () => {
         fileStatuses = {'/abs/app/root/tmpl/web/en/about.html': true};
 
         const result = await Adapter.getRenderData({
-            req: {url: '/about/', headers: {host: 'site.tst'}, socket: {}},
+            req: {url: '/about/', headers: {}, socket: {}},
         });
 
         assert.strictEqual(result.target.name, 'about.html');
-        assert.strictEqual(result.data.canonicalUrl, '//site.tst/en/about.html');
+        assert.strictEqual(result.data.canonicalUrl, 'https://mock.site/en/about.html');
         assert.deepStrictEqual(result.data.alternateUrls, {
-            en: '//site.tst/en/about.html',
-            ru: '//site.tst/ru/about.html',
+            en: 'https://mock.site/en/about.html',
+            ru: 'https://mock.site/ru/about.html',
         });
     });
 
