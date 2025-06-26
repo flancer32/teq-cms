@@ -28,8 +28,7 @@ export default class Fl32_Cms_Back_Cli_Command_Web {
             const rootCms = config.getRootPath();
             const rootWeb = path.join(rootCms, 'web');
 
-            // TODO: configure statics after the refactoring
-            // await handStatic.init({rootPath: rootWeb});
+            await handStatic.init({rootPath: rootWeb});
 
             dispatcher.addHandler(handLog);
             dispatcher.addHandler(handStatic);
