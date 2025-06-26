@@ -10,6 +10,7 @@ export default class Fl32_Cms_Back_Cli_Command_Web {
      * @param {Fl32_Web_Back_Handler_Pre_Log} handLog
      * @param {Fl32_Web_Back_Handler_Static} handStatic
      * @param {Fl32_Cms_Back_Web_Handler_Template} handTmpl
+     * @param {Fl32_Web_Back_Dto_Handler_Source} dtoSource
      * @param {Fl32_Web_Back_Server} server
      */
     constructor(
@@ -20,6 +21,7 @@ export default class Fl32_Cms_Back_Cli_Command_Web {
             Fl32_Web_Back_Handler_Pre_Log$: handLog,
             Fl32_Web_Back_Handler_Static$: handStatic,
             Fl32_Cms_Back_Web_Handler_Template$: handTmpl,
+            Fl32_Web_Back_Dto_Handler_Source$: dtoSource,
             Fl32_Web_Back_Server$: server,
         }
     ) {
@@ -28,7 +30,13 @@ export default class Fl32_Cms_Back_Cli_Command_Web {
             const rootCms = config.getRootPath();
             const rootWeb = path.join(rootCms, 'web');
 
-            await handStatic.init({rootPath: rootWeb});
+            const dto = dtoSource.create();
+            dto.root = rootWeb;
+            dto.prefix = '/';
+            dto.allow = {'.': ['.']};
+            dto.defaults = ['index.html'];
+
+            await handStatic.init({sources: [dto]});
 
             dispatcher.addHandler(handLog);
             dispatcher.addHandler(handStatic);
