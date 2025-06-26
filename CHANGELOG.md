@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.5.0] - 2025-06-26
+- Added CLI command to run TeqCMS as a web server.
+- Fixed static handler initialization and updated dependencies.
+
 ## [0.4.0] - 2025-06-18
 - Added base URL configuration for generating canonical links.
 - Added canonical and alternate link tags for localized pages.
