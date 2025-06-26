@@ -29,7 +29,8 @@
   },
   "scripts": {
     "eslint": "./node_modules/.bin/eslint ./src/",
-    "test": "node --test $(find ./test/unit -name '*.test.mjs')"
+    "test:accept": "node --test $(find ./accept/unit -name '*.test.mjs')",
+    "test:unit": "node --test $(find ./test/unit -name '*.test.mjs')"
   },
   "bin": {
     "teq-cms": "./bin/teq-cms.js"
