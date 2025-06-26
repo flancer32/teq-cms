@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.5.1] - 2025-06-27
+- Updated acceptance tests for Web CLI command.
+
 ## [0.5.0] - 2025-06-26
 - Added CLI command to run TeqCMS as a web server.
 - Fixed static handler initialization and updated dependencies.
