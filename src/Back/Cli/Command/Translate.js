@@ -26,6 +26,55 @@ export default class Fl32_Cms_Back_Cli_Command_Translate {
         /* eslint-enable jsdoc/require-param-description,jsdoc/check-param-names */
         // VARS
 
+        /**
+         * Read streamed LLM content.
+         * @param {AsyncIterable<Object>} stream
+         * @returns {Promise<string>}
+         */
+        const readStreamedContent = async function (stream) {
+            let result = '';
+            for await (const chunk of stream) {
+                const delta = chunk.choices?.[0]?.delta?.content;
+                if (delta) result += delta;
+            }
+            return result;
+        };
+
+        /**
+         * Fetch completion with streaming and auto-continue.
+         * @param {Object} params
+         * @param {Object} params.client
+         * @param {string} params.model
+         * @param {Array<{role: string, content: string}>} params.messages
+         * @returns {Promise<string>}
+         */
+        const fetchFullCompletion = async function ({client, model, messages}) {
+            let full = '';
+            let done = false;
+            let tries = 0;
+            while (!done && tries < 10) {
+                const stream = await client.chat.completions.create({
+                    model,
+                    messages,
+                    stream: true,
+                });
+                const part = await readStreamedContent(stream);
+                full += part;
+                if (/---END FILE---/.test(full)) {
+                    done = true;
+                } else {
+                    messages.push({role: 'assistant', content: part});
+                    messages.push({role: 'user', content: 'Continue.'});
+                    tries++;
+                }
+            }
+            return full;
+        };
+
+        // expose for unit testing
+        this.__readStreamedContent = readStreamedContent;
+        this.__fetchFullCompletion = fetchFullCompletion;
+
         // MAIN
         this.exec = async function () {
             // FUNCS
@@ -87,12 +136,8 @@ export default class Fl32_Cms_Back_Cli_Command_Translate {
                     }
                     messages.push({role: 'user', content: baseText});
 
-                    const completion = await client.chat.completions.create({
-                        model,
-                        messages,
-                    });
-                    const content = completion.choices[0].message.content;
-                    logger.info(`LLM usage: ${JSON.stringify(completion.usage)}`);
+                    const content = await fetchFullCompletion({client, model, messages});
+                    logger.info('LLM streaming translation completed.');
                     const match = content.match(/---FILE: (.+?)---\n([\s\S]+?)\n---END FILE---/);
                     if (!match) {
                         logger.error('Failed to extract generated file from response.');
