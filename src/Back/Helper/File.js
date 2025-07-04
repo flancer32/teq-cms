@@ -22,7 +22,7 @@ export default class Fl32_Cms_Back_Helper_File {
 
         /**
          * Builds an absolute path to the localized template file.
-         * @param {object} args
+         * @param {object} args - Parameters object.
          * @param {string} args.locale - Target locale
          * @param {string} args.path - Relative path to the template
          * @returns {string} Absolute path
@@ -34,7 +34,7 @@ export default class Fl32_Cms_Back_Helper_File {
 
         /**
          * Checks whether the given file exists.
-         * @param {object} args
+         * @param {object} args - Parameters object.
          * @param {string} args.path - Full path to the file
          * @returns {Promise<boolean>}
          */
@@ -49,7 +49,7 @@ export default class Fl32_Cms_Back_Helper_File {
 
         /**
          * Reads file content as UTF-8 string.
-         * @param {object} args
+         * @param {object} args - Parameters object.
          * @param {string} args.path - Full path to the file
          * @returns {Promise<string>}
          */
@@ -59,7 +59,7 @@ export default class Fl32_Cms_Back_Helper_File {
 
         /**
          * Returns file stats including mtime.
-         * @param {object} args
+         * @param {object} args - Parameters object.
          * @param {string} args.path - Full path to the file
          * @returns {Promise<import('node:fs').Stats>}
          */
@@ -69,7 +69,7 @@ export default class Fl32_Cms_Back_Helper_File {
 
         /**
          * Replaces a file extension if it matches the expected one.
-         * @param {object} args
+         * @param {object} args - Parameters object.
          * @param {string} args.path - Original file path
          * @param {string} args.ext - New extension (e.g. '.prompt.md')
          * @param {string} [args.fromExt='.html'] - Extension to be replaced
@@ -83,7 +83,7 @@ export default class Fl32_Cms_Back_Helper_File {
         /**
          * Resolves a template name relative to a base directory.
          *
-         * @param {object} args
+         * @param {object} args - Parameters object.
          * @param {string} args.baseDir - Directory used as base for resolution
          * @param {string} args.cleanPath - Clean path extracted from URL
          * @returns {Promise<string|undefined>} Resolved template name or undefined
@@ -91,6 +91,7 @@ export default class Fl32_Cms_Back_Helper_File {
         this.resolveTemplateName = async function ({baseDir, cleanPath}) {
             const trimmed = (cleanPath ?? '').replace(/^\/+|\/+$/g, '');
 
+            /* eslint-disable no-empty */
             try {
                 const fullPath = join(baseDir, trimmed);
                 await access(fullPath, constants.R_OK);
@@ -119,7 +120,7 @@ export default class Fl32_Cms_Back_Helper_File {
 
         /**
          * Writes UTF-8 string to file.
-         * @param {object} args
+         * @param {object} args - Parameters object.
          * @param {string} args.path - Full path to the file
          * @param {string} args.text - Content to write
          * @returns {Promise<void>}

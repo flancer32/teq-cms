@@ -13,7 +13,6 @@
 export default class Fl32_Cms_Back_Di_Replace_Adapter {
     /* eslint-disable jsdoc/require-param-description,jsdoc/check-param-names */
     /**
-     * @param {typeof import('node:fs')} fs
      * @param {typeof import('node:path')} path
      * @param {Fl32_Cms_Back_Logger} logger
      * @param {Fl32_Cms_Back_Config} config
@@ -23,7 +22,6 @@ export default class Fl32_Cms_Back_Di_Replace_Adapter {
      */
     constructor(
         {
-            'node:fs': fs,
             'node:path': path,
             Fl32_Cms_Back_Logger$: logger,
             Fl32_Cms_Back_Config$: config,

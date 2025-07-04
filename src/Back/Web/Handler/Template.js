@@ -7,7 +7,6 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
     /**
      * @param {typeof import('node:http2')} http2
      * @param {Fl32_Web_Back_Logger} logger
-     * @param {Fl32_Web_Back_Helper_Mime} helpMime
      * @param {Fl32_Web_Back_Helper_Respond} respond
      * @param {Fl32_Web_Back_Dto_Handler_Info} dtoInfo
      * @param {Fl32_Tmpl_Back_Service_Load} servTmplLoad
@@ -20,7 +19,6 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
         {
             'node:http2': http2,
             Fl32_Web_Back_Logger$: logger,
-            Fl32_Web_Back_Helper_Mime$: helpMime,
             Fl32_Web_Back_Helper_Respond$: respond,
             Fl32_Web_Back_Dto_Handler_Info$: dtoInfo,
             Fl32_Tmpl_Back_Service_Load$: servTmplLoad,
@@ -35,7 +33,6 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
         const {
             HTTP2_HEADER_CONTENT_ENCODING,
             HTTP2_HEADER_CONTENT_LENGTH,
-            HTTP_STATUS_OK,
             HTTP_STATUS_FOUND,
         } = H2;
 
@@ -50,7 +47,7 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
 
             try {
                 const {target, data, options} = await adapter.getRenderData({req});
-                const {resultCode, template} = await servTmplLoad.perform({target});
+                const {template} = await servTmplLoad.perform({target});
                 if (template) {
                     const url = req.url || '';
                     const hasLocale = config.getLocaleAllowed().some(loc => url === `/${loc}` || url.startsWith(`/${loc}/`));
@@ -64,7 +61,7 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
                         return true;
                     }
 
-                    const {resultCode, content} = await servTmplRender.perform({
+                    const {content} = await servTmplRender.perform({
                         target,
                         template,
                         data,

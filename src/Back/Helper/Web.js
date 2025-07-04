@@ -20,8 +20,11 @@ export default class Fl32_Cms_Back_Helper_Web {
 
         /**
          * Parses Accept-Language header into a prioritized language list.
-         * @param {string} header
-         * @returns {Array<{lang: string, q: number}>}
+         * @param {string} header - Raw value of the Accept-Language header, e.g. "en-US,en;q=0.9,ru;q=0.8".
+         * @returns {Array<{lang: string, q: number}>} - Array of language entries sorted by descending quality factor (q),
+         *      each entry having:
+         *          - `lang` — language code (e.g. "en", "ru-RU")
+         *          - `q` — quality factor (preference weight), defaults to 1.0
          */
         function parseAcceptLanguage(header) {
             if (!header) return [];
@@ -37,8 +40,8 @@ export default class Fl32_Cms_Back_Helper_Web {
 
         /**
          * Resolves preferred locale from Accept-Language header against allowed locales.
-         * @param {string} header
-         * @returns {string}
+         * @param {string} header - Raw Accept-Language header value, e.g. "en-US,en;q=0.9,fr;q=0.8".
+         * @returns {string} - Resolved locale code (e.g. "en", "ru", etc.).
          */
         function resolveFromAcceptLanguage(header) {
             const allowed = config.getLocaleAllowed();
@@ -53,8 +56,8 @@ export default class Fl32_Cms_Back_Helper_Web {
 
         /**
          * Extracts locale code from the URL path if present.
-         * @param {string} path
-         * @returns {string|null}
+         * @param {string} path - Raw URL path (e.g. "/en/about" or "/ru/blog/2024").
+         * @returns {string|null} - Extracted locale code if present in the path; otherwise, null.
          */
         function extractFromUrlPath(path) {
             const trimmed = path.replace(/^\/+|\/+$/g, '');
@@ -66,7 +69,7 @@ export default class Fl32_Cms_Back_Helper_Web {
         // MAIN
         /**
          * Extracts locale from request URL or Accept-Language header.
-         * @param {import('node:http').IncomingMessage | import('node:http2').Http2ServerRequest} req
+         * @param {import('node:http').IncomingMessage | import('node:http2').Http2ServerRequest} req - HTTP request object containing URL and headers.
          * @returns {string}
          */
         this.extractLocale = function ({req}) {
@@ -79,7 +82,7 @@ export default class Fl32_Cms_Back_Helper_Web {
         /**
          * Extracts locale and clean path from a URL path string.
          *
-         * @param {object} args
+         * @param {object} args - Parameters object.
          * @param {string} args.path - Raw URL path
          * @param {string[]} args.allowedLocales - List of supported locales
          * @param {string} args.fallbackLocale - Locale used when none found in path

@@ -1,5 +1,11 @@
 /**
- * TODO
+ * CLI command to translate HTML templates between locales using OpenAI-compatible LLM.
+ *
+ * This command scans base locale templates, detects changed files,
+ * reads optional prompt files, invokes the LLM for translation,
+ * and writes translated templates to appropriate paths.
+ *
+ * Designed for use within TeqCMS translation automation flow.
  */
 export default class Fl32_Cms_Back_Cli_Command_Translate {
     /* eslint-disable jsdoc/require-param-description,jsdoc/check-param-names */
@@ -28,8 +34,8 @@ export default class Fl32_Cms_Back_Cli_Command_Translate {
 
         /**
          * Read streamed LLM content.
-         * @param {AsyncIterable<Object>} stream
-         * @returns {Promise<string>}
+         * @param {AsyncIterable<object>} stream - Async iterator of streamed OpenAI response chunks.
+         * @returns {Promise<string>} - Concatenated content received from the stream.
          */
         const readStreamedContent = async function (stream) {
             let result = '';
@@ -42,10 +48,10 @@ export default class Fl32_Cms_Back_Cli_Command_Translate {
 
         /**
          * Fetch completion with streaming and auto-continue.
-         * @param {Object} params
-         * @param {Object} params.client
-         * @param {string} params.model
-         * @param {Array<{role: string, content: string}>} params.messages
+         * @param {object} args - Parameters object.
+         * @param {object} args.client - Initialized OpenAI API client (e.g., `openai` from `openai` package).
+         * @param {string} args.model - The model name to use (e.g., "gpt-4", "gpt-4o").
+         * @param {Array<{role: string, content: string}>} args.messages - The message history used as the prompt for the chat completion.
          * @returns {Promise<string>}
          */
         const fetchFullCompletion = async function ({client, model, messages}) {

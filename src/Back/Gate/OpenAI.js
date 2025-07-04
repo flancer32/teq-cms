@@ -5,13 +5,11 @@ export default class Fl32_Cms_Back_Gate_OpenAI {
     /* eslint-disable jsdoc/require-param-description,jsdoc/check-param-names */
     /**
      * @param {typeof import('openai')} openai
-     * @param {Fl32_Cms_Back_Logger} logger
      * @param {Fl32_Cms_Back_Config} config
      */
     constructor(
         {
             'node:openai': openai,
-            Fl32_Cms_Back_Logger$: logger,
             Fl32_Cms_Back_Config$: config,
         }
     ) {

@@ -73,7 +73,7 @@ export default class Fl32_Cms_Back_Store_Db_Translate {
 
         /**
          * Removes entry by a relative path.
-         * @param {string} pathRel
+         * @param {string} pathRel - Relative path to the template file (e.g. "blog/about.html").
          */
         this.remove = function (pathRel) {
             delete _data[pathRel];

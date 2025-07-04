@@ -28,7 +28,7 @@
     "url": "git+https://github.com/flancer32/teq-cms.git"
   },
   "scripts": {
-    "eslint": "./node_modules/.bin/eslint ./src/",
+    "test:eslint": "./node_modules/.bin/eslint ./src/",
     "test:accept": "node --test $(find ./accept/unit -name '*.test.mjs')",
     "test:unit": "node --test $(find ./test/unit -name '*.test.mjs')"
   },

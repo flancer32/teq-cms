@@ -2,8 +2,8 @@
 
 ## [0.5.2] - 2025-07-04
 
-- Added Spanish language option to the personal site example.
 - Implemented auto-continue for long LLM translations.
+- Fixed ESLint issues.
 
 ## [0.5.1] - 2025-06-27
 
