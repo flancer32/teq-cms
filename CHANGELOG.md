@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.5.2] - 2025-07-04
+
+- Added Spanish language option to the personal site example.
+- Implemented auto-continue for long LLM translations.
+
 ## [0.5.1] - 2025-06-27
 
 - Fix an error with the configuration of the static file handler.
