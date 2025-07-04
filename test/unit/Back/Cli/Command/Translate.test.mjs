@@ -5,7 +5,7 @@ import {buildTestContainer} from '../../../common.js';
 /** Simple async generator producing streaming chunks */
 function createStream(text) {
     return {
-        async *[Symbol.asyncIterator]() {
+        async* [Symbol.asyncIterator]() {
             yield {choices: [{delta: {content: text}}]};
         },
     };
@@ -18,7 +18,6 @@ describe('Fl32_Cms_Back_Cli_Command_Translate.fetchFullCompletion', () => {
     container.register('Fl32_Cms_Back_Defaults$', {PROMPT_SYSTEM: ''});
     container.register('Fl32_Cms_Back_Logger$', {info: () => {}, error: () => {}, warn: () => {}});
     container.register('Fl32_Cms_Back_Config$', {getAiApiModel: () => 'm'});
-    container.register('Fl32_Cms_Back_Gate_OpenAI$', {});
     container.register('Fl32_Cms_Back_Store_Db_Translate$', {});
     container.register('Fl32_Cms_Back_Helper_File$', {});
     container.register('Fl32_Cms_Back_Helper_Translate$', {});
