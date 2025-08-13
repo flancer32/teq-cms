@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.5.3] - 2025-08-13
+
+- Fixed project root detection to traverse parent directories when searching for `node_modules`.
+
 ## [0.5.2] - 2025-07-04
 
 - Implemented auto-continue for long LLM translations.
