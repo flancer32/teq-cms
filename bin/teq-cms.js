@@ -22,7 +22,7 @@ function findProjectRoot() {
     let dir = dirname(fileURLToPath(import.meta.url));
     while (dir !== dirname(dir)) {
         if (existsSync(join(dir, 'node_modules'))) return dir;
-        dir = dirname(dir);
+        dir = dirname(join(dir, '..'));
     }
 }
 
