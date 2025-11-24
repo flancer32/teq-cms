@@ -30,9 +30,6 @@ jobs:
 
       - run: npm ci
 
-      # Remove extra directories before publishing to npm
-      - run: rm -rf ./ctx/ ./test/
-
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.npm_token }}

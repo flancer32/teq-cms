@@ -30,6 +30,25 @@ Learn more at: [https://cms.teqfw.com](https://cms.teqfw.com)
 
 ---
 
+## Configuring TeqCMS in External Applications
+
+TeqCMS lets host applications register their DI customizations during startup. Drops a `teqcms.config.js` file into the project root or adds a `"teqcms"` entry to `package.json` that points to a configurator module. TeqCMS loads the module before running any CLI commands and invokes its default export with `{ resolver, replace }`, so the application can add namespace roots or swap implementations without touching the container directly.
+
+```json
+"teqcms": {
+  "configure": "./src/cms/setup.js"
+}
+```
+
+```js
+export default async function configure({ resolver, replace }) {
+  resolver.addNamespaceRoot('App_', './src');
+  replace.add('Fl32_Cms_Back_Api_Adapter', 'App_Cms_Custom_Adapter');
+}
+```
+
+---
+
 ## License
 
 Apache-2.0 © Alex Gusev — [https://github.com/flancer64](https://github.com/flancer64)

@@ -1,0 +1,7 @@
+!dist/
+.github/
+*.log
+ctx/
+doc/
+eslint.config.js
+test/

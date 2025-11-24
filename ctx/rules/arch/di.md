@@ -4,11 +4,11 @@
 
 TeqCMS uses the `@teqfw/di` container as the sole mechanism for linking modules.
 All dependencies are resolved using namespace identifiers without static imports.
-The container is created once — in the composition root (`bin/teq-cms.js`) — and must not be accessed directly anywhere else.
+The container is created once — in the composition root (`bin/teq-cms.mjs`) — and must not be accessed directly anywhere else.
 
 ## 2. Composition Root
 
-`bin/teq-cms.js` is the only point where the Dependency Graph is assembled.
+`bin/teq-cms.mjs` is the only point where the Dependency Graph is assembled.
 It performs the following:
 
 1. creates the container;

@@ -6,7 +6,7 @@ Version: 20251124
 
 This file is the root entry point for projects that use ADSM (Agent-Driven Software Management).
 It defines the roles of the Human and the Agent, the structure of the cognitive context, and the methodology invariants.
-It is read by the agent first, before any local instructions.
+It is read by the Agent first, before any local instructions.
 
 ---
 
@@ -31,7 +31,7 @@ The context defines the rules for modifying the product; the product reflects th
 
 ## Roles
 
-**Human:** goals, context management, approval of changes, structural development.
+**Human:** goals, context management, approval of changes, structural development.  
 **Agent:** task execution within the context, correct modification of the product, maintaining consistency, preparing iteration reports.
 
 ---
@@ -67,8 +67,7 @@ Recommended files:
 
 If the project contains additional `AGENTS.md` files (e.g., `ctx/rules/AGENTS.md`, `src/module/AGENTS.md`), the Agent must treat them as part of the cognitive context **within their respective space**.
 
-**ADSM Rule:**
-
+**ADSM Rule:**  
 When performing a task in directory `X`, the effective working context for the Agent consists of all `AGENTS.md` files located along the path from the project root to directory `X`.
 
 The Agent must:
@@ -80,7 +79,7 @@ The Agent must:
 
 ## `@LLM-DOC` Comments
 
-`@LLM-DOC` is embedded context inside the source code.
+`@LLM-DOC` is embedded context inside the source code.  
 It records architectural decisions and is protected.
 
 Rules:
@@ -101,15 +100,37 @@ Each iteration ends with a report:
 ./ctx/agent/report/YYYY/MM/DD/HH-MM-{title}.md
 ```
 
-A report includes the iteration goal, performed actions, and resulting artifacts.
-Missing report = `execution error`.
+A report includes the iteration goal, performed actions, and resulting artifacts.  
+Missing report = `execution error`.  
 If `ctx/agent/report-template.md` exists, the Agent uses it.
+
+**Protection Rule:**  
+All files inside `ctx/agent/report/` are immutable.  
+The Agent must **never modify, delete, rewrite, or rename** any file in this directory.  
+Attempting to alter a historical report = `execution error`.
+
+---
+
+## Historical Reports (`ctx/agent/report/`)
+
+The `ctx/agent/report/` directory is a **historical archive** of past human–agent interactions.
+
+Rules:
+
+1. Reports are **read-only artifacts**.  
+   They must never be modified, reprocessed, regenerated, or merged by the Agent.
+
+2. The directory is **not part of the active cognitive context**.  
+   The Agent must **not read, scan, analyze, summarize, or infer rules** from historical reports unless the Human explicitly instructs otherwise.
+
+3. Only the Human may restructure or reorganize past reports.  
+   The Agent creates **only a new report for the current iteration** and does not touch previous ones.
 
 ---
 
 ## Compatibility
 
-This file defines ADSM invariants and is used unchanged across all projects.
+This file defines ADSM invariants and is used unchanged across all projects.  
 Project-specific specifications are placed in `./ctx/` and in `@LLM-DOC` comments.
 
 ---
