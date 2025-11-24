@@ -17,8 +17,6 @@ jobs:
 
       - run: npm ci
 
-#      - run: npm test
-
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
@@ -31,6 +29,9 @@ jobs:
           registry-url: https://registry.npmjs.org/
 
       - run: npm ci
+
+      # Remove extra directories before publishing to npm
+      - run: rm -rf ./ctx/ ./test/
 
       - run: npm publish --access public
         env:
