@@ -4,4 +4,6 @@
 ctx/
 doc/
 eslint.config.js
+teqcms.config.js
+teqcms.config.mjs
 test/

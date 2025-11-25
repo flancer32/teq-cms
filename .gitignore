@@ -5,4 +5,6 @@
 /**/own_modules/
 /**/tmp/
 /http-client.env.json
+/teqcms.config.js
+/teqcms.config.mjs
 /tmp/

@@ -76,8 +76,8 @@ function resolveNamespaceRoots(rootDir, nodeModulesDir) {
 }
 
 function findConfigurator(rootDir) {
-    const directConfig = resolve(rootDir, 'teqcms.config.js');
-    if (existsSync(directConfig)) {
+    const directConfig = findDirectConfigurator(rootDir);
+    if (directConfig) {
         return directConfig;
     }
 
@@ -97,6 +97,15 @@ function findConfigurator(rootDir) {
     }
 
     console.warn('TeqCMS configuration file not found:', configuredFile);
+}
+
+function findDirectConfigurator(rootDir) {
+    for (const candidate of ['teqcms.config.mjs', 'teqcms.config.js']) {
+        const file = resolve(rootDir, candidate);
+        if (existsSync(file)) {
+            return file;
+        }
+    }
 }
 
 function parsePackageJson(file) {

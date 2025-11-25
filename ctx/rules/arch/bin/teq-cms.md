@@ -1,7 +1,3 @@
-Вот точный перевод на английский, с сохранением структуры и терминов.
-
----
-
 # `bin/teq-cms.mjs`: Composition Root Rules (short version)
 
 ## Purpose
@@ -52,10 +48,14 @@ The set of namespace roots is fixed; the composition root does not generate dyna
 
 ## 4. Application Configuration
 
-Two configuration options:
+TeqCMS first looks for a module that can configure the application. It attempts the files in this order:
 
-1. file `./teqcms.config.js`;
-2. `"teqcms": { "configure": "..." }` in `package.json`.
+1. `./teqcms.config.mjs` (preferred, as it retains native ES module semantics);
+2. `./teqcms.config.js`.
+
+If both are present, `.mjs` is used and `.js` is ignored.
+
+Alternatively, specify `"teqcms": { "configure": "path/to/module.mjs" }` in `package.json`. The configured path is resolved relative to the project root and may point to either `.mjs` or `.js`, but `.mjs` should be used when available.
 
 Format:
 

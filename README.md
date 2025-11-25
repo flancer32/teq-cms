@@ -32,7 +32,7 @@ Learn more at: [https://cms.teqfw.com](https://cms.teqfw.com)
 
 ## Configuring TeqCMS in External Applications
 
-TeqCMS lets host applications register their DI customizations during startup. Drops a `teqcms.config.js` file into the project root or adds a `"teqcms"` entry to `package.json` that points to a configurator module. TeqCMS loads the module before running any CLI commands and invokes its default export with `{ resolver, replace }`, so the application can add namespace roots or swap implementations without touching the container directly.
+TeqCMS lets host applications register their DI customizations during startup. Drop a `teqcms.config.mjs` file into the project root (or fall back to `teqcms.config.js` for CommonJS support) or add a `"teqcms"` entry to `package.json` that points to a configurator module. TeqCMS loads the module before running any CLI commands and invokes its default export with `{ resolver, replace }`, so the application can add namespace roots or swap implementations without touching the container directly.
 
 ```json
 "teqcms": {
