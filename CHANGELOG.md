@@ -1,8 +1,12 @@
 # Changelog
 
-## [0.5.3] - 2025-08-13
+## [0.5.3] - 2025-11-25
 
-- Fixed project root detection to traverse parent directories when searching for `node_modules`.
+- Added external DI configuration support (`teqcms.config.mjs` / `teqcms.config.js` and `"teqcms.configure"` in `package.json`).
+- Refactored CLI composition root (`bin/teq-cms.mjs`): unified namespace setup, Replace preprocessor pipeline, engine selection, safe dynamic imports, and strict root detection.
+- Introduced project context structure (`ctx/`) with ADSM documentation.
+- Cleaned up extra directories during npm publication in GitHub Actions.
+- Improved project root detection by traversing parent directories when searching for `node_modules`.
 
 ## [0.5.2] - 2025-07-04
 
