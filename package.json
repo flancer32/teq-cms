@@ -1,6 +1,6 @@
 {
   "name": "@flancer32/teq-cms",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Minimalistic file-based CMS for multilingual websites with AI-powered localization and Git-native content workflow.",
   "type": "module",
   "keywords": [
