@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "checkJs": true,
+    "allowSyntheticDefaultImports": true,
+    "module": "es2022",
+    "target": "es2022",
+    "moduleResolution": "node",
+    "strict": true
+  },
+  "include": ["*.js", "*.mjs", "*.d.ts", "src/**/*.js", "src/**/*.mjs"]
+}

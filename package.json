@@ -27,6 +27,7 @@
     "type": "git",
     "url": "git+https://github.com/flancer32/teq-cms.git"
   },
+  "types": "./types.d.ts",
   "scripts": {
     "start": "npx teq-cms web",
     "test:eslint": "./node_modules/.bin/eslint ./src/",
@@ -39,7 +40,7 @@
   "dependencies": {
     "@flancer32/teq-tmpl": "^0.3.0",
     "@flancer32/teq-web": "^0.3.0",
-    "@teqfw/di": "^1.0.2",
+    "@teqfw/di": "^1.2.0",
     "dotenv": "^16.5.0",
     "openai": "^4.103.0"
   },

@@ -20,7 +20,9 @@ async function bootstrap(rootDir) {
     const cmsRoot = process.env.TEQ_CMS_ROOT ? resolve(rootDir, process.env.TEQ_CMS_ROOT) : rootDir;
 
     const { default: Container } = await import('@teqfw/di');
+    /** @type {TeqFw_Di_Container} */
     const container = new Container();
+    /** @type TeqFw_Di_Api_Container_Resolver */
     const resolver = container.getResolver();
 
     for (const [namespace, namespaceRoot] of resolveNamespaceRoots(rootDir, nodeModulesDir)) {
