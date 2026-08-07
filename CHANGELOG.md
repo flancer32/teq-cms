@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0] - 2026-08-07
+
+- Updated TeqFW runtime dependencies to npm releases with compatible `>=` ranges.
+- Added the human-facing README promotion and Agent Skill guidance.
+- Added package type checking and TeqFW ESM validation scripts.
+- Added unit coverage for CMS components and aligned CLI composition with the current TeqFW host model.
+
 ## [0.5.4] - 2025-11-25
 
 - Added external DI configuration support (`teqcms.config.mjs` / `teqcms.config.js` and `"teqcms.configure"` in `package.json`).
