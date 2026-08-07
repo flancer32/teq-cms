@@ -25,8 +25,7 @@ description: Project-specific conventions for every task in the TeqCMS repositor
 
 - Communicate with the user in Russian.
 - Write source code, comments, documentation, commit messages, and identifiers in English.
-- End each iteration with a report under `ctx/agent/report/YYYY/MM/DD/HH-MM-{title}.md`.
-- Report changed files, verification results, and remaining risks.
+- Report changed files, verification results, and remaining risks in the final response.
 
 ## Project boundaries
 
