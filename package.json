@@ -29,6 +29,7 @@
   },
   "types": "./types.d.ts",
   "files": [
+    "bootstrap/",
     "src/",
     "tmpl/",
     "web/",
@@ -51,6 +52,8 @@
     "@teqfw/cli": "^2.0.0",
     "@teqfw/di": "^2.9.0",
     "@teqfw/log": "^2.0.0",
+    "mustache": "^4.2.0",
+    "nunjucks": "^3.2.4",
     "openai": "^4.103.0"
   },
   "teqfw": {
@@ -66,7 +69,7 @@
       },
       "cli": {
         "container": {
-          "configurator": "./src/Back/Cli/Configurator.mjs"
+          "configurator": "./bootstrap/configurator.mjs"
         },
         "plugin": "Fl32_Cms_Back_Cli_Plugin$",
         "command": {
@@ -86,9 +89,6 @@
         ]
       }
     }
-  },
-  "devDependencies": {
-    "nunjucks": "^3.2.4"
   },
   "overrides": {
     "whatwg-url": "13.0.0"

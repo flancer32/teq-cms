@@ -30,3 +30,9 @@ It must not contain static imports from TeqCMS or depend on application code fro
 - The application must not access the container outside the composition root.
 - Host applications customize the CMS through the configurator boundary.
 - The CMS remains an isolated core.
+- Runtime settings are read through package-owned typed configuration components;
+  business components do not read `process.env` or raw CMS configuration.
+- TeqCMS selects the concrete template engine in host composition from the
+  `TEQFW_TMPL__ENGINE` setting. `@flancer32/teq-tmpl` offers the engine
+  contract and implementations; TeqCMS owns the DI mapping policy and the
+  final choice.

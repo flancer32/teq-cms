@@ -41,7 +41,7 @@ Host applications customize the container through `teqfw.fw.cli.container.config
   "fw": {
     "cli": {
       "container": {
-        "configurator": "./src/cms/Configurator.mjs"
+        "configurator": "./bootstrap/configurator.mjs"
       }
     }
   }
@@ -55,6 +55,26 @@ export default class Configurator {
   }
 }
 ```
+
+The TeqCMS configurator is kept under `bootstrap/` because `@teqfw/cli`
+loads it through a dynamic import before the DI Container is resolved. It is a
+pre-DI composition module and must not depend on DI services.
+
+### Configuration
+
+TeqCMS loads configuration sources in this order: built-in defaults, an optional
+`.env` file, and process environment values. Later sources override earlier
+values. Configuration keys use the TeqFW form `NAMESPACE__PARAMETER`.
+
+Template settings belong to `@flancer32/teq-tmpl` and use the `TEQFW_TMPL`
+namespace. The tmpl package offers the available engine implementations and
+their common contract. TeqCMS, as the host application, owns the selection:
+`TEQFW_TMPL__ENGINE` tells TeqCMS which offered implementation to bind through
+DI. The tmpl package does not automatically choose the DI implementation.
+CMS-specific settings use the `TEQ_CMS` namespace; web server settings use
+`TEQFW_WEB`.
+
+Legacy `TEQ_CMS_*` environment names are not supported.
 
 ---
 

@@ -31,7 +31,7 @@ describe('Fl32_Cms_Back_Helper_File.resolveTemplateName', () => {
     });
 
     container.register('TeqFw_Cfg_Reader$', {
-        get: () => ({ROOT_PATH: '/root'}),
+        get: () => ({DEFAULT_LOCALE: 'en', ROOT_PATH: '/root'}),
     });
 
     it('should return exact file when exists', async () => {

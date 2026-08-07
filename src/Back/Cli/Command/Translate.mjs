@@ -17,7 +17,8 @@ export default class Fl32_Cms_Back_Cli_Command_Translate {
      * @param {object} deps
      * @param {Fl32_Cms_Back_Defaults} deps.DEF
      * @param {TeqFw_Log_Provider} deps.logger
-     * @param {TeqFw_Cfg_Reader} deps.reader
+     * @param {Fl32_Cms_Back_Config} deps.config
+     * @param {Fl32_Tmpl_Back_Config} deps.tmplConfig
      * @param {Fl32_Cms_Back_Gate_OpenAI} deps.gateOpenAI
      * @param {Fl32_Cms_Back_Store_Db_Translate} deps.dbTranslate
      * @param {Fl32_Cms_Back_Helper_Translate} deps.helpTranslate
@@ -27,7 +28,8 @@ export default class Fl32_Cms_Back_Cli_Command_Translate {
         {
             DEF,
             logger,
-            reader,
+            config,
+            tmplConfig,
             gateOpenAI,
             dbTranslate,
             helpFile,
@@ -103,16 +105,15 @@ export default class Fl32_Cms_Back_Cli_Command_Translate {
             // FUNCS
 
             // MAIN
-            const config = reader.get('TEQ_CMS');
-            const localeBase = config.LOCALE_BASE_TRANSLATE;
-            const localeAllowed = config.LOCALE_ALLOWED;
+            const localeBase = config.getLocaleBaseTranslate();
+            const localeAllowed = tmplConfig.getAvailableLocales();
 
             // load the base locale and initialize the translation DB
             await dbTranslate.init();
             await helpTranslate.syncDbWithFilesystem(dbTranslate);
             await dbTranslate.save();
 
-            const model = config.AI_API_MODEL;
+            const model = config.getAiApiModel();
             const client = await gateOpenAI.initClient();
 
             const db = dbTranslate.getData();
@@ -185,7 +186,8 @@ export const __deps__ = Object.freeze({
     default: Object.freeze({
         DEF: 'Fl32_Cms_Back_Defaults$',
         logger: 'TeqFw_Log_Provider$',
-        reader: 'TeqFw_Cfg_Reader$',
+        config: 'Fl32_Cms_Back_Config$',
+        tmplConfig: 'Fl32_Tmpl_Back_Config$',
         gateOpenAI: 'Fl32_Cms_Back_Gate_OpenAI$',
         dbTranslate: 'Fl32_Cms_Back_Store_Db_Translate$',
         helpFile: 'Fl32_Cms_Back_Helper_File$',

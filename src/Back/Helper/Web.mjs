@@ -10,12 +10,12 @@ export default class Fl32_Cms_Back_Helper_Web {
     /**
      * @param {object} deps
      * @param {typeof import('node:http2')} deps.http2
-     * @param {TeqFw_Cfg_Reader} deps.reader
+     * @param {Fl32_Tmpl_Back_Config} deps.tmplConfig
      */
     constructor(
         {
             http2,
-            reader,
+            tmplConfig,
         }
     ) {
         // VARS
@@ -45,14 +45,14 @@ export default class Fl32_Cms_Back_Helper_Web {
          * @returns {string} - Resolved locale code (e.g. "en", "ru", etc.).
          */
         function resolveFromAcceptLanguage(header) {
-            const allowed = reader.get('TEQ_CMS').LOCALE_ALLOWED;
+            const allowed = tmplConfig.getAvailableLocales();
             const accepted = parseAcceptLanguage(header);
             for (const lang of accepted) {
                 if (allowed.includes(lang)) return lang;
                 const short = lang.split('-')[0];
                 if (allowed.includes(short)) return short;
             }
-            return reader.get('TEQ_CMS').LOCALE_BASE_WEB;
+            return tmplConfig.getDefaultLocale();
         }
 
         /**
@@ -63,7 +63,7 @@ export default class Fl32_Cms_Back_Helper_Web {
         function extractFromUrlPath(path) {
             const trimmed = path.replace(/^\/+|\/+$/g, '');
             const first = trimmed.split('/')[0];
-            if (reader.get('TEQ_CMS').LOCALE_ALLOWED.includes(first)) return first;
+            if (tmplConfig.getAvailableLocales().includes(first)) return first;
             return null;
         }
 
@@ -113,6 +113,6 @@ export default class Fl32_Cms_Back_Helper_Web {
 export const __deps__ = Object.freeze({
     default: Object.freeze({
         http2: 'node:http2',
-        reader: 'TeqFw_Cfg_Reader$',
+        tmplConfig: 'Fl32_Tmpl_Back_Config$',
     }),
 });

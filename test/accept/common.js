@@ -44,10 +44,7 @@ export function buildTestContainer() {
                 TYPE: 'http',
                 }
                 : {
-                    LOCALE_ALLOWED: ['en'],
                     LOCALE_BASE_TRANSLATE: 'en',
-                    LOCALE_BASE_WEB: 'en',
-                    ROOT_PATH: process.cwd(),
                 },
     });
     return container;

@@ -13,14 +13,14 @@ export default class Fl32_Cms_Back_Store_Db_Translate {
      * @param {typeof import('node:fs/promises')} deps.fs
      * @param {typeof import('node:path')} deps.path
      * @param {TeqFw_Log_Provider} deps.logger
-     * @param {TeqFw_Cfg_Reader} deps.reader
+     * @param {Fl32_Tmpl_Back_Config} deps.tmplConfig
      */
     constructor(
         {
             fs,
             path,
             logger,
-            reader,
+            tmplConfig,
         }
     ) {
 
@@ -32,7 +32,7 @@ export default class Fl32_Cms_Back_Store_Db_Translate {
          * @returns {string} Absolute path to JSON file
          */
         const getFilePath = () => path.resolve(
-            path.join(reader.get('TEQ_CMS').ROOT_PATH, 'var', 'teq-cms', 'db_translate.json')
+            path.join(tmplConfig.getRootPath(), 'var', 'teq-cms', 'db_translate.json')
         );
 
         /**
@@ -120,6 +120,6 @@ export const __deps__ = Object.freeze({
         fs: 'node:fs/promises',
         path: 'node:path',
         logger: 'TeqFw_Log_Provider$',
-        reader: 'TeqFw_Cfg_Reader$',
+        tmplConfig: 'Fl32_Tmpl_Back_Config$',
     }),
 });

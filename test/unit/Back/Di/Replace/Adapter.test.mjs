@@ -35,12 +35,9 @@ describe('Fl32_Cms_Back_Di_Replace_Adapter', () => {
     });
 
     container.register('TeqFw_Cfg_Reader$', {
-        get: (namespace) => namespace === 'TEQ_CMS' ? {
-            LOCALE_ALLOWED: ['en', 'ru'],
-            LOCALE_BASE_WEB: 'en',
-            ROOT_PATH: '/abs/app/root',
-            BASE_URL: 'https://mock.site',
-        } : {},
+        get: (namespace) => namespace === 'TEQ_CMS'
+            ? {BASE_URL: 'https://mock.site'}
+            : {ALLOWED_LOCALES: ['en', 'ru'], DEFAULT_LOCALE: 'en', ROOT_PATH: '/abs/app/root'},
     });
 
     container.register('Fl32_Tmpl_Back_Dto_Target$', {

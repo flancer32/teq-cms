@@ -17,7 +17,11 @@
 <main>
   <h1>О проекте</h1>
   <p>Демонстрационная страница TeqCMS.</p>
-  <p>Доступные языки: <a href="/{{ lang1 }}/about.html">{{ lang1 }}</a>, <a href="/{{ lang2 }}/about.html">{{ lang2 }}</a>, <a href="/{{ lang3 }}/about.html">{{ lang3 }}</a></p>
+  <p>Доступные языки:
+    {% for localeCode in allowedLocales %}
+      <a href="/{{ localeCode }}/about.html">{{ localeCode }}</a>{% if not loop.last %}, {% endif %}
+    {% endfor %}
+  </p>
 </main>
 </body>
 </html>

@@ -8,12 +8,12 @@ export default class Fl32_Cms_Back_Gate_OpenAI {
     /**
      * @param {object} deps
      * @param {typeof import('openai')} deps.openai
-     * @param {TeqFw_Cfg_Reader} deps.reader
+     * @param {Fl32_Cms_Back_Config} deps.config
      */
     constructor(
         {
             openai,
-            reader,
+            config,
         }
     ) {
         // VARS
@@ -24,10 +24,9 @@ export default class Fl32_Cms_Back_Gate_OpenAI {
          * @returns {Promise<object>}
          */
         this.initClient = async function () {
-            const config = reader.get('TEQ_CMS');
-            const apiKey = config.AI_API_KEY;
-            const baseURL = config.AI_API_BASE_URL;
-            const organization = config.AI_API_ORG;
+            const apiKey = config.getAiApiKey();
+            const baseURL = config.getAiApiBaseUrl();
+            const organization = config.getAiApiOrganization();
             return new OpenAI({baseURL, apiKey, organization});
         };
     }
@@ -36,6 +35,6 @@ export default class Fl32_Cms_Back_Gate_OpenAI {
 export const __deps__ = Object.freeze({
     default: Object.freeze({
         openai: 'npm:openai',
-        reader: 'TeqFw_Cfg_Reader$',
+        config: 'Fl32_Cms_Back_Config$',
     }),
 });

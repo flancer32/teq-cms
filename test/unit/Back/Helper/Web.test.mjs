@@ -10,7 +10,7 @@ describe('Fl32_Cms_Back_Helper_Web.extractRoutingInfo', () => {
     });
 
     container.register('TeqFw_Cfg_Reader$', {
-        get: () => ({LOCALE_ALLOWED: ['en', 'ru'], LOCALE_BASE_WEB: 'en'}),
+        get: () => ({ALLOWED_LOCALES: ['en', 'ru'], DEFAULT_LOCALE: 'en', ROOT_PATH: '/root'}),
     });
 
     it('should extract locale from first segment', async () => {

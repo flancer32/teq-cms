@@ -11,13 +11,13 @@ export default class Fl32_Cms_Back_Helper_File {
      * @param {object} deps
      * @param {typeof import('node:path')} deps.path
      * @param {typeof import('node:fs')} deps.fs
-     * @param {TeqFw_Cfg_Reader} deps.reader
+     * @param {Fl32_Tmpl_Back_Config} deps.tmplConfig
      */
     constructor(
         {
             path,
             fs,
-            reader,
+            tmplConfig,
         }
     ) {
         const {dirname, join} = path;
@@ -32,7 +32,7 @@ export default class Fl32_Cms_Back_Helper_File {
          * @returns {string} Absolute path
          */
         this.getLocalizedPath = function ({locale, path}) {
-            const root = reader.get('TEQ_CMS').ROOT_PATH;
+            const root = tmplConfig.getRootPath();
             return join(root, 'tmpl', 'web', locale, path);
         };
 
@@ -140,6 +140,6 @@ export const __deps__ = Object.freeze({
     default: Object.freeze({
         path: 'node:path',
         fs: 'node:fs',
-        reader: 'TeqFw_Cfg_Reader$',
+        tmplConfig: 'Fl32_Tmpl_Back_Config$',
     }),
 });

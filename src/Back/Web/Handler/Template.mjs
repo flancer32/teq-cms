@@ -17,7 +17,7 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
      * @param {Fl32_Tmpl_Back_Service_Load} deps.servTmplLoad
      * @param {Fl32_Tmpl_Back_Service_Render} deps.servTmplRender
      * @param {Fl32_Cms_Back_Api_Adapter} deps.adapter
-     * @param {TeqFw_Cfg_Reader} deps.reader
+     * @param {Fl32_Tmpl_Back_Config} deps.tmplConfig
      * @param {Fl32_Web_Back_Enum_Stage} deps.STAGE
      */
     constructor(
@@ -29,7 +29,7 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
             servTmplLoad,
             servTmplRender,
             adapter,
-            reader,
+            tmplConfig,
             STAGE,
         }
     ) {
@@ -60,12 +60,12 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
                 const {template} = await servTmplLoad.perform({target});
                 if (template) {
                     const url = req.url || '';
-                    const config = reader.get('TEQ_CMS');
-                    const hasLocale = config.LOCALE_ALLOWED.some(loc => url === `/${loc}` || url.startsWith(`/${loc}/`));
+                    const hasLocale = tmplConfig.getAvailableLocales()
+                        .some(loc => url === `/${loc}` || url.startsWith(`/${loc}/`));
 
                     if (!hasLocale) {
                         // TODO: move this code to Fl32_Web_Back_Helper_Respond
-                        const loc = target.locales.user ?? config.LOCALE_BASE_WEB;
+                        const loc = target.locales.user ?? tmplConfig.getDefaultLocale();
                         const newLoc = url.startsWith('/') ? `/${loc}${url}` : `/${loc}/${url}`;
                         res.writeHead(HTTP_STATUS_FOUND, {location: newLoc});
                         res.end();
@@ -112,7 +112,7 @@ export const __deps__ = Object.freeze({
         servTmplLoad: 'Fl32_Tmpl_Back_Service_Load$',
         servTmplRender: 'Fl32_Tmpl_Back_Service_Render$',
         adapter: 'Fl32_Cms_Back_Api_Adapter$',
-        reader: 'TeqFw_Cfg_Reader$',
+        tmplConfig: 'Fl32_Tmpl_Back_Config$',
         STAGE: 'Fl32_Web_Back_Enum_Stage$',
     }),
 });

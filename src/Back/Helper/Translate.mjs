@@ -12,14 +12,16 @@ export default class Fl32_Cms_Back_Helper_Translate {
      * @param {typeof import('node:path')} deps.path
      * @param {typeof import('node:fs')} deps.fs
      * @param {TeqFw_Log_Provider} deps.logger
-     * @param {TeqFw_Cfg_Reader} deps.reader
+     * @param {Fl32_Tmpl_Back_Config} deps.tmplConfig
+     * @param {Fl32_Cms_Back_Config} deps.config
      */
     constructor(
         {
             path,
             fs,
             logger,
-            reader,
+            tmplConfig,
+            config,
         }
     ) {
         const {join, relative, resolve} = path;
@@ -33,9 +35,8 @@ export default class Fl32_Cms_Back_Helper_Translate {
          * @returns {Promise<void>}
          */
         this.syncDbWithFilesystem = async function (db) {
-            const config = reader.get('TEQ_CMS');
-            const baseLocale = config.LOCALE_BASE_TRANSLATE;
-            const root = config.ROOT_PATH;
+            const baseLocale = config.getLocaleBaseTranslate();
+            const root = tmplConfig.getRootPath();
             const dir = join(root, 'tmpl', 'web', baseLocale);
             const abs = resolve(dir);
             const allowedExt = '.html';
@@ -101,6 +102,7 @@ export const __deps__ = Object.freeze({
         path: 'node:path',
         fs: 'node:fs',
         logger: 'TeqFw_Log_Provider$',
-        reader: 'TeqFw_Cfg_Reader$',
+        tmplConfig: 'Fl32_Tmpl_Back_Config$',
+        config: 'Fl32_Cms_Back_Config$',
     }),
 });

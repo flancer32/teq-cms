@@ -10,7 +10,7 @@ export default class Fl32_Cms_Back_Cli_Command_Web {
     /**
      * @param {object} deps
      * @param {typeof import('node:path')} deps.path
-     * @param {TeqFw_Cfg_Reader} deps.reader
+     * @param {Fl32_Tmpl_Back_Config} deps.tmplConfig
      * @param {Fl32_Web_Back_Config_Runtime__Factory} deps.configFactory
      * @param {Fl32_Web_Back_PipelineEngine} deps.dispatcher
      * @param {Fl32_Web_Back_Handler_Pre_Log} deps.handLog
@@ -22,7 +22,7 @@ export default class Fl32_Cms_Back_Cli_Command_Web {
     constructor(
         {
             path,
-            reader,
+            tmplConfig,
             configFactory,
             dispatcher,
             handLog,
@@ -45,8 +45,7 @@ export default class Fl32_Cms_Back_Cli_Command_Web {
          * @returns {Promise<object>}
          */
         this.start = async function ({signal}) {
-            const config = reader.get('TEQ_CMS');
-            const rootCms = config.ROOT_PATH;
+            const rootCms = tmplConfig.getRootPath();
             const rootWeb = path.join(rootCms, 'web');
 
             const dto = dtoSource.create({
@@ -76,7 +75,7 @@ export default class Fl32_Cms_Back_Cli_Command_Web {
 export const __deps__ = Object.freeze({
     default: Object.freeze({
         path: 'node:path',
-        reader: 'TeqFw_Cfg_Reader$',
+        tmplConfig: 'Fl32_Tmpl_Back_Config$',
         configFactory: 'Fl32_Web_Back_Config_Runtime__Factory$',
         dispatcher: 'Fl32_Web_Back_PipelineEngine$',
         handLog: 'Fl32_Web_Back_Handler_Pre_Log$',

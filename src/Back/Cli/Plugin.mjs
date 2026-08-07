@@ -16,45 +16,31 @@ export default class Fl32_Cms_Back_Cli_Plugin {
      */
     constructor({loader, object, dotenv, processEnv, fs, path}) {
         /**
-         * Loads defaults, an optional dotenv file, and process environment values.
+         * Loads application defaults, an optional dotenv file, and process environment values.
          *
          * @returns {Promise<void>}
          */
         this.onStartup = async function () {
-            const root = process.env.TEQ_CMS_ROOT
-                ? path.resolve(process.cwd(), process.env.TEQ_CMS_ROOT)
-                : process.cwd();
             const defaults = {
-                    TEQFW_TMPL__ALLOWED_LOCALES: process.env.TEQ_CMS_LOCALE_ALLOWED?.split(',') || ['en', 'es', 'ru'],
-                    TEQFW_TMPL__DEFAULT_LOCALE: process.env.TEQ_CMS_LOCALE_BASE_DISPLAY || 'en',
-                    TEQFW_TMPL__ENGINE: process.env.TEQ_CMS_TMPL_ENGINE || 'nunjucks',
-                    TEQFW_TMPL__ROOT_PATH: root,
-                    TEQFW_WEB__PORT: process.env.TEQ_CMS_SERVER_PORT || 3000,
-                    TEQFW_WEB__TYPE: process.env.TEQ_CMS_SERVER_TYPE || 'http',
-                    TEQ_CMS__AI_API_BASE_URL: process.env.TEQ_CMS_AI_API_BASE_URL,
-                    TEQ_CMS__AI_API_KEY: process.env.TEQ_CMS_AI_API_KEY,
-                    TEQ_CMS__AI_API_MODEL: process.env.TEQ_CMS_AI_API_MODEL || 'gpt-4o-mini',
-                    TEQ_CMS__AI_API_ORG: process.env.TEQ_CMS_AI_API_ORG,
-                    TEQ_CMS__BASE_URL: process.env.TEQ_CMS_BASE_URL,
-                    TEQ_CMS__LOCALE_ALLOWED: process.env.TEQ_CMS_LOCALE_ALLOWED?.split(',') || ['en', 'es', 'ru'],
-                    TEQ_CMS__LOCALE_BASE_TRANSLATE: process.env.TEQ_CMS_LOCALE_BASE_TRANSLATE || 'ru',
-                    TEQ_CMS__LOCALE_BASE_WEB: process.env.TEQ_CMS_LOCALE_BASE_DISPLAY || 'en',
-                    TEQ_CMS__ROOT_PATH: root,
+                TEQFW_TMPL__ALLOWED_LOCALES: ['en', 'es', 'ru'],
+                TEQFW_TMPL__DEFAULT_LOCALE: 'en',
+                TEQFW_TMPL__ROOT_PATH: process.cwd(),
+                TEQ_CMS__AI_API_MODEL: 'gpt-4o-mini',
+                TEQ_CMS__LOCALE_BASE_TRANSLATE: 'ru',
             };
-            for (const key of Object.keys(defaults)) {
-                if (defaults[key] === undefined) delete defaults[key];
-            }
             const sources = [object.create(defaults, 'teq-cms-defaults')];
 
-            const dotenvPath = path.join(root, '.env');
+            const dotenvPath = path.join(process.cwd(), '.env');
             try {
                 await fs.access(dotenvPath);
-                sources.push(dotenv.create({path: dotenvPath, id: 'project-dotenv'}));
+                sources.push(normalizeListValues(
+                    dotenv.create({path: dotenvPath, id: 'project-dotenv'}),
+                ));
             } catch {
                 // An absent dotenv file is an optional configuration source.
             }
 
-            sources.push(processEnv.create(process.env));
+            sources.push(normalizeListValues(processEnv.create(process.env)));
             await loader.load(sources);
         };
 
@@ -65,6 +51,35 @@ export default class Fl32_Cms_Back_Cli_Plugin {
          */
         this.onShutdown = async function () {};
     }
+}
+
+/**
+ * Normalizes comma-separated values before they enter typed configuration.
+ *
+ * Environment-backed Sources can only provide strings, while the tmpl
+ * configuration contract exposes available locales as an array. The host
+ * performs this boundary conversion because it owns configuration sources.
+ *
+ * @param {TeqFw_Cfg_Source__Captured} source
+ * @returns {TeqFw_Cfg_Source__Captured}
+ */
+function normalizeListValues(source) {
+    return Object.freeze({
+        id: source.id,
+        load: async () => {
+            const entries = await source.load();
+            return Object.freeze(entries.map(entry => {
+                if (entry.key !== 'TEQFW_TMPL__ALLOWED_LOCALES' || typeof entry.value !== 'string') {
+                    return entry;
+                }
+                const value = entry.value
+                    .split(',')
+                    .map(item => item.trim())
+                    .filter(Boolean);
+                return Object.freeze({...entry, value});
+            }));
+        },
+    });
 }
 
 export const __deps__ = Object.freeze({

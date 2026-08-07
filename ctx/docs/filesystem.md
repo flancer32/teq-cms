@@ -11,6 +11,7 @@ Defines the declarative structure of the project repository at the top level onl
 
 - `.agents/` — project-local skills linked from installed TeqFW packages and project-owned skills.
 - `ctx/` — cognitive context containing project documentation and project-local agent materials.
+- `bootstrap/` — pre-DI host composition modules loaded directly by the process host.
 - `src/` — CMS runtime implementation.
 - `test/` — unit and acceptance tests.
 - `tmpl/` — sample website templates.

@@ -16,6 +16,7 @@ const SRC = path.resolve(import.meta.dirname, '../../src');
 export function buildTestContainer() {
     const container = new Container();
     container.addNamespaceRoot('Fl32_Cms_', SRC, '.mjs');
+    container.addNamespaceRoot('Fl32_Tmpl_', path.resolve(import.meta.dirname, '../../node_modules/@flancer32/teq-tmpl/src'), '.js');
     container.addNamespaceRoot('TeqFw_Cfg_', path.resolve(import.meta.dirname, '../../node_modules/@teqfw/cfg/src'), '.mjs');
     container.addNamespaceRoot('TeqFw_Log_', path.resolve(import.meta.dirname, '../../node_modules/@teqfw/log/src'), '.mjs');
     container.enableTestMode();

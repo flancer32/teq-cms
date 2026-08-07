@@ -20,7 +20,8 @@ export default class Fl32_Cms_Back_Di_Replace_Adapter {
      * @param {object} deps
      * @param {typeof import('node:path')} deps.path
      * @param {TeqFw_Log_Provider} deps.logger
-     * @param {TeqFw_Cfg_Reader} deps.reader
+     * @param {Fl32_Tmpl_Back_Config} deps.tmplConfig
+     * @param {Fl32_Cms_Back_Config} deps.config
      * @param {Fl32_Tmpl_Back_Dto_Target} deps.dtoTmplTarget
      * @param {Fl32_Cms_Back_Helper_Web} deps.helpWeb
      * @param {Fl32_Cms_Back_Helper_File} deps.helpFile
@@ -29,7 +30,8 @@ export default class Fl32_Cms_Back_Di_Replace_Adapter {
         {
             path,
             logger,
-            reader,
+            tmplConfig,
+            config,
             dtoTmplTarget,
             helpWeb,
             helpFile,
@@ -47,16 +49,15 @@ export default class Fl32_Cms_Back_Di_Replace_Adapter {
         this.getRenderData = async function ({req}) {
             let target, data, options;
             try {
-                const config = reader.get('TEQ_CMS');
-                const localeAllowed = config.LOCALE_ALLOWED;
-                const localeBaseWeb = config.LOCALE_BASE_WEB;
+                const localeAllowed = tmplConfig.getAvailableLocales();
+                const localeBaseWeb = tmplConfig.getDefaultLocale();
                 const rawPath = decodeURIComponent(req.url?.split('?')[0] || '');
                 const {cleanPath, locale} = helpWeb.extractRoutingInfo({
                     path: rawPath,
                     allowedLocales: localeAllowed,
                     fallbackLocale: localeBaseWeb,
                 });
-                const root = config.ROOT_PATH;
+                const root = tmplConfig.getRootPath();
                 const baseDir = join(root, 'tmpl', 'web', localeBaseWeb);
                 const tmplPath = await helpFile.resolveTemplateName({
                     baseDir,
@@ -73,7 +74,7 @@ export default class Fl32_Cms_Back_Di_Replace_Adapter {
                         },
                     });
 
-                    const rawBaseUrl = config.BASE_URL;
+                    const rawBaseUrl = config.getBaseUrl();
                     const baseUrl = (rawBaseUrl || `//${req.headers.host || 'localhost'}`).replace(/\/+$/, '');
 
                     const canonicalUrl = `${baseUrl}/${localeBaseWeb}/${tmplPath}`;
@@ -107,7 +108,8 @@ export const __deps__ = Object.freeze({
     default: Object.freeze({
         path: 'node:path',
         logger: 'TeqFw_Log_Provider$',
-        reader: 'TeqFw_Cfg_Reader$',
+        tmplConfig: 'Fl32_Tmpl_Back_Config$',
+        config: 'Fl32_Cms_Back_Config$',
         dtoTmplTarget: 'Fl32_Tmpl_Back_Dto_Target$',
         helpWeb: 'Fl32_Cms_Back_Helper_Web$',
         helpFile: 'Fl32_Cms_Back_Helper_File$',
