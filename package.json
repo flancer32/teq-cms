@@ -28,27 +28,66 @@
     "url": "git+https://github.com/flancer32/teq-cms.git"
   },
   "types": "./types.d.ts",
+  "files": [
+    "src/",
+    "tmpl/",
+    "web/",
+    "CHANGELOG.md",
+    "jsconfig.json",
+    "LICENSE",
+    "README.md",
+    "types.d.ts"
+  ],
   "scripts": {
-    "start": "npx teq-cms web",
-    "test:eslint": "./node_modules/.bin/eslint ./src/",
-    "test:accept": "node --test $(find ./accept/unit -name '*.test.mjs')",
-    "test:unit": "node --test $(find ./test/unit -name '*.test.mjs')"
-  },
-  "bin": {
-    "teq-cms": "./bin/teq-cms.mjs"
+    "start": "teq web:start",
+    "test:accept": "node --test $(find ./test/accept -name '*.test.mjs')",
+    "test:unit": "node --test $(find ./test/unit -name '*.test.mjs')",
+    "test": "npm run test:unit && npm run test:accept"
   },
   "dependencies": {
-    "@flancer32/teq-tmpl": "^0.3.0",
-    "@flancer32/teq-web": "^0.3.0",
-    "@teqfw/di": "^1.2.0",
-    "dotenv": "^16.5.0",
+    "@flancer32/teq-tmpl": "^0.4.0",
+    "@flancer32/teq-web": "^0.16.0",
+    "@teqfw/cfg": "^2.0.0",
+    "@teqfw/cli": "^2.0.0",
+    "@teqfw/di": "^2.9.0",
+    "@teqfw/log": "^2.0.0",
     "openai": "^4.103.0"
   },
+  "teqfw": {
+    "fw": {
+      "di": {
+        "namespaces": [
+          {
+            "prefix": "Fl32_Cms_",
+            "path": "./src",
+            "ext": ".mjs"
+          }
+        ]
+      },
+      "cli": {
+        "container": {
+          "configurator": "./src/Back/Cli/Configurator.mjs"
+        },
+        "plugin": "Fl32_Cms_Back_Cli_Plugin$",
+        "command": {
+          "default": "web:start"
+        },
+        "commands": [
+          {
+            "id": "web:start",
+            "summary": "Start the TeqCMS web server.",
+            "component": "Fl32_Cms_Back_Cli_Command_Web$"
+          },
+          {
+            "id": "translate",
+            "summary": "Translate CMS templates.",
+            "component": "Fl32_Cms_Back_Cli_Command_Translate$"
+          }
+        ]
+      }
+    }
+  },
   "devDependencies": {
-    "@eslint/js": "^9.25.0",
-    "eslint": "^9.25.0",
-    "eslint-plugin-jsdoc": "^50.6.8",
-    "mocha": "^11.3.0",
     "nunjucks": "^3.2.4"
   },
   "overrides": {

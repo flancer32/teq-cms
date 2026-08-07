@@ -1,140 +1,110 @@
-# AGENTS.md — entry instruction for LLM agents
+# Root Level
 
-Version: 20251124
+- Path: `AGENTS.md`
+- Template Version: `20260702`
+- Changed: `20260807`
 
 ## Purpose
 
-This file is the root entry point for projects that use ADSM (Agent-Driven Software Management).
-It defines the roles of the Human and the Agent, the structure of the cognitive context, and the methodology invariants.
-It is read by the Agent first, before any local instructions.
+This file defines the root-level working rules for the project repository.
 
----
+This file is the first instruction source for every agent operating within the repository.
 
-## ADSM Principles
+## Level Boundary
 
-### Project Spaces
+Defines:
 
-A project consists of two interconnected spaces:
+- Root-level working boundaries between the repository, the cognitive context, and the software product.
+- Repository-topology rules needed to work safely when `ctx/` may be mounted separately.
+- Root-level protection and escalation rules for this project.
 
-- **Cognitive context** (`./ctx/`) — documentation, rules, specifications.
-- **Software product** (everything outside `ctx/`) — source code and executable artifacts.
+Does NOT define:
 
-The context defines the rules for modifying the product; the product reflects the applied context.
+- Product-specific meaning, requirements, or domain knowledge.
+- Implementation-level structure such as source code, runtime details, or filesystem layout.
+- Task-specific instructions, workflows, or local operational procedures.
 
-### Interaction
+## ADSM Project Model
 
-- The Human formulates goals, maintains the context, and approves changes.
-- The Agent interprets the context and modifies the product within its boundaries.
-- Every iteration ends with an Agent report.
+An ADSM project consists of two interconnected spaces:
 
----
+- the **Cognitive Context** located in `./ctx/`
+- the **Software Product** located outside `./ctx/`
 
-## Roles
+The cognitive context is the long-term textual memory of the project.
 
-**Human:** goals, context management, approval of changes, structural development.  
-**Agent:** task execution within the context, correct modification of the product, maintaining consistency, preparing iteration reports.
+The cognitive context is the primary communication medium between Humans and Agents working on the project.
 
----
+The cognitive context is the authoritative knowledge source used by Agents when modifying the project.
 
-## Minimal Project Structure
+The software product is the implementation that must be kept consistent with the cognitive context.
 
-```text
-/
-├─ ctx/         ← cognitive context
-├─ AGENTS.md    ← instruction for agents
-└─ README.md    ← human-readable project description
-```
+## Human and Agent Roles
 
----
+The Human defines goals, authorizes work, evaluates outcomes, and evolves the project.
 
-## Context Dependencies
+The Agent interprets the cognitive context, performs assigned tasks, modifies the project within task boundaries, and maintains consistency between the cognitive context and the software product.
 
-Agent behavior is defined by documents located in:
+The Agent operates through text and must treat project documentation as operational memory, not as secondary commentary.
 
-```txt
-./ctx/
-```
+## Cognitive Context
 
-Recommended files:
+The canonical execution location of the cognitive context is `./ctx/`.
 
-- `ctx/agent/AGENTS.md` — local agent rules;
-- `ctx/product/overview.md` — product purpose;
-- `ctx/rules/architecture.md` — architectural principles;
-- `ctx/rules/language.md` — language policy;
-- `ctx/rules/privacy.md` — personal-data handling rules.
+Project-specific knowledge, requirements, architecture, environment descriptions, and implementation guidance are defined within the cognitive context.
 
-### AGENTS.md instructions in other directories
+The Agent must consult `./ctx/AGENTS.md` for project-specific instructions when `./ctx/` exists.
 
-If the project contains additional `AGENTS.md` files (e.g., `ctx/rules/AGENTS.md`, `src/module/AGENTS.md`), the Agent must treat them as part of the cognitive context **within their respective space**.
+The Agent must consult `./ctx/docs/filesystem.md` for the project filesystem structure and documentation layout when that file exists.
 
-**ADSM Rule:**  
-When performing a task in directory `X`, the effective working context for the Agent consists of all `AGENTS.md` files located along the path from the project root to directory `X`.
+Documentation distributed with the software product may exist outside `./ctx/`, but it does not replace, redefine, or supersede the cognitive context.
 
-The Agent must:
+## Bootstrap and Repository Topology
 
-- treat all these files as a unified system of rules;
-- resolve overlaps according to directory hierarchy (deeper directories have higher priority within their space).
+An ADSM project may use one repository or two repositories.
 
----
+In a one-repository topology, the software product and the cognitive context are versioned together.
 
-## `@LLM-DOC` Comments
+In a two-repository topology, the software product and the cognitive context are independent version-controlled repositories, and the cognitive context repository is mounted under `./ctx/`.
 
-`@LLM-DOC` is embedded context inside the source code.  
-It records architectural decisions and is protected.
+The Agent must detect whether `./ctx/` is part of the current repository or an independent version-controlled repository.
 
-Rules:
+The Agent must preserve repository boundaries.
 
-1. The marker is used only inside source files.
-2. All comments must be written in English.
-3. The Agent must detect, preserve, and never modify or delete any `@LLM-DOC` comment, using it as authoritative context.
+The Agent must not mix changes between independent repositories.
 
-**ADSM Invariant:** modifying `@LLM-DOC` = `execution error`.
+The Agent must not remove, replace, relocate, or unmount `./ctx/`.
 
----
+If `./ctx/` does not exist, the Agent may perform bootstrap operations required to create the initial cognitive context structure.
 
-## Reporting
+After bootstrap is complete, `./ctx/AGENTS.md` becomes the entry point for project-specific instructions.
 
-Each iteration ends with a report:
+## Context and Product Consistency
 
-```txt
-./ctx/agent/report/YYYY/MM/DD/HH-MM-{title}.md
-```
+The cognitive context is the source of truth for the project.
 
-A report includes the iteration goal, performed actions, and resulting artifacts.  
-Missing report = `execution error`.  
-If `ctx/agent/report-template.md` exists, the Agent uses it.
+If the cognitive context and the software product diverge, the Agent must treat the cognitive context as authoritative.
 
-**Protection Rule:**  
-All files inside `ctx/agent/report/` are immutable.  
-The Agent must **never modify, delete, rewrite, or rename** any file in this directory.  
-Attempting to alter a historical report = `execution error`.
+The Agent must maintain consistency between the cognitive context and the software product.
 
----
+The Agent may modify the cognitive context when required by the assigned task and when the modification remains consistent with higher-level context constraints.
 
-## Historical Reports (`ctx/agent/report/`)
+The Agent may modify the software product when required by the assigned task and when the modification remains consistent with the cognitive context.
 
-The `ctx/agent/report/` directory is a **historical archive** of past human–agent interactions.
+## AGENTS.md Hierarchy
+
+Additional `AGENTS.md` files may exist in subdirectories.
+
+The effective working context of the Agent is the aggregate of all `AGENTS.md` files located along the path from the repository root to the target directory.
 
 Rules:
 
-1. Reports are **read-only artifacts**.  
-   They must never be modified, reprocessed, regenerated, or merged by the Agent.
+- deeper levels override higher levels within their scope
+- root-level invariants cannot be overridden
+- all levels must remain mutually consistent
 
-2. The directory is **not part of the active cognitive context**.  
-   The Agent must **not read, scan, analyze, summarize, or infer rules** from historical reports unless the Human explicitly instructs otherwise.
+## Root File Protection
 
-3. Only the Human may restructure or reorganize past reports.  
-   The Agent creates **only a new report for the current iteration** and does not touch previous ones.
+This file defines root-level project control rules.
 
----
-
-## Compatibility
-
-This file defines ADSM invariants and is used unchanged across all projects.  
-Project-specific specifications are placed in `./ctx/` and in `@LLM-DOC` comments.
-
----
-
-## `output.md` Files
-
-`output.md` files are not part of the cognitive context and must be ignored by the Agent.
+The Agent must not modify, replace, delete, relocate, or reinterpret this file unless explicitly instructed by the Human.

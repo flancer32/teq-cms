@@ -1,0 +1,32 @@
+# Dependency Injection Rules
+
+## Composition Root
+
+TeqCMS uses `@teqfw/di` as the sole mechanism for linking modules.
+The `@teqfw/cli` executable creates the container once and assembles the dependency graph.
+TeqCMS contributes namespace metadata, a host configurator, a configuration-loading plugin, and command descriptors through `package.json`.
+
+All DI-environment modifications occur at the composition boundary.
+Internal modules resolve dependencies through DI identifiers and must not access the container directly.
+
+## Application Extensions
+
+Applications customize TeqCMS through the public configurator mechanism or package metadata:
+
+```js
+export default class Configurator {
+  configure({applicationRoot, argv}) {
+    return {namespaceRoots: [], preprocessors: []};
+  }
+}
+```
+
+The configurator may add application namespace roots and override implementations through returned preprocessors.
+It must not contain static imports from TeqCMS or depend on application code from the CMS package.
+
+## Invariants
+
+- Internal components depend on DI tokens rather than host implementation paths.
+- The application must not access the container outside the composition root.
+- Host applications customize the CMS through the configurator boundary.
+- The CMS remains an isolated core.

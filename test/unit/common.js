@@ -15,8 +15,9 @@ const SRC = path.resolve(import.meta.dirname, '../../src');
  */
 export function buildTestContainer() {
     const container = new Container();
-    const resolver = container.getResolver();
-    resolver.addNamespaceRoot('Fl32_Cms_', SRC);
+    container.addNamespaceRoot('Fl32_Cms_', SRC, '.mjs');
+    container.addNamespaceRoot('TeqFw_Cfg_', path.resolve(import.meta.dirname, '../../node_modules/@teqfw/cfg/src'), '.mjs');
+    container.addNamespaceRoot('TeqFw_Log_', path.resolve(import.meta.dirname, '../../node_modules/@teqfw/log/src'), '.mjs');
     container.enableTestMode();
     return container;
 }

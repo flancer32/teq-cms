@@ -9,9 +9,8 @@ describe('Fl32_Cms_Back_Helper_Web.extractRoutingInfo', () => {
         constants: {HTTP2_HEADER_ACCEPT_LANGUAGE: 'accept-language'},
     });
 
-    container.register('Fl32_Cms_Back_Config$', {
-        getLocaleAllowed: () => ['en', 'ru'],
-        getLocaleBaseWeb: () => 'en',
+    container.register('TeqFw_Cfg_Reader$', {
+        get: () => ({LOCALE_ALLOWED: ['en', 'ru'], LOCALE_BASE_WEB: 'en'}),
     });
 
     it('should extract locale from first segment', async () => {

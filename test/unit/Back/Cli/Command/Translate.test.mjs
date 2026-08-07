@@ -16,8 +16,8 @@ describe('Fl32_Cms_Back_Cli_Command_Translate.fetchFullCompletion', () => {
 
     // Stubs for required deps
     container.register('Fl32_Cms_Back_Defaults$', {PROMPT_SYSTEM: ''});
-    container.register('Fl32_Cms_Back_Logger$', {info: () => {}, error: () => {}, warn: () => {}});
-    container.register('Fl32_Cms_Back_Config$', {getAiApiModel: () => 'm'});
+    container.register('TeqFw_Log_Provider$', {forSource: () => ({info: () => {}, error: () => {}, warn: () => {}})});
+    container.register('TeqFw_Cfg_Reader$', {get: () => ({AI_API_MODEL: 'm'})});
     container.register('Fl32_Cms_Back_Store_Db_Translate$', {});
     container.register('Fl32_Cms_Back_Helper_File$', {});
     container.register('Fl32_Cms_Back_Helper_Translate$', {});

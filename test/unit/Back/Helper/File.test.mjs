@@ -30,8 +30,8 @@ describe('Fl32_Cms_Back_Helper_File.resolveTemplateName', () => {
         extname: (p) => path.extname(p),
     });
 
-    container.register('Fl32_Cms_Back_Config$', {
-        getRootPath: () => '/root',
+    container.register('TeqFw_Cfg_Reader$', {
+        get: () => ({ROOT_PATH: '/root'}),
     });
 
     it('should return exact file when exists', async () => {

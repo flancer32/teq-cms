@@ -30,20 +30,29 @@ Learn more at: [https://cms.teqfw.com](https://cms.teqfw.com)
 
 ---
 
-## Configuring TeqCMS in External Applications
+## Running TeqCMS
 
-TeqCMS lets host applications register their DI customizations during startup. Drop a `teqcms.config.mjs` file into the project root (or fall back to `teqcms.config.js` for CommonJS support) or add a `"teqcms"` entry to `package.json` that points to a configurator module. TeqCMS loads the module before running any CLI commands and invokes its default export with `{ resolver, replace }`, so the application can add namespace roots or swap implementations without touching the container directly.
+TeqCMS uses the standard `@teqfw/cli` host and publishes metadata-driven commands. Run the web server with `npm start` or `npm exec -- teq web:start`; run translations with `npm exec -- teq translate`.
+
+Host applications customize the container through `teqfw.fw.cli.container.configurator` in their `package.json`. The configurator exports a default class with a `configure({applicationRoot, argv})` method and returns namespace roots, preprocessors, or postprocessors. It does not receive or construct the DI container.
 
 ```json
-"teqcms": {
-  "configure": "./src/cms/setup.js"
+"teqfw": {
+  "fw": {
+    "cli": {
+      "container": {
+        "configurator": "./src/cms/Configurator.mjs"
+      }
+    }
+  }
 }
 ```
 
 ```js
-export default async function configure({ resolver, replace }) {
-  resolver.addNamespaceRoot('App_', './src');
-  replace.add('Fl32_Cms_Back_Api_Adapter', 'App_Cms_Custom_Adapter');
+export default class Configurator {
+  configure({applicationRoot, argv}) {
+    return {namespaceRoots: [], preprocessors: []};
+  }
 }
 ```
 
