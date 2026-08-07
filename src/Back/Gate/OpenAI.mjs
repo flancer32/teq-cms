@@ -22,7 +22,7 @@ export default class Fl32_Cms_Back_Gate_OpenAI {
         };
 
         /**
-         * @returns {object}
+         * @returns {Fl32_Cms_Back_Gate_OpenAI_Config}
          */
         const getConfig = function () {
             const baseUrl = normalizeBaseUrl(config.getAiApiBaseUrl());
@@ -73,13 +73,13 @@ export default class Fl32_Cms_Back_Gate_OpenAI {
         /**
          * Creates an async iterable from an OpenAI streaming response.
          * @param {Response} response
-         * @returns {Promise<object>}
+         * @returns {Promise<Fl32_Cms_Back_Gate_OpenAI_Stream>}
          */
         const readStream = async function (response) {
             /**
-             * @returns {Promise<object>}
+             * @returns {Promise<Fl32_Cms_Back_Gate_OpenAI_Stream>}
              */
-            const stream = async function* () {
+            const stream = /** @type {() => Promise<Fl32_Cms_Back_Gate_OpenAI_Stream>} */ (/** @type {unknown} */ (async function* () {
                 if (!response.body?.getReader) throw new Error('OpenAI streaming response has no body.');
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
@@ -99,7 +99,7 @@ export default class Fl32_Cms_Back_Gate_OpenAI {
                     const chunk = parseEvent(buffer);
                     if (chunk) yield chunk;
                 }
-            };
+            }));
             return stream();
         };
 
@@ -107,10 +107,11 @@ export default class Fl32_Cms_Back_Gate_OpenAI {
          * @param {object} deps - Request parameters.
          * @param {string} deps.model - Model name.
          * @param {object[]} deps.messages - Chat message history.
-         * @returns {Promise<object>} Streaming response chunks.
+         * @returns {Promise<Fl32_Cms_Back_Gate_OpenAI_Stream>} Streaming response chunks.
          */
         this.createChatCompletion = async function ({model, messages}) {
             const {baseUrl, apiKey} = getConfig();
+            /** @type {Record<string, string>} */
             const headers = {
                 'content-type': 'application/json',
                 authorization: `Bearer ${apiKey}`,

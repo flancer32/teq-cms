@@ -53,10 +53,11 @@ export default class Fl32_Cms_Back_Helper_Translate {
             /**
              * @param {string} dirAbs
              * @param {string} baseAbs
-             * @returns {Promise<object>}
+             * @returns {Promise<Fl32_Cms_Back_Helper_Translate_Scan>}
              */
             async function scan(dirAbs, baseAbs) {
                 const entries = await readdir(dirAbs, {withFileTypes: true});
+                /** @type {Map<string, string>} */
                 const result = new Map();
                 for (const entry of entries) {
                     const absPath = join(dirAbs, entry.name);

@@ -37,5 +37,5 @@ export default class Fl32_Cms_Back_Api_Adapter {
  * @typedef {object} Fl32_Cms_Back_Api_Adapter.RenderData
  * @property {object} data - Variables used in the template (e.g., page metadata, content blocks, user info).
  * @property {object} options - Template engine options (e.g., layout, partials, flags).
- * @property {Fl32_Tmpl_Back_Dto_Target.Dto} target - Render target metadata including template path, type, and localization context.
+ * @property {Fl32_Tmpl_Back_Dto_Target__DTO} target - Render target metadata including template path, type, and localization context.
  */

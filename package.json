@@ -45,7 +45,9 @@
     "help": "teq help",
     "test:accept": "node --test $(find ./test/accept -name '*.test.mjs')",
     "test:unit": "node --test $(find ./test/unit -name '*.test.mjs')",
-    "test": "npm run test:unit && npm run test:accept"
+    "test": "npm run test:unit && npm run test:accept",
+    "typecheck": "tsc -p jsconfig.json",
+    "validate:esm": "teqfw-esm-validator src --profile base"
   },
   "dependencies": {
     "@flancer32/teq-tmpl": "git+https://github.com/flancer32/teq-tmpl.git#main",
@@ -56,6 +58,10 @@
     "@teqfw/log": "^2.0.0",
     "mustache": "^4.2.0",
     "nunjucks": "^3.2.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "typescript": "^5.9.3"
   },
   "teqfw": {
     "fw": {

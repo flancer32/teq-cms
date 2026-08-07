@@ -41,7 +41,7 @@ export default class Fl32_Cms_Back_Cli_Command_Translate {
 
         /**
          * Read streamed LLM content.
-         * @param {AsyncIterable<object>} stream - Async iterator of streamed OpenAI response chunks.
+         * @param {AsyncIterable<Fl32_Cms_Back_Cli_Command_Translate_Stream_Chunk>} stream - Async iterator of streamed OpenAI response chunks.
          * @returns {Promise<string>} - Concatenated content received from the stream.
          */
         const readStreamedContent = async function (stream) {

@@ -14,12 +14,13 @@ export default class Fl32_Cms_Back_Di_Replace_Tmpl_Engine {
      * @param {Fl32_Tmpl_Back_Api_Engine} deps.nunjucks
      */
     constructor({config, simple, mustache, nunjucks}) {
+        /** @type {Record<string, Fl32_Tmpl_Back_Api_Engine>} */
         const engines = {simple, mustache, nunjucks};
         const engine = engines[config.getEngine()] ?? simple;
 
         /**
-         * @param {object} params
-         * @returns {Promise<object>}
+         * @param {Fl32_Cms_Back_Di_Replace_Tmpl_Engine_Params} params
+         * @returns {Promise<Fl32_Cms_Back_Di_Replace_Tmpl_Engine_Result>}
          */
         this.render = (params) => engine.render(params);
     }

@@ -10,7 +10,7 @@
  * Extracts the user locale from the first URL segment and builds the template path
  * based on the remaining segments. Falls back to the base locale if no match is found.
  *
- * Returns a render target DTO (`Fl32_Tmpl_Back_Dto_Target.Dto`) with a resolved path and locales,
+ * Returns a render target DTO (`Fl32_Tmpl_Back_Dto_Target__DTO`) with a resolved path and locales,
  * along with request metadata and rendering options.
  *
  * @implements Fl32_Cms_Back_Api_Adapter
@@ -43,7 +43,7 @@ export default class Fl32_Cms_Back_Di_Replace_Adapter {
         // MAIN
         /**
          * @param {object} deps
-         * @param {object} deps.req
+         * @param {Fl32_Cms_Back_Di_Replace_Adapter_Request} deps.req
          * @returns {Promise<object>}
          */
         this.getRenderData = async function ({req}) {
@@ -78,6 +78,7 @@ export default class Fl32_Cms_Back_Di_Replace_Adapter {
                     const baseUrl = (rawBaseUrl || `//${req.headers.host || 'localhost'}`).replace(/\/+$/, '');
 
                     const canonicalUrl = `${baseUrl}/${localeBaseWeb}/${tmplPath}`;
+                    /** @type {Record<string, string>} */
                     const alternateUrls = {};
                     for (const loc of localeAllowed) {
                         alternateUrls[loc] = `${baseUrl}/${loc}/${tmplPath}`;

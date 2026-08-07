@@ -16,7 +16,7 @@ export default class Fl32_Cms_Back_Helper_Cast {
          *
          * @param {*} data
          * @param {function(*): *} [itemCast]
-         * @returns {Array}
+         * @returns {Array<*>}
          */
         this.array = function (data, itemCast) {
             let arr = [];
@@ -60,9 +60,11 @@ export default class Fl32_Cms_Back_Helper_Cast {
          *
          * @param {*} data
          * @param {object} enu
+         * @param {Fl32_Cms_Back_Helper_Cast_Enum_Options} [options]
          * @returns {string|undefined}
          */
-        this.enum = function (data, enu, {lower, upper} = {}) {
+        this.enum = function (data, enu, options = {}) {
+            const {lower, upper} = options;
             let norm = data;
 
             if (typeof data === 'string') {

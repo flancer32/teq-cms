@@ -1,11 +1,26 @@
 {
   "compilerOptions": {
     "checkJs": true,
-    "allowSyntheticDefaultImports": true,
-    "module": "es2022",
-    "target": "es2022",
-    "moduleResolution": "node",
-    "strict": true
+    "forceConsistentCasingInFileNames": true,
+    "maxNodeModuleJsDepth": 0,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "noEmit": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ESNext",
+    "types": ["node"]
   },
-    "include": ["*.js", "*.mjs", "*.d.ts", "bootstrap/**/*.mjs", "src/**/*.mjs"]
+  "files": [
+    "bootstrap/di-config.mjs",
+    "types.d.ts",
+    "node_modules/@flancer32/teq-tmpl/types.d.ts",
+    "node_modules/@flancer32/teq-web/types.d.ts",
+    "node_modules/@teqfw/cfg/types.d.ts",
+    "node_modules/@teqfw/cli/types.d.ts",
+    "node_modules/@teqfw/di/types.d.ts",
+    "node_modules/@teqfw/log/types.d.ts"
+  ],
+  "include": ["src"],
+  "exclude": ["dist", "test", "node_modules"]
 }

@@ -13,13 +13,20 @@ Type declarations are delivered through `.d.ts` files and JSDoc comments in `.mj
 "types": "./types.d.ts"
 ```
 
-`types.d.ts` lives in the package root and presents the public type surface.
+`types.d.ts` lives in the package root and presents the canonical ambient type
+map for the configured `Fl32_Cms_` namespace. It is loaded together with the
+source and type maps of TeqFW dependencies by `jsconfig.json`.
 
 ## Resolution and Syntax
 
 TypeScript declaration syntax is allowed only in `.d.ts` files.
 Declarations must not redefine Node.js built-in types or DI namespaces.
-Resolution follows the root `jsconfig.json`.
+Resolution follows the root `jsconfig.json` with NodeNext module and module
+resolution semantics.
+
+Each namespace-addressed runtime module has one deterministic instance alias
+in `types.d.ts`; class exports also have a matching `__Class` constructor alias.
+JSDoc uses these aliases without CDC lifecycle suffixes such as `$`.
 
 ## Prohibited Patterns
 

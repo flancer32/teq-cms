@@ -48,7 +48,7 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
         });
 
         /**
-         * @param {object} context
+         * @param {Fl32_Web_Back_Pipeline_RequestContext} context
          * @returns {Promise<void>}
          */
         this.handle = async function (context) {
@@ -60,8 +60,12 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
                 const {template} = await servTmplLoad.perform({target});
                 if (template) {
                     const url = req.url || '';
-                    const hasLocale = tmplConfig.getAvailableLocales()
-                        .some(loc => url === `/${loc}` || url.startsWith(`/${loc}/`));
+                    const hasLocale = tmplConfig.getAvailableLocales().some(
+                        /** @param {string} loc */
+                        function (loc) {
+                            return url === `/${loc}` || url.startsWith(`/${loc}/`);
+                        }
+                    );
 
                     if (!hasLocale) {
                         // TODO: move this code to Fl32_Web_Back_Helper_Respond

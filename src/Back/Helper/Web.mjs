@@ -71,14 +71,14 @@ export default class Fl32_Cms_Back_Helper_Web {
         /**
          * Extracts locale from request URL or Accept-Language header.
          * @param {object} deps
-         * @param {object} deps.req - HTTP request object containing URL and headers.
+         * @param {Fl32_Cms_Back_Di_Replace_Adapter_Request} deps.req - HTTP request object containing URL and headers.
          * @returns {string}
          */
         this.extractLocale = function ({req}) {
             const urlPath = decodeURIComponent(req.url?.split('?')[0] || '');
             const fromUrl = extractFromUrlPath(urlPath);
             if (fromUrl) return fromUrl;
-            return resolveFromAcceptLanguage(req.headers[HTTP2_HEADER_ACCEPT_LANGUAGE]);
+            return resolveFromAcceptLanguage(req.headers[HTTP2_HEADER_ACCEPT_LANGUAGE] || '');
         };
 
         /**

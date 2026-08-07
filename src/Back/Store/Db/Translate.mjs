@@ -25,6 +25,7 @@ export default class Fl32_Cms_Back_Store_Db_Translate {
     ) {
 
         // VAR
+        /** @type {Record<string, Record<string, string>>} */
         let _data = {};
         const log = logger.forSource('Fl32_Cms_Back_Store_Db_Translate');
 
@@ -47,10 +48,12 @@ export default class Fl32_Cms_Back_Store_Db_Translate {
                 log.info(`Loaded translations DB: ${FILE}`);
             } catch (err) {
                 _data = {};
-                if (err.code === 'ENOENT') {
+                const code = err instanceof Error && 'code' in err ? err.code : undefined;
+                const message = err instanceof Error ? err.message : String(err);
+                if (code === 'ENOENT') {
                     log.warn(`Translations DB not found, created empty: ${FILE}`);
                 } else {
-                    log.error(`Failed to load translations DB: ${err.message}`);
+                    log.error(`Failed to load translations DB: ${message}`);
                 }
             }
         };

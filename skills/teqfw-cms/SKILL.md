@@ -101,10 +101,19 @@ For source or integration changes, run the checks required by the host project,
 normally:
 
 - `npm test`;
-- `teqfw-esm-validator src --profile base` for validated runtime source;
-- `npx tsc -p jsconfig.json` when JSDoc contracts or type declarations change;
+- `npm run typecheck` for JavaScript, JSDoc, and ambient type
+  map checking;
+- `npm run validate:esm` for validated runtime source;
 - `git diff --check`;
 - `npm pack --dry-run` and inspect that `skills/teqfw-cms/` is included.
+
+The root `types.d.ts` is the canonical package type map. Keep one deterministic
+namespace alias for every module under the declared `Fl32_Cms_` namespace and
+use aliases without CDC suffixes in JSDoc. `jsconfig.json` includes the
+package's runtime source, type map, and installed TeqFW dependency type maps;
+tests are verified by `npm test`, while foreign dependency source trees remain
+outside the package type-check target. `maxNodeModuleJsDepth: 0` prevents
+TypeScript from falling back to checking untyped JavaScript in dependencies.
 
 When changing package behavior, verify the real CLI startup path and the
 published package boundary rather than relying only on isolated DI fixtures.
