@@ -22,7 +22,7 @@ No package-owned `bin/teq-cms.mjs` bridge is maintained.
 
 ## Dependencies
 
-Runtime dependencies include `@flancer32/teq-tmpl`, `@flancer32/teq-web`, `@teqfw/cfg`, `@teqfw/cli`, `@teqfw/di`, `@teqfw/log`, and `openai`.
+Runtime dependencies include `@flancer32/teq-tmpl`, `@flancer32/teq-web`, `@teqfw/cfg`, `@teqfw/cli`, `@teqfw/di`, and `@teqfw/log`. OpenAI-compatible APIs are accessed through the native Node.js `fetch` API.
 The development dependency `nunjucks` is required for template tests.
 
 ## Package Contents

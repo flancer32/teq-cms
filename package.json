@@ -53,8 +53,7 @@
     "@teqfw/di": "^2.9.0",
     "@teqfw/log": "^2.0.0",
     "mustache": "^4.2.0",
-    "nunjucks": "^3.2.4",
-    "openai": "^4.103.0"
+    "nunjucks": "^3.2.4"
   },
   "teqfw": {
     "fw": {

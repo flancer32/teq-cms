@@ -6,7 +6,7 @@ TeqCMS is a Node.js ESM package and CLI for a minimalist file-based multilingual
 
 ## Problem Space
 
-The package renders localized website templates and synchronizes translations through an OpenAI-compatible API while keeping content in files and Git.
+The package renders localized website templates and synchronizes translations through an OpenAI-compatible HTTP API while keeping content in files and Git.
 
 ## Product Role
 
@@ -27,7 +27,7 @@ The primary audience is developers who integrate the CMS into Node.js websites a
 
 - Content and translation state are file-based.
 - The CLI is the composition root.
-- Runtime recovery after the dependency migration is intentionally a separate phase.
+- The translation gateway uses native Node.js `fetch` and parses the streaming `/chat/completions` response directly; no OpenAI SDK is required.
 
 ## What This Project Is Not
 

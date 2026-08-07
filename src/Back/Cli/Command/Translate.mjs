@@ -56,7 +56,7 @@ export default class Fl32_Cms_Back_Cli_Command_Translate {
         /**
          * Fetch completion with streaming and auto-continue.
          * @param {object} deps - Parameters object.
-         * @param {object} deps.client - Initialized OpenAI API client.
+         * @param {Fl32_Cms_Back_Gate_OpenAI} deps.client - OpenAI HTTP gateway.
          * @param {string} deps.model - The model name to use.
          * @param {object[]} deps.messages - The message history used as the prompt.
          * @returns {Promise<string>}
@@ -66,11 +66,7 @@ export default class Fl32_Cms_Back_Cli_Command_Translate {
             let done = false;
             let tries = 0;
             while (!done && tries < 10) {
-                const stream = await client.chat.completions.create({
-                    model,
-                    messages,
-                    stream: true,
-                });
+                const stream = await client.createChatCompletion({model, messages});
                 const part = await readStreamedContent(stream);
                 full += part;
                 if (/---END FILE---/.test(full)) {
@@ -114,7 +110,7 @@ export default class Fl32_Cms_Back_Cli_Command_Translate {
             await dbTranslate.save();
 
             const model = config.getAiApiModel();
-            const client = await gateOpenAI.initClient();
+            const client = gateOpenAI;
 
             const db = dbTranslate.getData();
             for (const relPath of Object.keys(db)) {

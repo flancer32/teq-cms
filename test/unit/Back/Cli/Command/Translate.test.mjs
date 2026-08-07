@@ -34,18 +34,13 @@ describe('Fl32_Cms_Back_Cli_Command_Translate.fetchFullCompletion', () => {
     it('should request continuation when END marker absent', async () => {
         let call = 0;
         const client = {
-            chat: {
-                completions: {
-                    create: async () => {
-                        call++;
-                        return call === 1
-                            ? createStream('part1 ')
-                            : createStream('part2 ---END FILE---');
-                    },
-                },
+            createChatCompletion: async () => {
+                call++;
+                return call === 1
+                    ? createStream('part1 ')
+                    : createStream('part2 ---END FILE---');
             },
         };
-        container.register('Fl32_Cms_Back_Gate_OpenAI$', {initClient: async () => client});
         const cmd = await container.get('Fl32_Cms_Back_Cli_Command_Translate$');
         const messages = [{role: 'user', content: 'hello'}];
         const res = await cmd.__fetchFullCompletion({client, model: 'm', messages});
@@ -84,9 +79,9 @@ describe('Fl32_Cms_Back_Cli_Command_Translate.execute', () => {
             config: {getLocaleBaseTranslate: () => 'en', getAiApiModel: () => 'model'},
             tmplConfig: {getAvailableLocales: () => ['en', 'ru']},
             gateOpenAI: {
-                initClient: async () => ({chat: {completions: {create: async () => createStream(
+                createChatCompletion: async () => createStream(
                     ['---FILE: about.html---', '<h1>Привет</h1>', '---END FILE---'].join(String.fromCharCode(10)),
-                )}}}),
+                ),
             },
             dbTranslate: db,
             helpTranslate: {syncDbWithFilesystem: async () => {}},

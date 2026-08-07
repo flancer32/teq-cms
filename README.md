@@ -55,6 +55,11 @@ CMS-specific settings use the `TEQ_CMS` namespace; web server settings use
 
 Legacy `TEQ_CMS_*` environment names are not supported.
 
+Translation uses the OpenAI-compatible HTTP API directly. Configure
+`TEQ_CMS__AI_API_BASE_URL`, `TEQ_CMS__AI_API_KEY`, and
+`TEQ_CMS__AI_API_MODEL`; the application sends streaming requests to
+`<base-url>/chat/completions` and does not require the `openai` npm package.
+
 ---
 
 ## License
