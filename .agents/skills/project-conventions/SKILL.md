@@ -45,11 +45,14 @@ description: Project-specific conventions for every task in the TeqCMS repositor
 - When a platform package API or version matters, inspect the installed package source, metadata, tests, and linked skill under `.agents/skills/` before relying on it.
 - Treat validator errors and test failures as blocking. Eslint warnings must be reported separately from errors.
 
+## GitHub
+
+- In all multiline text sent to GitHub, including issues and comments, use actual line breaks; never send literal `\n`, which GitHub displays as text.
+
 ## Shared memory
 
 - `flancer32/ai-memo` is the shared cross-project issue tracker and memory.
 - Issue source: `flancer32/teq-cms`; expected resolver: `flancer32/teq-cms`. Every issue must name the project or projects expected to resolve it.
-- In multiline text sent to GitHub, use actual line breaks; never send literal `\n`, which GitHub displays as text.
 - When referring to a commit in another repository, use its full GitHub URL: `https://github.com/vendor/name/commit/<sha>`.
 - Notes for this project use `project/flancer32/teq-cms/`.
 - Do not perform automatic issue, commit, or push actions without explicit project policy or user authorization.
