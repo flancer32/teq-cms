@@ -10,6 +10,7 @@ Defines the declarative structure of the project repository at the top level onl
 ## Root Directories
 
 - `.agents/` — project-local skills linked from installed TeqFW packages and project-owned skills.
+- `skills/` — the package-owned consumer skill distributed with the npm package.
 - `ctx/` — cognitive context containing project documentation and project-local agent materials.
 - `src/` — CMS runtime implementation.
 - `test/` — unit and acceptance tests.

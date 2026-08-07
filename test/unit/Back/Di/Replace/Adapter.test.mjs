@@ -34,6 +34,8 @@ describe('Fl32_Cms_Back_Di_Replace_Adapter', () => {
         extname: (p) => path.extname(p),
     });
 
+    container.register('TeqFw_Cli_Config$', {applicationRoot: '/abs/app/root'});
+
     container.register('TeqFw_Cfg_Reader$', {
         get: (namespace) => namespace === 'TEQ_CMS'
             ? {BASE_URL: 'https://mock.site'}

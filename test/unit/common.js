@@ -18,7 +18,15 @@ export function buildTestContainer() {
     container.addNamespaceRoot('Fl32_Cms_', SRC, '.mjs');
     container.addNamespaceRoot('Fl32_Tmpl_', path.resolve(import.meta.dirname, '../../node_modules/@flancer32/teq-tmpl/src'), '.js');
     container.addNamespaceRoot('TeqFw_Cfg_', path.resolve(import.meta.dirname, '../../node_modules/@teqfw/cfg/src'), '.mjs');
+    container.addNamespaceRoot('TeqFw_Cli_', path.resolve(import.meta.dirname, '../../node_modules/@teqfw/cli/src'), '.mjs');
     container.addNamespaceRoot('TeqFw_Log_', path.resolve(import.meta.dirname, '../../node_modules/@teqfw/log/src'), '.mjs');
     container.enableTestMode();
+    container.register('TeqFw_Cli_Config$', {
+        applicationRoot: process.cwd(),
+        cwd: process.cwd(),
+        argv: [],
+        dotenvPath: undefined,
+        dotenvExplicit: false,
+    });
     return container;
 }

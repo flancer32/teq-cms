@@ -30,6 +30,8 @@ describe('Fl32_Cms_Back_Helper_File.resolveTemplateName', () => {
         extname: (p) => path.extname(p),
     });
 
+    container.register('TeqFw_Cli_Config$', {applicationRoot: '/root'});
+
     container.register('TeqFw_Cfg_Reader$', {
         get: () => ({DEFAULT_LOCALE: 'en', ROOT_PATH: '/root'}),
     });

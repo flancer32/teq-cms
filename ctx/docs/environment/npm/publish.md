@@ -3,7 +3,9 @@
 ## Package Contents
 
 The published tarball is controlled by the `files` allowlist in `package.json`.
-It includes runtime sources, templates, web assets, declaration files, and selected package documentation.
+It includes runtime sources, templates, web assets, the package-owned
+consumer skill under `skills/`, declaration files, and selected package
+documentation.
 
 Development-only directories and generated artifacts are excluded, including `test/`, `doc/`, `ctx/`, caches, and build output.
 

@@ -27,7 +27,9 @@ The development dependency `nunjucks` is required for template tests.
 
 ## Package Contents
 
-The `files` allowlist publishes runtime sources, templates, web assets, declarations, and required package documentation.
+The `files` allowlist publishes runtime sources, templates, web assets, the
+package-owned consumer skill under `skills/`, declarations, and required
+package documentation.
 Development-only directories such as `test/`, `doc/`, and `ctx/` remain outside the npm payload.
 
 ## Runtime Baseline
