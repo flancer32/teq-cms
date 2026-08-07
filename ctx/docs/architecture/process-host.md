@@ -11,7 +11,9 @@ The package declares:
 
 - `teqfw.fw.di.namespaces` for the `Fl32_Cms_` source namespace;
 - `teqfw.fw.cli.container.configurator` for the pre-DI host configurator;
-- `teqfw.fw.cli.plugin` for configuration loading and web-pipeline setup;
+
+The canonical standalone host path for this module is `bootstrap/di-config.mjs`.
+- `teqfw.fw.cli.plugin` for web-pipeline setup;
 - `teqfw.fw.cli.commands` for `translate`;
 - `teqfw.fw.cli.command.default` for `fl32:web:start` provided by `teq-web`.
 
@@ -21,15 +23,16 @@ TeqCMS must not import `@teqfw/cli/src/**` or invoke an internal launcher path f
 ## Commands
 
 - `fl32:web:start` is the long-running command supplied by `@flancer32/teq-web`.
-- `translate` is a finite command with `execute(context)`.
+- `cms:translate` is a finite command with `execute(context)`.
 - Commands must not call `process.exit` or assign `process.exitCode`.
 
 ## Configuration Lifecycle
 
-The CMS CLI plugin loads configuration sources before command selection and
-registers the static and template handlers before `fl32:web:start` locks the
-pipeline. Typed package configuration components then read their own namespaces
-through `TeqFw_Cfg_Reader$`.
+The host configurator provides ordered configuration Sources. `@teqfw/cli`
+loads them once before resolving lifecycle plugins and commands. The CMS CLI
+plugin then registers the static and template handlers before `fl32:web:start`
+locks the pipeline. Typed package configuration components read their own
+namespaces through `TeqFw_Cfg_Reader$`.
 
 Configuration keys use the canonical TeqFW form `NAMESPACE__PARAMETER`. The
 `TEQFW_TMPL` and `TEQFW_WEB` namespaces belong to their respective plugins;

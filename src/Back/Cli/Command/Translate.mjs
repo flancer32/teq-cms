@@ -88,7 +88,7 @@ export default class Fl32_Cms_Back_Cli_Command_Translate {
         /**
          * @returns {Promise<void>}
          */
-        this.id = 'translate';
+        this.id = 'cms:translate';
         this.summary = 'Translate CMS templates.';
         this.lifetime = 'finite';
 

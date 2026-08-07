@@ -5,7 +5,7 @@
 TeqCMS uses `@teqfw/di` as the sole mechanism for linking modules.
 The `@teqfw/cli` executable creates the container once and assembles the dependency graph.
 TeqCMS contributes namespace metadata, a host configurator, a CLI lifecycle
-plugin, and the `translate` command descriptor through `package.json`.
+plugin, and the `cms:translate` command descriptor through `package.json`.
 
 All DI-environment modifications occur at the composition boundary.
 Internal modules resolve dependencies through DI identifiers and must not access the container directly.

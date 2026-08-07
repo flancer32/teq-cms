@@ -88,6 +88,8 @@ describe('Fl32_Cms_Back_Cli_Command_Translate.execute', () => {
             helpFile,
         });
 
+        assert.equal(command.id, 'cms:translate');
+
         await command.execute({});
 
         assert.deepEqual(writes, [{path: '/tmpl/ru/about.html', text: '<h1>Привет</h1>'}]);

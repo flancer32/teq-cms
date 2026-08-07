@@ -32,17 +32,17 @@ Learn more at: [https://cms.teqfw.com](https://cms.teqfw.com)
 
 ## Running TeqCMS
 
-TeqCMS uses the standard `@teqfw/cli` host and publishes metadata-driven commands. Run the web server with `npm start` or `npm exec -- teq fl32:web:start`; run translations with `npm exec -- teq translate`.
+TeqCMS uses the standard `@teqfw/cli` host and publishes metadata-driven commands. Run the web server with `npm start` or `npm exec -- teq fl32:web:start`; run translations with `npm exec -- teq cms:translate`.
 
 During standalone development TeqCMS is also the host application: its
-pre-DI configurator selects CMS implementations, while its CLI plugin loads cfg
-and registers the CMS web pipeline. Embedded hosts may provide the same
+pre-DI configurator selects CMS implementations and provides ordered cfg
+sources, while its CLI plugin registers the CMS web pipeline. Embedded hosts may provide the same
 platform composition responsibilities externally.
 
 ### Configuration
 
-The CLI plugin loads configuration sources before command resolution. TeqCMS
-configuration components read detached namespace fragments through
+The CLI host loads configuration sources once before resolving plugins and
+commands. TeqCMS configuration components read detached namespace fragments through
 `TeqFw_Cfg_Reader$` and convert them into typed settings. Configuration keys use
 the TeqFW form `NAMESPACE__PARAMETER`.
 

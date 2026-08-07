@@ -41,6 +41,7 @@
   ],
   "scripts": {
     "start": "teq fl32:web:start",
+    "help": "teq help",
     "test:accept": "node --test $(find ./test/accept -name '*.test.mjs')",
     "test:unit": "node --test $(find ./test/unit -name '*.test.mjs')",
     "test": "npm run test:unit && npm run test:accept"
@@ -49,7 +50,7 @@
     "@flancer32/teq-tmpl": "^0.4.0",
     "@flancer32/teq-web": "^0.16.0",
     "@teqfw/cfg": "^2.0.0",
-    "@teqfw/cli": "^2.0.0",
+    "@teqfw/cli": "git+https://github.com/teqfw/cli.git#main",
     "@teqfw/di": "^2.9.0",
     "@teqfw/log": "^2.0.0",
     "mustache": "^4.2.0",
@@ -71,12 +72,12 @@
           "default": "fl32:web:start"
         },
         "container": {
-          "configurator": "./bootstrap/configurator.mjs"
+          "configurator": "./bootstrap/di-config.mjs"
         },
         "plugin": "Fl32_Cms_Back_Cli_Plugin$",
         "commands": [
           {
-            "id": "translate",
+            "id": "cms:translate",
             "summary": "Translate CMS templates.",
             "component": "Fl32_Cms_Back_Cli_Command_Translate$"
           }
