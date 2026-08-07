@@ -40,7 +40,7 @@
     "types.d.ts"
   ],
   "scripts": {
-    "start": "teq web:start",
+    "start": "teq fl32:web:start",
     "test:accept": "node --test $(find ./test/accept -name '*.test.mjs')",
     "test:unit": "node --test $(find ./test/unit -name '*.test.mjs')",
     "test": "npm run test:unit && npm run test:accept"
@@ -68,19 +68,14 @@
         ]
       },
       "cli": {
+        "command": {
+          "default": "fl32:web:start"
+        },
         "container": {
           "configurator": "./bootstrap/configurator.mjs"
         },
         "plugin": "Fl32_Cms_Back_Cli_Plugin$",
-        "command": {
-          "default": "web:start"
-        },
         "commands": [
-          {
-            "id": "web:start",
-            "summary": "Start the TeqCMS web server.",
-            "component": "Fl32_Cms_Back_Cli_Command_Web$"
-          },
           {
             "id": "translate",
             "summary": "Translate CMS templates.",

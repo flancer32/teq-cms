@@ -2,7 +2,9 @@
 
 TeqCMS is a Node.js ESM plugin composed around the standard `@teqfw/cli` process host.
 
-The `teq` executable creates the DI environment. TeqCMS contributes namespace metadata, a host configurator, a configuration-loading CLI plugin, and static command descriptors.
+The `teq` executable creates the DI environment. During standalone development
+TeqCMS is also the host application: its configurator selects implementations
+and its CLI plugin loads configuration and registers the CMS web pipeline.
 
 Runtime areas include configuration, web request handling, template rendering, translation orchestration, filesystem persistence, and the OpenAI gateway.
 

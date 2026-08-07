@@ -32,45 +32,24 @@ Learn more at: [https://cms.teqfw.com](https://cms.teqfw.com)
 
 ## Running TeqCMS
 
-TeqCMS uses the standard `@teqfw/cli` host and publishes metadata-driven commands. Run the web server with `npm start` or `npm exec -- teq web:start`; run translations with `npm exec -- teq translate`.
+TeqCMS uses the standard `@teqfw/cli` host and publishes metadata-driven commands. Run the web server with `npm start` or `npm exec -- teq fl32:web:start`; run translations with `npm exec -- teq translate`.
 
-Host applications customize the container through `teqfw.fw.cli.container.configurator` in their `package.json`. The configurator exports a default class with a `configure({applicationRoot, argv})` method and returns namespace roots, preprocessors, or postprocessors. It does not receive or construct the DI container.
-
-```json
-"teqfw": {
-  "fw": {
-    "cli": {
-      "container": {
-        "configurator": "./bootstrap/configurator.mjs"
-      }
-    }
-  }
-}
-```
-
-```js
-export default class Configurator {
-  configure({applicationRoot, argv}) {
-    return {namespaceRoots: [], preprocessors: []};
-  }
-}
-```
-
-The TeqCMS configurator is kept under `bootstrap/` because `@teqfw/cli`
-loads it through a dynamic import before the DI Container is resolved. It is a
-pre-DI composition module and must not depend on DI services.
+During standalone development TeqCMS is also the host application: its
+pre-DI configurator selects CMS implementations, while its CLI plugin loads cfg
+and registers the CMS web pipeline. Embedded hosts may provide the same
+platform composition responsibilities externally.
 
 ### Configuration
 
-TeqCMS loads configuration sources in this order: built-in defaults, an optional
-`.env` file, and process environment values. Later sources override earlier
-values. Configuration keys use the TeqFW form `NAMESPACE__PARAMETER`.
+The CLI plugin loads configuration sources before command resolution. TeqCMS
+configuration components read detached namespace fragments through
+`TeqFw_Cfg_Reader$` and convert them into typed settings. Configuration keys use
+the TeqFW form `NAMESPACE__PARAMETER`.
 
 Template settings belong to `@flancer32/teq-tmpl` and use the `TEQFW_TMPL`
-namespace. The tmpl package offers the available engine implementations and
-their common contract. TeqCMS, as the host application, owns the selection:
-`TEQFW_TMPL__ENGINE` tells TeqCMS which offered implementation to bind through
-DI. The tmpl package does not automatically choose the DI implementation.
+namespace. The tmpl package owns the typed configuration and offers the engine
+implementations. The platform host owns configuration loading and final DI
+composition from `TEQFW_TMPL__ENGINE`.
 CMS-specific settings use the `TEQ_CMS` namespace; web server settings use
 `TEQFW_WEB`.
 
