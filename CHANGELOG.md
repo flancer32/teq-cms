@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.1] - 2026-08-08
+
+- Switched `@flancer32/teq-tmpl` and `@flancer32/teq-web` to npm registry dependencies with `<=1.0.0` ranges.
+
 ## [0.6.0] - 2026-08-07
 
 - Updated TeqFW runtime dependencies to npm releases with compatible `>=` ranges.
