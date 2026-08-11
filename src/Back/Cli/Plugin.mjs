@@ -7,11 +7,11 @@
 export default class Fl32_Cms_Back_Cli_Plugin {
     /**
      * @param {object} deps
-     * @param {Fl32_Web_Back_PipelineEngine} deps.pipeline
-     * @param {Fl32_Web_Back_Handler_Pre_Log} deps.handLog
-     * @param {Fl32_Web_Back_Handler_Static} deps.handStatic
+     * @param {TeqFw_Web_Back_PipelineEngine} deps.pipeline
+     * @param {TeqFw_Web_Back_Handler_Pre_Log} deps.handLog
+     * @param {TeqFw_Web_Back_Handler_Static} deps.handStatic
      * @param {Fl32_Cms_Back_Web_Handler_Template} deps.handTmpl
-     * @param {Fl32_Web_Back_Dto_Source__Factory} deps.dtoSource
+     * @param {TeqFw_Web_Back_Dto_Source__Factory} deps.dtoSource
      * @param {Fl32_Tmpl_Back_Config} deps.tmplConfig
      * @param {typeof import('node:path')} deps.path
      */
@@ -45,11 +45,11 @@ export default class Fl32_Cms_Back_Cli_Plugin {
 
 export const __deps__ = Object.freeze({
     default: Object.freeze({
-        pipeline: 'Fl32_Web_Back_PipelineEngine$',
-        handLog: 'Fl32_Web_Back_Handler_Pre_Log$',
-        handStatic: 'Fl32_Web_Back_Handler_Static$',
+        pipeline: 'TeqFw_Web_Back_PipelineEngine$',
+        handLog: 'TeqFw_Web_Back_Handler_Pre_Log$',
+        handStatic: 'TeqFw_Web_Back_Handler_Static$',
         handTmpl: 'Fl32_Cms_Back_Web_Handler_Template$',
-        dtoSource: 'Fl32_Web_Back_Dto_Source__Factory$',
+        dtoSource: 'TeqFw_Web_Back_Dto_Source__Factory$',
         tmplConfig: 'Fl32_Tmpl_Back_Config$',
         path: 'node:path',
     }),

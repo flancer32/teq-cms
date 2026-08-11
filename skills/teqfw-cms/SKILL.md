@@ -32,8 +32,8 @@ boundary and the checks that protect it.
    implementations. It must remain plain host code and is intentionally
    outside `teqfw-esm-validator` validation.
 5. Keep the CMS lifecycle plugin focused on registering the CMS handlers in
-   the `@flancer32/teq-web` pipeline. The `fl32:web:start` command belongs to
-   `@flancer32/teq-web`; the finite `cms:translate` command belongs to TeqCMS
+   the `@teqfw/web` pipeline. The `web:start` command belongs to
+   `@teqfw/web`; the finite `cms:translate` command belongs to TeqCMS
    and is declared in `package.json` metadata.
 
 ## Configuration ownership
@@ -54,7 +54,7 @@ TeqCMS owns only the `TEQ_CMS` namespace:
   `ru`.
 
 Template settings belong to `@flancer32/teq-tmpl` under `TEQFW_TMPL`.
-Web-server settings belong to `@flancer32/teq-web` under `TEQFW_WEB`.
+Web-server settings belong to `@teqfw/web` under `TEQFW_WEB`.
 Do not add CMS aliases for those settings, read `process.env` in runtime
 components, or reintroduce the removed `TEQ_CMS_*` single-underscore names.
 The application root is a CLI runtime fact from `TeqFw_Cli_Config$`, not a CMS

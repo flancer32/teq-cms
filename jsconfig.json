@@ -15,7 +15,7 @@
     "bootstrap/di-config.mjs",
     "types.d.ts",
     "node_modules/@flancer32/teq-tmpl/types.d.ts",
-    "node_modules/@flancer32/teq-web/types.d.ts",
+    "node_modules/@teqfw/web/types.d.ts",
     "node_modules/@teqfw/cfg/types.d.ts",
     "node_modules/@teqfw/cli/types.d.ts",
     "node_modules/@teqfw/di/types.d.ts",

@@ -1,6 +1,6 @@
 {
   "name": "@flancer32/teq-cms",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Minimalistic file-based CMS for multilingual websites with AI-powered localization and Git-native content workflow.",
   "type": "module",
   "keywords": [
@@ -41,7 +41,7 @@
     "types.d.ts"
   ],
   "scripts": {
-    "start": "teq fl32:web:start",
+    "start": "teq web:start",
     "help": "teq help",
     "test:accept": "node --test $(find ./test/accept -name '*.test.mjs')",
     "test:unit": "node --test $(find ./test/unit -name '*.test.mjs')",
@@ -51,11 +51,11 @@
   },
   "dependencies": {
     "@flancer32/teq-tmpl": "<=1.0.0",
-    "@flancer32/teq-web": "<=1.0.0",
     "@teqfw/cfg": ">=2.0.0",
     "@teqfw/cli": ">=2.1.0",
     "@teqfw/di": ">=2.9.0",
     "@teqfw/log": ">=2.0.0",
+    "@teqfw/web": "^2.0.0",
     "mustache": "^4.2.0",
     "nunjucks": "^3.2.4"
   },
@@ -76,7 +76,7 @@
       },
       "cli": {
         "command": {
-          "default": "fl32:web:start"
+          "default": "web:start"
         },
         "container": {
           "configurator": "./bootstrap/di-config.mjs"

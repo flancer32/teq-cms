@@ -65,7 +65,7 @@ describe('Fl32_Cms_Back_Web_Handler_Template', () => {
         assert.deepEqual(handler.getRegistrationInfo(), {
             name: 'Fl32_Cms_Back_Web_Handler_Template',
             stage: 'process',
-            before: ['Fl32_Web_Back_Handler_Static'],
+            before: ['TeqFw_Web_Back_Handler_Static'],
         });
     });
 });

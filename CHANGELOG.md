@@ -1,8 +1,14 @@
 # Changelog
 
+## [0.7.0] - 2026-08-11
+
+- Migrated the web runtime from `@flancer32/teq-web` to `@teqfw/web` 2.x.
+- Renamed web DI tokens from `Fl32_Web_` to `TeqFw_Web_` and the server command to `web:start`.
+
+
 ## [0.6.1] - 2026-08-08
 
-- Switched `@flancer32/teq-tmpl` and `@flancer32/teq-web` to npm registry dependencies with `<=1.0.0` ranges.
+- Switched `@flancer32/teq-tmpl` and `@teqfw/web` to npm registry dependencies with `<=1.0.0` ranges.
 
 ## [0.6.0] - 2026-08-07
 

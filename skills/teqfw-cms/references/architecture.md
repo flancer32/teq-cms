@@ -12,7 +12,7 @@ host.
   boundary. It is dynamically imported before DI and therefore cannot use DI.
 - `Fl32_Cms_Back_Cli_Plugin` participates in lifecycle startup and registers
   the CMS static, logging, and template handlers in the web pipeline.
-- `@flancer32/teq-web` owns the long-running `fl32:web:start` command.
+- `@teqfw/web` owns the long-running `web:start` command.
 - TeqCMS owns the finite `cms:translate` command and the CMS translation
   domain services.
 - `@flancer32/teq-tmpl` owns localized template configuration, target and

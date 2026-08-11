@@ -6,7 +6,7 @@ Platform dependencies are switched before runtime compatibility is restored. A t
 
 ## Web Package Boundary
 
-The renewed `@flancer32/teq-web` package is updated as a separate compatibility boundary. It must not be silently replaced by `@teqfw/web` without an explicit decision and contract review.
+The renewed `@teqfw/web` package is updated as a separate compatibility boundary. It must not be silently replaced by `@teqfw/web` without an explicit decision and contract review.
 
 ## Documentation Consolidation
 

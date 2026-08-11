@@ -15,14 +15,14 @@ The package declares:
 The canonical standalone host path for this module is `bootstrap/di-config.mjs`.
 - `teqfw.fw.cli.plugin` for web-pipeline setup;
 - `teqfw.fw.cli.commands` for `translate`;
-- `teqfw.fw.cli.command.default` for `fl32:web:start` provided by `teq-web`.
+- `teqfw.fw.cli.command.default` for `web:start` provided by `teq-web`.
 
-The package script invokes the published executable as `teq fl32:web:start`.
+The package script invokes the published executable as `teq web:start`.
 TeqCMS must not import `@teqfw/cli/src/**` or invoke an internal launcher path from package scripts.
 
 ## Commands
 
-- `fl32:web:start` is the long-running command supplied by `@flancer32/teq-web`.
+- `web:start` is the long-running command supplied by `@teqfw/web`.
 - `cms:translate` is a finite command with `execute(context)`.
 - Commands must not call `process.exit` or assign `process.exitCode`.
 
@@ -30,7 +30,7 @@ TeqCMS must not import `@teqfw/cli/src/**` or invoke an internal launcher path f
 
 The host configurator provides ordered configuration Sources. `@teqfw/cli`
 loads them once before resolving lifecycle plugins and commands. The CMS CLI
-plugin then registers the static and template handlers before `fl32:web:start`
+plugin then registers the static and template handlers before `web:start`
 locks the pipeline. Typed package configuration components read their own
 namespaces through `TeqFw_Cfg_Reader$`.
 

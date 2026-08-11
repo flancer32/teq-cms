@@ -18,7 +18,7 @@ export function buildTestContainer() {
     const container = new Container();
     container.addNamespaceRoot('Fl32_Cms_', SRC, '.mjs');
     container.addNamespaceRoot('Fl32_Tmpl_', join(NPM, '@flancer32', 'teq-tmpl', 'src'), '.js');
-    container.addNamespaceRoot('Fl32_Web_', join(NPM, '@flancer32', 'teq-web', 'src'), '.mjs');
+    container.addNamespaceRoot('TeqFw_Web_', join(NPM, '@teqfw', 'web', 'src'), '.mjs');
     container.addNamespaceRoot('TeqFw_Cfg_', join(NPM, '@teqfw', 'cfg', 'src'), '.mjs');
     container.addNamespaceRoot('TeqFw_Cli_', join(NPM, '@teqfw', 'cli', 'src'), '.mjs');
     container.addNamespaceRoot('TeqFw_Log_', join(NPM, '@teqfw', 'log', 'src'), '.mjs');

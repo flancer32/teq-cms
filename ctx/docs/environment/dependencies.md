@@ -3,7 +3,7 @@
 The dependency-switch checkpoint targets the following package generation:
 
 - `@flancer32/teq-tmpl` `^0.4.0`.
-- `@flancer32/teq-web` `^0.16.0`.
+- `@teqfw/web` `^0.16.0`.
 - `@teqfw/di` `^2.9.0`.
 - `@teqfw/log` `^2.0.0`.
 - `@teqfw/cfg` `^2.0.0`.

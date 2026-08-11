@@ -21,9 +21,9 @@ npm install
 npm start
 ```
 
-The package uses the standard `@teqfw/cli` host. The web server is available as `fl32:web:start`, and template translation as `cms:translate`.
+The package uses the standard `@teqfw/cli` host. The web server is available as `web:start`, and template translation as `cms:translate`.
 
-Configure the CMS with the `TEQ_CMS__*` namespace. Translation uses an OpenAI-compatible HTTP API; set `TEQ_CMS__AI_API_BASE_URL`, `TEQ_CMS__AI_API_KEY`, and `TEQ_CMS__AI_API_MODEL` in the host environment. Template-engine settings belong to `@flancer32/teq-tmpl`, and web-server settings belong to `@flancer32/teq-web`.
+Configure the CMS with the `TEQ_CMS__*` namespace. Translation uses an OpenAI-compatible HTTP API; set `TEQ_CMS__AI_API_BASE_URL`, `TEQ_CMS__AI_API_KEY`, and `TEQ_CMS__AI_API_MODEL` in the host environment. Template-engine settings belong to `@flancer32/teq-tmpl`, and web-server settings belong to `@teqfw/web`.
 
 Learn more at [cms.teqfw.com](https://cms.teqfw.com).
 

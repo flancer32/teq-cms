@@ -32,7 +32,7 @@ description: Project-specific conventions for every task in the TeqCMS repositor
 - `src/` contains the TeqCMS runtime implementation. Runtime source files use native ESM and the `.mjs` extension.
 - `@teqfw/cli` is the Node.js CLI composition root. Keep namespace metadata, host configurator, configuration loading, preprocessors, and command lifecycle integration in the package boundaries expected by `teq` rather than in business components.
 - `test/` contains unit and acceptance tests. Test composition must use explicit DI tokens and mocks appropriate to the tested boundary.
-- TeqFW components declare dependencies through `__deps__` and resolve platform services through DI tokens. Use `@teqfw/di`, `@teqfw/cfg`, `@teqfw/log`, `@teqfw/cli`, `@flancer32/teq-tmpl`, and `@flancer32/teq-web` according to their installed contracts; do not recreate package-owned platform services inside TeqCMS.
+- TeqFW components declare dependencies through `__deps__` and resolve platform services through DI tokens. Use `@teqfw/di`, `@teqfw/cfg`, `@teqfw/log`, `@teqfw/cli`, `@flancer32/teq-tmpl`, and `@teqfw/web` according to their installed contracts; do not recreate package-owned platform services inside TeqCMS.
 - Keep application configuration in the `@teqfw/cfg` reader boundary and application composition in the CLI root. Use `TeqFw_Log_Provider` for logging.
 - Preserve `@LLM-DOC` comments exactly. Do not modify, delete, or infer rules from historical files under `ctx/agent/report/`.
 - Do not add production dependencies without explaining the need. Ignore `output.md` files and do not treat `node_modules/` as project context.
