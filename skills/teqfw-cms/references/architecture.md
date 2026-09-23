@@ -17,6 +17,7 @@ host.
   domain services.
 - `@flancer32/teq-tmpl` owns localized template configuration, target and
   rendering contracts, and the available engine implementations.
+- Optional Markdown publication remains CMS-owned: safe source and catalog, a PROCESS handler ordered before template/static delivery, machine-locale policy, and Markdown translation. The host supplies presentation templates and owns the human sitemap. `Fl32_Cms_Back_Publication_Catalog$` provides route-sorted entries for indexes and sitemap integration.
 
 ## Composition rules
 

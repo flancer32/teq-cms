@@ -1,6 +1,6 @@
 import {describe, it} from 'node:test';
 import assert from 'assert';
-import {buildTestContainer} from '../../common.js';
+import {buildTestContainer} from '../../../support/unit.js';
 
 describe('Fl32_Cms_Back_Helper_Web.extractRoutingInfo', () => {
     const container = buildTestContainer();

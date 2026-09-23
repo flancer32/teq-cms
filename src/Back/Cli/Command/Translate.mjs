@@ -2,9 +2,9 @@
 
 /**
  * @namespace Fl32_Cms_Back_Cli_Command_Translate
- * @description CLI command for template translation.
+ * @description CLI command for HTML template and opted-in Markdown translation.
  *
- * CLI command to translate HTML templates between locales using OpenAI-compatible LLM.
+ * CLI command to translate HTML templates and opted-in Markdown publications between locales using an OpenAI-compatible LLM.
  *
  * This command scans base locale templates, detects changed files,
  * reads optional prompt files, invokes the LLM for translation,
@@ -23,6 +23,8 @@ export default class Fl32_Cms_Back_Cli_Command_Translate {
      * @param {Fl32_Cms_Back_Store_Db_Translate} deps.dbTranslate
      * @param {Fl32_Cms_Back_Helper_Translate} deps.helpTranslate
      * @param {Fl32_Cms_Back_Helper_File} deps.helpFile
+     * @param {Fl32_Cms_Back_Publication_Source} deps.pubSource
+     * @param {Fl32_Cms_Back_Publication_Translate} deps.pubTranslate
      */
     constructor(
         {
@@ -34,6 +36,8 @@ export default class Fl32_Cms_Back_Cli_Command_Translate {
             dbTranslate,
             helpFile,
             helpTranslate,
+            pubSource,
+            pubTranslate,
         }
     ) {
         // VARS
@@ -89,7 +93,7 @@ export default class Fl32_Cms_Back_Cli_Command_Translate {
          * @returns {Promise<void>}
          */
         this.id = 'cms:translate';
-        this.summary = 'Translate CMS templates.';
+        this.summary = 'Translate CMS templates and opted-in Markdown publications.';
         this.lifetime = 'finite';
 
         /**
@@ -129,6 +133,13 @@ export default class Fl32_Cms_Back_Cli_Command_Translate {
                 }
 
                 const baseText = await helpFile.readText({path: pathBase});
+                const isMarkdown = relPath.endsWith('.md');
+                const publication = isMarkdown ? await pubSource.read({
+                    locale: localeBase,
+                    route: relPath.slice(0, -3),
+                }) : null;
+                if (isMarkdown && !publication) throw new Error(`Publication source not found: ${relPath}`);
+                const job = publication ? pubTranslate.prepare(publication) : null;
 
                 for (const locale of localeAllowed) {
                     if (locale === localeBase) continue; // skip base locale
@@ -140,7 +151,9 @@ export default class Fl32_Cms_Back_Cli_Command_Translate {
                     log.info(`Translate template '${relPath}' from '${localeBase}' to '${locale}'.`);
 
                     const pathTrans = helpFile.getLocalizedPath({locale, path: relPath});
-                    const pathPrompt = helpFile.replaceExt({path: pathTrans, ext: '.prompt.md'});
+                    const pathPrompt = helpFile.replaceExt({
+                        path: pathTrans, ext: '.prompt.md', fromExt: isMarkdown ? '.md' : '.html',
+                    });
 
                     let promptText = '';
                     if (await helpFile.exists({path: pathPrompt})) {
@@ -149,25 +162,40 @@ export default class Fl32_Cms_Back_Cli_Command_Translate {
 
                     /** @type {Array<{role: 'system'|'user', content: string}>} */
                     const messages = [
-                        {role: 'system', content: DEF.PROMPT_SYSTEM},
+                        {role: 'system', content: job ?
+                            'Translate only natural-language JSON field values and Markdown body prose. Preserve all [[TEQCMS_00000]]-style markers exactly and in order. Return a JSON object with exactly the input keys inside the requested file block markers.' :
+                            DEF.PROMPT_SYSTEM},
                         {role: 'user', content: `Translate template "${relPath}" from ${localeBase} to ${locale}.`},
                     ];
                     if (promptText) {
                         messages.push({role: 'user', content: promptText});
                     }
-                    messages.push({role: 'user', content: baseText});
+                    messages.push({role: 'user', content: job ? job.payload : baseText});
 
                     const content = await fetchFullCompletion({client, model, messages});
                     log.info('LLM streaming translation completed.');
                     const match = content.match(/---FILE: (.+?)---\n([\s\S]+?)\n---END FILE---/);
                     if (!match) {
                         log.error('Failed to extract generated file from response.');
-                        const path = helpFile.replaceExt({path: pathTrans, ext: '.answer.md'});
+                        const path = helpFile.replaceExt({
+                            path: pathTrans, ext: '.answer.md', fromExt: isMarkdown ? '.md' : '.html',
+                        });
                         await helpFile.writeText({path, text: content});
-                        return;
+                        continue;
                     }
                     const [, , text] = match;
-                    await helpFile.writeText({path: pathTrans, text});
+                    let translated = text;
+                    if (job) {
+                        try {
+                            translated = job.complete(text);
+                        } catch (error) {
+                            log.error('Markdown translation failed structural validation.', {err: error});
+                            const path = helpFile.replaceExt({path: pathTrans, ext: '.answer.md', fromExt: '.md'});
+                            await helpFile.writeText({path, text: content});
+                            continue;
+                        }
+                    }
+                    await helpFile.writeText({path: pathTrans, text: translated});
                     log.info(`Generated result saved to '${pathTrans}'`);
                     dbTranslate.setMtime(relPath, locale, (new Date()).toISOString());
                     await dbTranslate.save();
@@ -188,5 +216,7 @@ export const __deps__ = Object.freeze({
         dbTranslate: 'Fl32_Cms_Back_Store_Db_Translate$',
         helpFile: 'Fl32_Cms_Back_Helper_File$',
         helpTranslate: 'Fl32_Cms_Back_Helper_Translate$',
+        pubSource: 'Fl32_Cms_Back_Publication_Source$',
+        pubTranslate: 'Fl32_Cms_Back_Publication_Translate$',
     }),
 });

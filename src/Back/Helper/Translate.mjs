@@ -40,6 +40,8 @@ export default class Fl32_Cms_Back_Helper_Translate {
             const dir = join(root, 'tmpl', 'web', baseLocale);
             const abs = resolve(dir);
             const allowedExt = '.html';
+            /** @type {Fl32_Cms_Back_Publication_Family[]} */
+            const publicationFamilies = config.getPublicationFamilies?.() ?? [];
 
             // Check if base directory exists
             try {
@@ -64,10 +66,14 @@ export default class Fl32_Cms_Back_Helper_Translate {
                     if (entry.isDirectory()) {
                         const sub = await scan(absPath, baseAbs);
                         for (const [k, v] of sub) result.set(k, v);
-                    } else if (entry.isFile() && entry.name.endsWith(allowedExt)) {
+                    } else if (entry.isFile() && (entry.name.endsWith(allowedExt) ||
+                        /^[A-Za-z0-9_-]+\.md$/.test(entry.name))) {
                         const statData = await stat(absPath);
                         const relPath = relative(baseAbs, absPath).replace(/\\/g, '/');
-                        result.set(relPath, statData.mtime.toISOString());
+                        if (relPath.endsWith(allowedExt) || publicationFamilies.some(family =>
+                            relPath.startsWith(`${family.prefix}/`))) {
+                            result.set(relPath, statData.mtime.toISOString());
+                        }
                     }
                 }
                 return result;

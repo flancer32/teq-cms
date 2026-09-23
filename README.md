@@ -27,6 +27,10 @@ Configure the CMS with the `TEQ_CMS__*` namespace. Translation uses an OpenAI-co
 
 Learn more at [cms.teqfw.com](https://cms.teqfw.com).
 
+## Markdown publications
+
+Hosts can opt a route family into localized Markdown-backed HTML pages and an explicitly selected machine-readable Markdown corpus. TeqCMS also provides deterministic `/llms.txt` discovery for that corpus. See the [Markdown publication guide](docs/publications.md) for configuration, authoring, presentation data, translation, and host integration.
+
 ## Agent-Driven Development
 
 TeqFW is built through the same development model that it is designed to enable: one human defines the intent, architecture, constraints, and acceptance criteria; coding agents implement and maintain the products; other agents use those products in different combinations to create applications.

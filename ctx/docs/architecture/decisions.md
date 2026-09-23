@@ -1,12 +1,15 @@
 # Architecture Decisions
 
+- Path: `ctx/docs/architecture/decisions.md`
+- Changed: `20260923`
+
 ## Dependency Migration Checkpoint
 
-Platform dependencies are switched before runtime compatibility is restored. A temporarily broken application is acceptable at this checkpoint because it exposes the actual integration delta.
+The prior dependency-switch checkpoint has been completed. The current runtime uses the installed CLI, DI, cfg, tmpl, and web package contracts and is verified by unit tests, acceptance tests, type checking, and ESM validation.
 
 ## Web Package Boundary
 
-The renewed `@teqfw/web` package is updated as a separate compatibility boundary. It must not be silently replaced by `@teqfw/web` without an explicit decision and contract review.
+TeqCMS uses `@teqfw/web` 2.x for the HTTP pipeline, server transport, and static delivery. CMS publication policy remains in TeqCMS.
 
 ## Documentation Consolidation
 
@@ -19,9 +22,11 @@ the `TEQFW_TMPL` configuration projection, the engine contract, and the offered
 provider implementations. Platform composition owns configuration loading and
 the final engine binding. TeqCMS provides both the host configurator and the
 startup plugin when it runs as the standalone development host. The plugin also
-registers the CMS web pipeline before the `teq-web` start command locks it.
+registers the CMS web pipeline before the `web:start` command locks it.
 
 Legacy `TEQ_CMS_*` configuration names are not supported. The platform-owned
-application root is not a CMS setting; the current process-working-directory
-fallback remains temporary until the CLI host exposes its application root to
-configuration Sources.
+application root is supplied by `TeqFw_Cli_Config$.applicationRoot` and is not a CMS setting.
+
+## Markdown Publication Presentation
+
+Issue #29 uses a configured presentation template per publication family. TeqCMS supplies parsed metadata, rendered Markdown HTML, canonical and locale alternate URLs, and a Markdown alternate URL only for a public machine locale. The host template owns layout and page composition. The contract supports several non-overlapping route prefixes without a host adapter or a fixed article taxonomy.

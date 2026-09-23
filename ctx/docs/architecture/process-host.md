@@ -1,5 +1,8 @@
 # TeqCMS Process Host
 
+- Path: `ctx/docs/architecture/process-host.md`
+- Changed: `20260923`
+
 ## Purpose
 
 TeqCMS does not publish or maintain a custom `bin/teq-cms.mjs` launcher.
@@ -23,7 +26,7 @@ TeqCMS must not import `@teqfw/cli/src/**` or invoke an internal launcher path f
 ## Commands
 
 - `web:start` is the long-running command supplied by `@teqfw/web`.
-- `cms:translate` is a finite command with `execute(context)`.
+- `cms:translate` is a finite command with `execute(context)` for HTML templates and opted-in Markdown publications.
 - Commands must not call `process.exit` or assign `process.exitCode`.
 
 ## Configuration Lifecycle

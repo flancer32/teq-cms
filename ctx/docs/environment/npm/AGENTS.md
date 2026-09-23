@@ -1,5 +1,7 @@
 # NPM Environment Documentation
 
+- Changed: `20260923`
+
 - Path: `ctx/docs/environment/npm/AGENTS.md`
 
 ## Purpose

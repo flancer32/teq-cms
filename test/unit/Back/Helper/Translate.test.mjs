@@ -1,6 +1,9 @@
 import {describe, it} from 'node:test';
 import assert from 'node:assert/strict';
 import Helper from '../../../../src/Back/Helper/Translate.mjs';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 
 function createFileSystem() {
     const entries = [
@@ -66,5 +69,30 @@ describe('Fl32_Cms_Back_Helper_Translate', () => {
         });
 
         await assert.doesNotReject(() => helper.syncDbWithFilesystem({getData: () => {}}));
+    });
+
+    it('tracks Markdown only inside configured families and skips prompt sidecars', async () => {
+        const root = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'cms-translate-scan-'));
+        try {
+            for (const rel of ['index.html', 'journal/post.md', 'journal/post.prompt.md', 'other/out.md']) {
+                const file = path.join(root, 'tmpl/web/en', rel);
+                await fs.promises.mkdir(path.dirname(file), {recursive: true});
+                await fs.promises.writeFile(file, 'content');
+            }
+            const found = [];
+            const helper = new Helper({
+                fs, path,
+                logger: {forSource: () => ({info() {}, warn() {}})},
+                tmplConfig: {getRootPath: () => root},
+                config: {getLocaleBaseTranslate: () => 'en', getPublicationFamilies: () => [{prefix: 'journal'}]},
+            });
+            await helper.syncDbWithFilesystem({
+                getData: () => ({}), getMtime: () => null,
+                setMtime: rel => found.push(rel), remove() {},
+            });
+            assert.deepEqual(found.sort(), ['index.html', 'journal/post.md']);
+        } finally {
+            await fs.promises.rm(root, {recursive: true, force: true});
+        }
     });
 });

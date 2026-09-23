@@ -30,6 +30,7 @@
   "types": "./types.d.ts",
   "files": [
     "bootstrap/",
+    "docs/",
     "skills/",
     "src/",
     "tmpl/",
@@ -56,8 +57,10 @@
     "@teqfw/di": ">=2.9.0",
     "@teqfw/log": ">=2.0.0",
     "@teqfw/web": "^2.0.0",
+    "marked": "^16.4.2",
     "mustache": "^4.2.0",
-    "nunjucks": "^3.2.4"
+    "nunjucks": "^3.2.4",
+    "yaml": "^2.9.1"
   },
   "devDependencies": {
     "@types/node": "^20.19.43",
@@ -85,7 +88,7 @@
         "commands": [
           {
             "id": "cms:translate",
-            "summary": "Translate CMS templates.",
+            "summary": "Translate CMS templates and opted-in Markdown publications.",
             "component": "Fl32_Cms_Back_Cli_Command_Translate$"
           }
         ]

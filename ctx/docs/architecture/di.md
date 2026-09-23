@@ -1,5 +1,8 @@
 # Dependency Injection Rules
 
+- Path: `ctx/docs/architecture/di.md`
+- Changed: `20260923`
+
 ## Composition Root
 
 TeqCMS uses `@teqfw/di` as the sole mechanism for linking modules.

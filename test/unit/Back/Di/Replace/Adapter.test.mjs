@@ -1,7 +1,7 @@
 import {describe, it} from 'node:test';
 import assert from 'assert';
 import path from 'node:path';
-import {buildTestContainer} from '../../../common.js';
+import {buildTestContainer} from '../../../../support/unit.js';
 
 describe('Fl32_Cms_Back_Di_Replace_Adapter', () => {
     const container = buildTestContainer();

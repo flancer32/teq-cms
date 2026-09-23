@@ -1,5 +1,8 @@
 # JSConfig Environment Rules
 
+- Path: `ctx/docs/environment/npm/jsconfig.md`
+- Changed: `20260923`
+
 ## Location and Coverage
 
 `jsconfig.json` exists at the project root and covers the runtime, the package

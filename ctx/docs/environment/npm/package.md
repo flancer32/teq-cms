@@ -1,5 +1,8 @@
 # NPM Package Configuration Rules
 
+- Path: `ctx/docs/environment/npm/package.md`
+- Changed: `20260923`
+
 ## Metadata Invariants
 
 - `name` is `@flancer32/teq-cms`.
@@ -22,15 +25,14 @@ No package-owned `bin/teq-cms.mjs` bridge is maintained.
 
 ## Dependencies
 
-Runtime dependencies include `@flancer32/teq-tmpl`, `@teqfw/web`, `@teqfw/cfg`, `@teqfw/cli`, `@teqfw/di`, and `@teqfw/log`. OpenAI-compatible APIs are accessed through the native Node.js `fetch` API.
-The development dependency `nunjucks` is required for template tests.
+Runtime dependencies include `@flancer32/teq-tmpl`, `@teqfw/web`, `@teqfw/cfg`, `@teqfw/cli`, `@teqfw/di`, `@teqfw/log`, `marked`, `yaml`, `mustache`, and `nunjucks`. OpenAI-compatible APIs are accessed through the native Node.js `fetch` API.
 
 ## Package Contents
 
 The `files` allowlist publishes runtime sources, templates, web assets, the
 package-owned consumer skill under `skills/`, declarations, and required
 package documentation.
-Development-only directories such as `test/`, `doc/`, and `ctx/` remain outside the npm payload.
+The `docs/` usage guides are published. Development-only directories such as `test/` and `ctx/` remain outside the npm payload.
 
 ## Runtime Baseline
 

@@ -1,5 +1,8 @@
 # Type Declaration Rules
 
+- Path: `ctx/docs/environment/npm/types.md`
+- Changed: `20260923`
+
 ## Source Restrictions
 
 The project contains no TypeScript source files.

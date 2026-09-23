@@ -17,18 +17,6 @@ export default class Configurator {
     configure({applicationRoot, argv}) {
         void applicationRoot;
         void argv;
-        return {preprocessors: [createReplacePreprocessor()]};
+        return {container: {preprocessors: ['Fl32_Cms_Back_Di_Preprocessor$']}};
     }
-}
-
-/** @returns {TeqFw_Cli_Api_Container_Preprocessor} */
-function createReplacePreprocessor() {
-    const replacements = new Map([
-        ['Fl32_Cms_Back_Api_Adapter', 'Fl32_Cms_Back_Di_Replace_Adapter'],
-        ['Fl32_Tmpl_Back_Api_Engine', 'Fl32_Cms_Back_Di_Replace_Tmpl_Engine'],
-    ]);
-    return depId => {
-        const replacement = replacements.get(depId.moduleName);
-        return replacement ? Object.freeze({...depId, moduleName: replacement}) : depId;
-    };
 }

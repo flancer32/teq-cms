@@ -1,5 +1,8 @@
 # NPM Exports Rules
 
+- Path: `ctx/docs/environment/npm/exports.md`
+- Changed: `20260923`
+
 ## Export Prohibition
 
 TeqCMS must not define the `exports` field at the package root or any subpath.

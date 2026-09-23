@@ -1,5 +1,8 @@
 # AI Introduction
 
+- Path: `ctx/docs/ai-intro.md`
+- Changed: `20260923`
+
 ## Project Type
 
 TeqCMS is a Node.js ESM package and CLI for a minimalist file-based multilingual CMS.

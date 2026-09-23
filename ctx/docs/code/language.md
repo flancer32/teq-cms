@@ -1,5 +1,8 @@
 # Project Language Policy
 
+- Path: `ctx/docs/code/language.md`
+- Changed: `20260923`
+
 - All project documentation, specifications, and organizational texts are written in English.
 - User-interface texts, labels, and explanatory messages are written in English.
 - Source comments, logs, error messages, and service strings are written in English.

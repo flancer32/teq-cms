@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Added opt-in Markdown publication families with localized HTML, explicit machine-locale Markdown, and deterministic `/llms.txt` discovery.
+- Extended `cms:translate` to validate and translate opted-in Markdown while preserving its structural syntax.
+- Updated the standalone CLI host preprocessor declaration for the installed TeqFW contracts.
+
 ## [0.7.0] - 2026-08-11
 
 - Migrated the web runtime from `@flancer32/teq-web` to `@teqfw/web` 2.x.

@@ -1,5 +1,8 @@
 # NPM Publish Rules
 
+- Path: `ctx/docs/environment/npm/publish.md`
+- Changed: `20260923`
+
 ## Package Contents
 
 The published tarball is controlled by the `files` allowlist in `package.json`.

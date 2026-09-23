@@ -13,6 +13,7 @@ describe('Fl32_Cms_Back_Cli_Plugin', () => {
             handTmpl: 'template',
             dtoSource: {create: value => { calls.push(['source', value]); return 'source'; }},
             tmplConfig: {getRootPath: () => '/application'},
+            config: {getPublicationFamilies: () => []},
             path: {join: (...parts) => parts.join('/')},
         });
 
