@@ -1,10 +1,5 @@
-/.idea/
 /**/.env
 /**/node_modules/
-/**/output.md
-/**/own_modules/
+/**/output*.md
+/**/output*.zip
 /**/tmp/
-/http-client.env.json
-/teqcms.config.js
-/teqcms.config.mjs
-/tmp/
