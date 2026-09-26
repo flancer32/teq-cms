@@ -11,7 +11,7 @@ The package metadata currently requires:
 - `@teqfw/di` `>=2.9.0`.
 - `@teqfw/log` `>=2.0.0`.
 - `@teqfw/cfg` `>=2.0.0`.
-- `@teqfw/cli` `>=2.1.0`.
+- `@teqfw/cli` `>=2.4.0` for declarative host Container policy configuration.
 
 The package requires Node.js 20 or newer.
 The package uses `mustache` and `nunjucks` as runtime template engines selected by host composition.

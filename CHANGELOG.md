@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Raised the minimum `@teqfw/cli` dependency to `2.4.0`, which introduced declarative host Container policy configuration.
 - Added opt-in Markdown publication families with localized HTML, explicit machine-locale Markdown, and deterministic `/llms.txt` discovery.
 - Extended `cms:translate` to validate and translate opted-in Markdown while preserving its structural syntax.
 - Updated the standalone CLI host preprocessor declaration for the installed TeqFW contracts.
