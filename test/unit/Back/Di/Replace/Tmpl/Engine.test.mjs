@@ -7,7 +7,7 @@ describe('Fl32_Cms_Back_Di_Replace_Tmpl_Engine', () => {
         it(`delegates to the ${name} engine`, async () => {
             const selected = {render: async params => ({engine: name, params})};
             const actual = new Engine({
-                config: {getEngine: () => name},
+                reader: {get: () => ({ENGINE: name})},
                 simple: name === 'simple' ? selected : {render: async () => ({})},
                 mustache: name === 'mustache' ? selected : {render: async () => ({})},
                 nunjucks: name === 'nunjucks' ? selected : {render: async () => ({})},
@@ -18,7 +18,7 @@ describe('Fl32_Cms_Back_Di_Replace_Tmpl_Engine', () => {
 
     it('falls back to simple for an unknown engine', async () => {
         const wrapper = new Engine({
-            config: {getEngine: () => 'unknown'},
+            reader: {get: () => ({ENGINE: 'unknown'})},
             simple: {render: async () => 'simple'},
             mustache: {render: async () => 'mustache'},
             nunjucks: {render: async () => 'nunjucks'},

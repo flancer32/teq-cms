@@ -53,7 +53,9 @@ TeqCMS owns only the `TEQ_CMS` namespace:
 - `TEQ_CMS__LOCALE_BASE_TRANSLATE` — translation source locale, defaulting to
   `ru`.
 
-Template settings belong to `@flancer32/teq-tmpl` under `TEQFW_TMPL`.
+Template locale settings belong to `@flancer32/teq-tmpl` under `TEQFW_TMPL`.
+The standalone CMS host also reads `TEQFW_TMPL__ENGINE` as a composition
+choice; this key is not projected by the tmpl package.
 Web-server settings belong to `@teqfw/web` under `TEQFW_WEB`.
 Do not add CMS aliases for those settings, read `process.env` in runtime
 components, or reintroduce the removed `TEQ_CMS_*` single-underscore names.
@@ -63,11 +65,11 @@ or template configuration setting.
 ## Template engine boundary
 
 The host application chooses the concrete template engine. The tmpl package
-owns the engine contract and offers implementations; it exposes the typed
-`TEQFW_TMPL__ENGINE` choice but does not automatically bind a DI implementation
-from that value. In the standalone TeqCMS host, the pre-DI configurator maps
+owns the engine contract and offers implementations; it does not expose an
+engine selector. In the standalone TeqCMS host, the pre-DI configurator maps
 the engine contract to the CMS adapter, and that adapter delegates to the
-selected implementation. A host embedding TeqCMS may provide its own mapping.
+selected implementation using the host's `TEQFW_TMPL__ENGINE` choice. A host
+embedding TeqCMS may provide its own mapping.
 
 Do not move engine selection into CMS business components, add a package-local
 configuration loader, or assume that the tmpl package selects the engine by

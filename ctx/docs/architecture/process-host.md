@@ -14,13 +14,12 @@ The package declares:
 
 - `teqfw.fw.di.namespaces` for the `Fl32_Cms_` source namespace;
 - `teqfw.fw.cli.container.configurator` for the pre-DI host configurator;
-
-The canonical standalone host path for this module is `bootstrap/di-config.mjs`.
 - `teqfw.fw.cli.plugin` for web-pipeline setup;
 - `teqfw.fw.cli.commands` for `translate`;
-- `teqfw.fw.cli.command.default` for `web:start` provided by `teq-web`.
+- `teqfw.fw.cli.command.default` for `web:start` provided by `@teqfw/web`.
 
 The package script invokes the published executable as `teq web:start`.
+The standalone host configurator is `bootstrap/di-config.mjs`.
 TeqCMS must not import `@teqfw/cli/src/**` or invoke an internal launcher path from package scripts.
 
 ## Commands
@@ -42,9 +41,10 @@ Configuration keys use the canonical TeqFW form `NAMESPACE__PARAMETER`. The
 `TEQ_CMS` contains only CMS-specific settings. Legacy `TEQ_CMS_*` names are not
 supported.
 
-The platform host selects one `@flancer32/teq-tmpl` implementation and binds it
-to the contract through DI using `TEQFW_TMPL__ENGINE`. The tmpl package offers
-the engine contract and available implementations.
+The standalone host selects one `@flancer32/teq-tmpl` implementation and binds
+it to the contract through DI using `TEQFW_TMPL__ENGINE` as a host composition
+setting. The tmpl package offers the engine contract and implementations; its
+typed configuration does not expose an engine selector.
 
 The platform-owned application root remains an open CLI contract. Until the
 platform exposes it to configuration Sources, the CMS uses the process working

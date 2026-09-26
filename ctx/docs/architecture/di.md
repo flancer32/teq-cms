@@ -28,5 +28,5 @@ It must not contain static imports from TeqCMS or depend on application code fro
 - Runtime settings are read through package-owned typed configuration components;
   business components do not read `process.env` or raw CMS configuration.
 - The host application selects the concrete template engine in host composition
-  from the `TEQFW_TMPL__ENGINE` setting. `@flancer32/teq-tmpl` offers the engine
-  contract and implementations.
+  from the host-owned `TEQFW_TMPL__ENGINE` setting. `@flancer32/teq-tmpl` offers
+  the engine contract and implementations, but does not project this setting.

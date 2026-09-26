@@ -27,10 +27,10 @@ CLI components. The canonical namespace metadata is
 Internal components use DI CDC identifiers and do not access the Container.
 
 The host selects the concrete template engine at composition time. The
-`TEQFW_TMPL__ENGINE` value is configuration input for that host decision, not
-an automatic DI alias. TeqCMS's standalone adapter delegates to the selected
-tmpl provider; an embedding application may install another mapping that
-implements the same contract.
+`TEQFW_TMPL__ENGINE` value is host composition input for that decision, not
+a tmpl package setting or an automatic DI alias. TeqCMS's standalone adapter
+delegates to the selected tmpl provider; an embedding application may install
+another mapping that implements the same contract.
 
 The application root is supplied as the CLI runtime value
 `TeqFw_Cli_Config$.applicationRoot`. It is not a CMS setting and should not be

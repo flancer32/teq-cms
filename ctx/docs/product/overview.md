@@ -24,10 +24,8 @@ The system uses a strict file structure and automation without control panels or
 
 - Pages are HTML templates rendered by the server through the selected template engine.
 - Request processing extracts locale and path, prepares data, and selects the appropriate template.
-- `@flancer32/teq-tmpl` offers template locales, the engine contract, and the
-  available engine implementations. The host application owns the final engine
-  selection; TeqCMS owns CMS-specific settings, server composition, and model
-  API parameters.
+- The host selects the template engine and supplies the website's templates.
+  TeqCMS owns CMS-specific settings and model API parameters.
 - Translation state is stored in JSON and synchronized with the file system.
 - Markdown remains the authored source. Human visitors receive server-rendered HTML through a host-owned presentation template. Agents may receive original Markdown only in configured machine-readable locales. Discovery projects only authorized source routes.
 

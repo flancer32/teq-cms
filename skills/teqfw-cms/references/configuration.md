@@ -21,10 +21,11 @@ TEQ_CMS__PUBLICATION_MACHINE_LOCALES
 TEQ_CMS__PUBLICATION_DISCOVERY_PATH
 ```
 
-The template package reads `TEQFW_TMPL` and owns allowed locales, default
-locale, and engine choice. The web package reads `TEQFW_WEB` and owns web
-server settings. Use each package's typed configuration component instead of
-duplicating or forwarding raw values in CMS code.
+The template package reads `TEQFW_TMPL` and owns allowed locales and the default
+locale. The standalone CMS host reads `TEQFW_TMPL__ENGINE` through the cfg
+reader to select an engine implementation; tmpl does not project this key.
+The web package reads `TEQFW_WEB` and owns web server settings. Runtime
+components use each package's typed configuration component.
 
 ## Precedence and boundaries
 

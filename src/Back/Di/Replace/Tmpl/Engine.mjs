@@ -8,15 +8,16 @@
 export default class Fl32_Cms_Back_Di_Replace_Tmpl_Engine {
     /**
      * @param {object} deps
-     * @param {Fl32_Tmpl_Back_Config} deps.config
+     * @param {TeqFw_Cfg_Reader} deps.reader
      * @param {Fl32_Tmpl_Back_Api_Engine} deps.simple
      * @param {Fl32_Tmpl_Back_Api_Engine} deps.mustache
      * @param {Fl32_Tmpl_Back_Api_Engine} deps.nunjucks
      */
-    constructor({config, simple, mustache, nunjucks}) {
+    constructor({reader, simple, mustache, nunjucks}) {
         /** @type {Record<string, Fl32_Tmpl_Back_Api_Engine>} */
         const engines = {simple, mustache, nunjucks};
-        const engine = engines[config.getEngine()] ?? simple;
+        const selected = reader.get('TEQFW_TMPL').ENGINE;
+        const engine = typeof selected === 'string' ? engines[selected] ?? simple : simple;
 
         /**
          * @param {Fl32_Cms_Back_Di_Replace_Tmpl_Engine_Params} params
@@ -28,7 +29,7 @@ export default class Fl32_Cms_Back_Di_Replace_Tmpl_Engine {
 
 export const __deps__ = Object.freeze({
     default: Object.freeze({
-        config: 'Fl32_Tmpl_Back_Config$',
+        reader: 'TeqFw_Cfg_Reader$',
         simple: 'Fl32_Tmpl_Back_Service_Engine_Simple$',
         mustache: 'Fl32_Tmpl_Back_Service_Engine_Mustache$',
         nunjucks: 'Fl32_Tmpl_Back_Service_Engine_Nunjucks$',

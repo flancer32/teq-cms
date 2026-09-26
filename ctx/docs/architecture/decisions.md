@@ -5,7 +5,8 @@
 
 ## Dependency Migration Checkpoint
 
-The prior dependency-switch checkpoint has been completed. The current runtime uses the installed CLI, DI, cfg, tmpl, and web package contracts and is verified by unit tests, acceptance tests, type checking, and ESM validation.
+The prior dependency-switch checkpoint has been completed. Current package
+compatibility is established by the checks in `../code/verification.md`.
 
 ## Web Package Boundary
 
@@ -18,9 +19,11 @@ The former legacy context branches were projected into the four ADSM documentati
 ## Template Engine Composition
 
 TeqCMS uses `@flancer32/teq-tmpl` for template rendering. The tmpl package owns
-the `TEQFW_TMPL` configuration projection, the engine contract, and the offered
-provider implementations. Platform composition owns configuration loading and
-the final engine binding. TeqCMS provides both the host configurator and the
+the locale settings in `TEQFW_TMPL`, the engine contract, and the offered
+provider implementations. The standalone CMS host reads `TEQFW_TMPL__ENGINE`
+as its own composition choice; tmpl does not project or select that setting.
+Platform composition owns configuration loading and the final engine binding.
+TeqCMS provides both the host configurator and the
 startup plugin when it runs as the standalone development host. The plugin also
 registers the CMS web pipeline before the `web:start` command locks it.
 
