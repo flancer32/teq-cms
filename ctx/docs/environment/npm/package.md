@@ -1,7 +1,7 @@
 # NPM Package Configuration Rules
 
 - Path: `ctx/docs/environment/npm/package.md`
-- Changed: `20260923`
+- Changed: `20260926`
 
 ## Metadata Invariants
 
@@ -13,7 +13,7 @@
 
 ## Typing and Module System
 
-- `types` is `./types.d.ts`.
+- `types` is `types.d.ts`.
 - Runtime files are `.mjs` and follow Node ESM resolution.
 - The package has no `exports` or `main` entry and no CommonJS compatibility layer.
 - Type declarations use JSDoc and `.d.ts`; no `.ts` or `.tsx` sources are added.
@@ -25,7 +25,7 @@ No package-owned `bin/teq-cms.mjs` bridge is maintained.
 
 ## Dependencies
 
-Runtime dependencies include `@flancer32/teq-tmpl`, `@teqfw/web`, `@teqfw/cfg`, `@teqfw/cli`, `@teqfw/di`, `@teqfw/log`, `marked`, `yaml`, `mustache`, and `nunjucks`. OpenAI-compatible APIs are accessed through the native Node.js `fetch` API.
+Runtime dependencies include `@flancer32/teq-tmpl`, `@teqfw/web`, `@teqfw/cfg`, `@teqfw/cli`, `@teqfw/di`, `@teqfw/log`, `marked`, `yaml`, `mustache`, and `nunjucks`.
 
 ## Package Contents
 

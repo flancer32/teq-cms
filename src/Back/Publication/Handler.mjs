@@ -11,7 +11,6 @@ export default class Fl32_Cms_Back_Publication_Handler {
      * @param {Fl32_Cms_Back_Config} deps.config
      * @param {Fl32_Tmpl_Back_Config} deps.tmplConfig
      * @param {Fl32_Cms_Back_Publication_Source} deps.source
-     * @param {Fl32_Cms_Back_Publication_Catalog} deps.catalog
      * @param {Fl32_Tmpl_Back_Dto_Target} deps.dtoTarget
      * @param {Fl32_Tmpl_Back_Service_Render} deps.render
      * @param {TeqFw_Web_Back_Helper_Respond} deps.respond
@@ -20,7 +19,7 @@ export default class Fl32_Cms_Back_Publication_Handler {
      * @param {TeqFw_Log_Provider} deps.logger
      * @param {typeof import('node:path')} deps.path
      */
-    constructor({config, tmplConfig, source, catalog, dtoTarget, render, respond, dtoInfo, STAGE, logger, path}) {
+    constructor({config, tmplConfig, source, dtoTarget, render, respond, dtoInfo, STAGE, logger, path}) {
         const log = logger.forSource('Fl32_Cms_Back_Publication_Handler');
         const info = dtoInfo.create({
             name: 'Fl32_Cms_Back_Publication_Handler',
@@ -32,7 +31,8 @@ export default class Fl32_Cms_Back_Publication_Handler {
         /** @type {string[]} */
         const locales = tmplConfig.getAvailableLocales();
         /** @type {string[]} */
-        const machines = config.getPublicationMachineLocales();
+        const configuredMachines = config.getPublicationMachineLocales();
+        const machines = configuredMachines;
         if (machines.some(locale => !locales.includes(locale))) {
             throw new Error('Publication machine locales must be maintained human locales.');
         }
@@ -62,33 +62,6 @@ export default class Fl32_Cms_Back_Publication_Handler {
                 respond.code404_NotFound({res});
                 context.completed = true;
             };
-            if (rawPath === config.getPublicationDiscoveryPath()) {
-                try {
-                    const base = config.getBaseUrl();
-                    if (!base) throw new Error('BASE_URL is required for publication discovery.');
-                    const lines = [
-                        '# Published Markdown',
-                        '',
-                        `Human locales: ${locales.join(', ')}`,
-                        `Machine-readable locales: ${machines.join(', ') || 'none'}`,
-                        '',
-                    ];
-                    for (const locale of machines) {
-                        /** @type {Fl32_Cms_Back_Publication_Item[]} */
-                        const items = await catalog.list({locale});
-                        for (const item of items) {
-                            lines.push(`- ${new URL(`/${locale}/${item.route}.md`, base).href}`);
-                        }
-                    }
-                    const body = `${lines.join('\n')}\n`;
-                    respond.code200_Ok({res, headers: {'content-type': 'text/plain; charset=utf-8'}, body});
-                    context.completed = true;
-                } catch (error) {
-                    log.error('Publication discovery failed.', {err: error});
-                    fail();
-                }
-                return;
-            }
             let decodedPath;
             try {
                 decodedPath = decodeURIComponent(rawPath);
@@ -195,7 +168,6 @@ export const __deps__ = Object.freeze({
         config: 'Fl32_Cms_Back_Config$',
         tmplConfig: 'Fl32_Tmpl_Back_Config$',
         source: 'Fl32_Cms_Back_Publication_Source$',
-        catalog: 'Fl32_Cms_Back_Publication_Catalog$',
         dtoTarget: 'Fl32_Tmpl_Back_Dto_Target$',
         render: 'Fl32_Tmpl_Back_Service_Render$',
         respond: 'TeqFw_Web_Back_Helper_Respond$',

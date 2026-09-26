@@ -88,7 +88,7 @@ export default class Fl32_Cms_Back_Helper_Web {
          * @param {string} deps.path - Raw URL path
          * @param {string[]} deps.allowedLocales - List of supported locales
          * @param {string} deps.fallbackLocale - Locale used when none found in path
-         * @returns {object}
+         * @returns {Fl32_Cms_Back_Helper_Web_RoutingInfo}
          */
         this.extractRoutingInfo = function ({path, allowedLocales, fallbackLocale}) {
             const trimmed = (path ?? '').replace(/^\/+|\/+$/g, '');

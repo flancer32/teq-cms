@@ -1,7 +1,7 @@
 {
   "name": "@flancer32/teq-cms",
   "version": "0.7.0",
-  "description": "Minimalistic file-based CMS for multilingual websites with AI-powered localization and Git-native content workflow.",
+  "description": "Agent-first, file-based CMS for multilingual Markdown content and human-readable HTML.",
   "type": "module",
   "keywords": [
     "teqfw",
@@ -27,7 +27,7 @@
     "type": "git",
     "url": "git+https://github.com/flancer32/teq-cms.git"
   },
-  "types": "./types.d.ts",
+  "types": "types.d.ts",
   "files": [
     "bootstrap/",
     "docs/",
@@ -88,9 +88,9 @@
         "plugin": "Fl32_Cms_Back_Cli_Plugin$",
         "commands": [
           {
-            "id": "cms:translate",
-            "summary": "Translate CMS templates and opted-in Markdown publications.",
-            "component": "Fl32_Cms_Back_Cli_Command_Translate$"
+            "id": "cms:generate",
+            "summary": "Generate robots.txt, llms.txt, and sitemap.xml.",
+            "component": "Fl32_Cms_Back_Cli_Command_Generate$"
           }
         ]
       }

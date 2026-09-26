@@ -57,7 +57,9 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
 
             try {
                 const {target, data, options} = await adapter.getRenderData({req});
-                const {template} = await servTmplLoad.perform({target});
+                if (!target) return;
+                const typedTarget = /** @type {Fl32_Tmpl_Back_Dto_Target__DTO} */ (target);
+                const {template} = await servTmplLoad.perform({target: typedTarget});
                 if (template) {
                     const url = req.url || '';
                     const hasLocale = tmplConfig.getAvailableLocales().some(
@@ -69,7 +71,7 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
 
                     if (!hasLocale) {
                         // TODO: move this code to TeqFw_Web_Back_Helper_Respond
-                        const loc = target.locales.user ?? tmplConfig.getDefaultLocale();
+                        const loc = typedTarget.locales.user ?? tmplConfig.getDefaultLocale();
                         const newLoc = url.startsWith('/') ? `/${loc}${url}` : `/${loc}/${url}`;
                         res.writeHead(HTTP_STATUS_FOUND, {location: newLoc});
                         res.end();
@@ -78,7 +80,7 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
                     }
 
                     const {content} = await servTmplRender.perform({
-                        target,
+                        target: typedTarget,
                         template,
                         data,
                         options,

@@ -10,7 +10,7 @@ metadata:
 
 Use this skill for consumer or maintenance work that crosses the TeqCMS
 runtime, its TeqFW host composition, CMS configuration, localized templates,
-web pipeline, or translation command. The host project's instructions and
+web pipeline, or discovery command. The host project's instructions and
 current source remain authoritative; this skill describes the package-owned
 boundary and the checks that protect it.
 
@@ -33,7 +33,7 @@ boundary and the checks that protect it.
    outside `teqfw-esm-validator` validation.
 5. Keep the CMS lifecycle plugin focused on registering the CMS handlers in
    the `@teqfw/web` pipeline. The `web:start` command belongs to
-   `@teqfw/web`; the finite `cms:translate` command belongs to TeqCMS
+   `@teqfw/web`; the finite `cms:generate` command belongs to TeqCMS
    and is declared in `package.json` metadata.
 
 ## Configuration ownership
@@ -46,12 +46,10 @@ snapshot; each package owns its typed projection through
 TeqCMS owns only the `TEQ_CMS` namespace:
 
 - `TEQ_CMS__BASE_URL` — canonical public base URL;
-- `TEQ_CMS__AI_API_BASE_URL` — OpenAI-compatible API base URL;
-- `TEQ_CMS__AI_API_KEY` — API credential;
-- `TEQ_CMS__AI_API_MODEL` — model name, defaulting to `gpt-4o-mini`;
-- `TEQ_CMS__AI_API_ORG` — optional organization identifier;
-- `TEQ_CMS__LOCALE_BASE_TRANSLATE` — translation source locale, defaulting to
-  `ru`.
+- `TEQ_CMS__PUBLICATION_FAMILIES` — explicitly enabled route families;
+- `TEQ_CMS__PUBLICATION_MACHINE_LOCALES` — locales whose Markdown is public;
+- `TEQ_CMS__AGENT_MESSAGE_ENABLED` — enables the private file inbox route;
+- `TEQ_CMS__AGENT_MESSAGE_TOKEN` — optional shared contact token.
 
 Template locale settings belong to `@flancer32/teq-tmpl` under `TEQFW_TMPL`.
 The standalone CMS host also reads `TEQFW_TMPL__ENGINE` as a composition

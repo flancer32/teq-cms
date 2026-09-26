@@ -12,12 +12,13 @@ export default class Fl32_Cms_Back_Cli_Plugin {
      * @param {TeqFw_Web_Back_Handler_Static} deps.handStatic
      * @param {Fl32_Cms_Back_Web_Handler_Template} deps.handTmpl
      * @param {Fl32_Cms_Back_Publication_Handler} deps.handPublication
+     * @param {Fl32_Cms_Back_Web_Handler_AgentMessage} deps.handAgentMessage
      * @param {TeqFw_Web_Back_Dto_Source__Factory} deps.dtoSource
      * @param {Fl32_Tmpl_Back_Config} deps.tmplConfig
      * @param {Fl32_Cms_Back_Config} deps.config
      * @param {typeof import('node:path')} deps.path
      */
-    constructor({pipeline, handLog, handStatic, handTmpl, handPublication, dtoSource, tmplConfig, config, path}) {
+    constructor({pipeline, handLog, handStatic, handTmpl, handPublication, handAgentMessage, dtoSource, tmplConfig, config, path}) {
         /**
          * Registers CMS handlers before the web command starts.
          *
@@ -35,6 +36,7 @@ export default class Fl32_Cms_Back_Cli_Plugin {
             pipeline.addHandler(handStatic);
             pipeline.addHandler(handTmpl);
             if (config.getPublicationFamilies().length) pipeline.addHandler(handPublication);
+            if (config.getAgentMessageEnabled()) pipeline.addHandler(handAgentMessage);
         };
 
         /**
@@ -53,6 +55,7 @@ export const __deps__ = Object.freeze({
         handStatic: 'TeqFw_Web_Back_Handler_Static$',
         handTmpl: 'Fl32_Cms_Back_Web_Handler_Template$',
         handPublication: 'Fl32_Cms_Back_Publication_Handler$',
+        handAgentMessage: 'Fl32_Cms_Back_Web_Handler_AgentMessage$',
         dtoSource: 'TeqFw_Web_Back_Dto_Source__Factory$',
         tmplConfig: 'Fl32_Tmpl_Back_Config$',
         config: 'Fl32_Cms_Back_Config$',

@@ -44,7 +44,7 @@ export default class Fl32_Cms_Back_Di_Replace_Adapter {
         /**
          * @param {object} deps
          * @param {Fl32_Cms_Back_Di_Replace_Adapter_Request} deps.req
-         * @returns {Promise<object>}
+         * @returns {Promise<Fl32_Cms_Back_Api_Adapter_RenderData>}
          */
         this.getRenderData = async function ({req}) {
             let target, data, options;

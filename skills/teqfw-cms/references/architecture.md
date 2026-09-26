@@ -13,11 +13,10 @@ host.
 - `Fl32_Cms_Back_Cli_Plugin` participates in lifecycle startup and registers
   the CMS static, logging, and template handlers in the web pipeline.
 - `@teqfw/web` owns the long-running `web:start` command.
-- TeqCMS owns the finite `cms:translate` command and the CMS translation
-  domain services.
+- TeqCMS owns the finite `cms:generate` command and publication discovery.
 - `@flancer32/teq-tmpl` owns localized template configuration, target and
   rendering contracts, and the available engine implementations.
-- Optional Markdown publication remains CMS-owned: safe source and catalog, a PROCESS handler ordered before template/static delivery, machine-locale policy, and Markdown translation. The host supplies presentation templates and owns the human sitemap. `Fl32_Cms_Back_Publication_Catalog$` provides route-sorted entries for indexes and sitemap integration.
+- Optional Markdown publication remains CMS-owned: safe source and catalog, a PROCESS handler ordered before template/static delivery, and machine-locale policy. The host supplies presentation templates. `Fl32_Cms_Back_Publication_Catalog$` provides route-sorted entries for indexes and discovery generation. An optional PROCESS handler accepts agent messages into a private inbox.
 
 ## Composition rules
 

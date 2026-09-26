@@ -8,10 +8,9 @@ TEQFW_TMPL__DEFAULT_LOCALE=de
 TEQ_CMS__BASE_URL=https://example.com
 TEQ_CMS__PUBLICATION_FAMILIES=[{"prefix":"journal","presentation":"publication.html"}]
 TEQ_CMS__PUBLICATION_MACHINE_LOCALES=en
-TEQ_CMS__PUBLICATION_DISCOVERY_PATH=/llms.txt
 ```
 
-The family prefix may be any safe relative path, such as `journal` or `stories/longform`. It is not tied to a year or slug scheme. Prefixes cannot overlap. `PUBLICATION_MACHINE_LOCALES` accepts a comma-separated list of maintained locales; leave it empty when no raw Markdown should be public. `PUBLICATION_DISCOVERY_PATH` defaults to `/llms.txt`. An absolute `BASE_URL` without a path is required when publication is enabled. The default human locale, translation base locale, and machine locale are separate settings.
+The family prefix may be any safe relative path, such as `journal` or `stories/longform`. Prefixes cannot overlap. `PUBLICATION_MACHINE_LOCALES` accepts a comma-separated list of maintained locales; leave it empty when no raw Markdown should be public. An absolute `BASE_URL` without a path is required when publication is enabled. Publication is disabled until a host configures a family.
 
 ## Author a publication
 
@@ -34,7 +33,7 @@ Markdown body text with [a link](https://example.com).
 
 `title`, `description`, and an ISO calendar `date` are required. Other YAML fields remain available to the presentation template. TeqCMS reads only source files under configured family prefixes. Keep authored Markdown and any raw HTML in Git and review it as trusted site content.
 
-For this example, `/en/journal/example` renders HTML from `tmpl/web/en/journal/example.md`. `/en/journal/example.md` returns the original file as `text/markdown; charset=utf-8` because `en` is a machine locale. `/de/journal/example.md` returns 404. Each human locale needs its own localized source; `cms:translate` can create translated Markdown from the configured translation base locale.
+For this example, `/en/journal/example` renders HTML from `tmpl/web/en/journal/example.md`. `/en/journal/example.md` returns the original file as `text/markdown; charset=utf-8` because `en` is a machine locale. `/de/journal/example.md` returns 404. An agent authors and reviews each locale's source file.
 
 ## Present HTML
 
@@ -60,10 +59,14 @@ The template owns page layout, navigation, cards, SEO elements, and any CTA. Wit
 {% if markdownAlternateUrl %}<link rel="alternate" type="text/markdown" href="{{ markdownAlternateUrl }}">{% endif %}
 ```
 
-Use the equivalent syntax for another selected engine. The host can use `Fl32_Cms_Back_Publication_Catalog$` through DI to build indexes and the human sitemap: `await catalog.list({locale: 'en'})` returns route-sorted entries with metadata, source, Markdown, and HTML. The catalog includes only configured families.
+Use the equivalent syntax for another selected engine. The host can use `Fl32_Cms_Back_Publication_Catalog$` through DI to build indexes: `await catalog.list({locale: 'en'})` returns route-sorted entries with metadata, source, Markdown, and HTML. The catalog includes only configured families.
 
-## Translate and discover
+## Generate discovery files
 
-Run `teq cms:translate` after setting the OpenAI-compatible API configuration. The command continues translating HTML templates and additionally scans Markdown only under configured families. It translates `title`, `description`, `summary`, `displayDate`, and `imageAlt` when present, plus body prose. It preserves route paths, front-matter keys, dates, other metadata, code, links, image URLs, and raw HTML. A structurally invalid model response is stored as an `.answer.md` diagnostic and is not published as a localized Markdown file.
+Run `teq cms:generate` from the host application after editing the publication corpus. The command writes `web/robots.txt`, `web/llms.txt`, and `web/sitemap.xml`. Commit the generated files with the content they describe and regenerate them after content changes. The sitemap contains configured HTML publication routes; other site routes require host-owned sitemap integration.
 
-`/llms.txt` lists the authorized machine Markdown URLs in stable route order, with human and machine locale declarations. It does not replace the host's HTML sitemap. The endpoint reads the current file corpus at request time, so a Git update becomes visible without a separate generation command.
+`llms.txt` lists only the configured machine Markdown URLs in stable route order. The static web handler serves these files from `web/`. Empty machine locales produce no Markdown links.
+
+## Agent contact
+
+Set `TEQ_CMS__AGENT_MESSAGE_ENABLED=true` to enable `GET /agent/message`. Send an agent identifier in `X-Agent-Id` and a short message in `X-Agent-Message`; optionally configure `TEQ_CMS__AGENT_MESSAGE_TOKEN` and send it as `X-Agent-Token`. The handler returns `202 Accepted` after saving a JSON record under `var/teq-cms/agent-messages/`. The route is disabled by default. The host owner is responsible for reading this private inbox and arranging notification or reply outside the CMS.

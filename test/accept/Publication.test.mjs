@@ -38,7 +38,7 @@ async function fixture() {
     const config = {
         getPublicationFamilies: () => [family],
         getPublicationMachineLocales: () => ['en'],
-        getPublicationDiscoveryPath: () => '/llms.txt',
+        getAgentMessageEnabled: () => false,
         getBaseUrl: () => 'https://example.test',
     };
     const source = new Source({fs, path, tmplConfig, config, parseDocument, marked});
@@ -46,7 +46,7 @@ async function fixture() {
     const respond = new Respond({http2});
     const rendered = [];
     const handler = new Handler({
-        config, tmplConfig, source, catalog, respond, dtoInfo: info, STAGE, logger, path,
+        config, tmplConfig, source, respond, dtoInfo: info, STAGE, logger, path,
         dtoTarget: {create: value => value},
         render: {perform: async value => {
             rendered.push(value);
@@ -69,6 +69,7 @@ async function fixture() {
     const plugin = new Plugin({
         pipeline, handLog: {getRegistrationInfo: () => ({name: 'log', stage: STAGE.INIT}), handle: async () => {}},
         handStatic: staticHandler, handTmpl: templateHandler, handPublication: handler,
+        handAgentMessage: {},
         dtoSource: {create: value => value}, tmplConfig, config, path,
     });
     await plugin.onStartup();
@@ -87,7 +88,7 @@ async function fixture() {
 }
 
 describe('Markdown publication through the CMS plugin and web pipeline', () => {
-    it('serves three localized HTML routes, one Markdown corpus, and deterministic discovery', async () => {
+    it('serves three localized HTML routes and the configured Markdown corpus', async () => {
         const app = await fixture();
         try {
             for (const locale of locales) {
@@ -117,14 +118,6 @@ describe('Markdown publication through the CMS plugin and web pipeline', () => {
             assert.equal((await app.send('/en/journal/2026/hello.md/')).status, 404);
             assert.equal((await app.send('/de//journal/2026/hello.md')).status, 404);
             assert.equal((await app.send('/de/journal/./2026/hello.md')).status, 404);
-            const discovery = await app.send('/llms.txt');
-            assert.equal(discovery.status, 200);
-            assert.deepEqual(discovery.body.match(/https:\/\/example\.test\/[^\s]+/g), [
-                'https://example.test/en/journal/2025/first.md',
-                'https://example.test/en/journal/2026/hello.md',
-            ]);
-            assert.match(discovery.body, /Human locales: en, de, ru/);
-            assert.match(discovery.body, /Machine-readable locales: en/);
             assert.deepEqual(app.calls, []);
             await app.send('/de/about');
             assert.deepEqual(app.calls, ['template', 'static']);

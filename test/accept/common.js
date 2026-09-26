@@ -43,9 +43,7 @@ export function buildTestContainer() {
                 PORT: 3050,
                 TYPE: 'http',
                 }
-                : {
-                    LOCALE_BASE_TRANSLATE: 'en',
-                },
+                : {},
     });
     container.register('TeqFw_Cli_Config$', {
         applicationRoot: process.cwd(),

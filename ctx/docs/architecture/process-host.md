@@ -1,7 +1,7 @@
 # TeqCMS Process Host
 
 - Path: `ctx/docs/architecture/process-host.md`
-- Changed: `20260923`
+- Changed: `20260926`
 
 ## Purpose
 
@@ -15,7 +15,7 @@ The package declares:
 - `teqfw.fw.di.namespaces` for the `Fl32_Cms_` source namespace;
 - `teqfw.fw.cli.container.configurator` for the pre-DI host configurator;
 - `teqfw.fw.cli.plugin` for web-pipeline setup;
-- `teqfw.fw.cli.commands` for `translate`;
+- `teqfw.fw.cli.commands` for `cms:generate`;
 - `teqfw.fw.cli.command.default` for `web:start` provided by `@teqfw/web`.
 
 The package script invokes the published executable as `teq web:start`.
@@ -25,14 +25,14 @@ TeqCMS must not import `@teqfw/cli/src/**` or invoke an internal launcher path f
 ## Commands
 
 - `web:start` is the long-running command supplied by `@teqfw/web`.
-- `cms:translate` is a finite command with `execute(context)` for HTML templates and opted-in Markdown publications.
+- `cms:generate` is a finite command with `execute(context)` for discovery files.
 - Commands must not call `process.exit` or assign `process.exitCode`.
 
 ## Configuration Lifecycle
 
 The host configurator provides ordered configuration Sources. `@teqfw/cli`
 loads them once before resolving lifecycle plugins and commands. The CMS CLI
-plugin then registers the static and template handlers before `web:start`
+plugin then registers the agent-message, publication, static, and template handlers before `web:start`
 locks the pipeline. Typed package configuration components read their own
 namespaces through `TeqFw_Cfg_Reader$`.
 

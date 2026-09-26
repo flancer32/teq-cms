@@ -9,12 +9,10 @@ it('blocks localized Markdown before source or template access', async () => {
         config: {
             getPublicationFamilies: () => [{prefix: 'notes', presentation: 'page.html'}],
             getPublicationMachineLocales: () => ['en'],
-            getPublicationDiscoveryPath: () => '/llms.txt',
             getBaseUrl: () => 'https://example.test',
         },
         tmplConfig: {getAvailableLocales: () => ['en', 'de'], getDefaultLocale: () => 'de'},
         source: {getFamily: () => ({prefix: 'notes', presentation: 'page.html'}), read: async () => { calls.push('read'); }},
-        catalog: {list: async () => { calls.push('catalog'); return []; }},
         dtoTarget: {create: value => value},
         render: {perform: async () => { calls.push('render'); return {resultCode: 'SUCCESS', content: ''}; }},
         respond: {

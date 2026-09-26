@@ -11,30 +11,16 @@ export default class Fl32_Cms_Back_Helper_File {
      * @param {object} deps
      * @param {typeof import('node:path')} deps.path
      * @param {typeof import('node:fs')} deps.fs
-     * @param {Fl32_Tmpl_Back_Config} deps.tmplConfig
      */
     constructor(
         {
             path,
             fs,
-            tmplConfig,
         }
     ) {
-        const {dirname, join} = path;
+        const {join} = path;
         const {promises, constants} = fs;
-        const {access, mkdir, readFile, stat, writeFile} = promises;
-
-        /**
-         * Builds an absolute path to the localized template file.
-         * @param {object} deps - Parameters object.
-         * @param {string} deps.locale - Target locale
-         * @param {string} deps.path - Relative path to the template
-         * @returns {string} Absolute path
-         */
-        this.getLocalizedPath = function ({locale, path}) {
-            const root = tmplConfig.getRootPath();
-            return join(root, 'tmpl', 'web', locale, path);
-        };
+        const {access, stat} = promises;
 
         /**
          * Checks whether the given file exists.
@@ -51,38 +37,6 @@ export default class Fl32_Cms_Back_Helper_File {
             }
         };
 
-        /**
-         * Reads file content as UTF-8 string.
-         * @param {object} deps - Parameters object.
-         * @param {string} deps.path - Full path to the file
-         * @returns {Promise<string>}
-         */
-        this.readText = async function ({path}) {
-            return readFile(path, 'utf-8');
-        };
-
-        /**
-         * Returns file stats including mtime.
-         * @param {object} deps - Parameters object.
-         * @param {string} deps.path - Full path to the file
-         * @returns {Promise<object>}
-         */
-        this.stat = async function ({path}) {
-            return stat(path);
-        };
-
-        /**
-         * Replaces a file extension if it matches the expected one.
-         * @param {object} deps - Parameters object.
-         * @param {string} deps.path - Original file path
-         * @param {string} deps.ext - New extension (e.g. '.prompt.md')
-         * @param {string} [deps.fromExt='.html'] - Extension to be replaced
-         * @returns {string} Updated file path
-         */
-        this.replaceExt = function ({path, ext, fromExt = '.html'}) {
-            if (!path.endsWith(fromExt)) return path;
-            return path.slice(0, -fromExt.length) + ext;
-        };
 
         /**
          * Resolves a template name relative to a base directory.
@@ -121,18 +75,6 @@ export default class Fl32_Cms_Back_Helper_File {
             return undefined;
         };
 
-        /**
-         * Writes UTF-8 string to file.
-         * @param {object} deps - Parameters object.
-         * @param {string} deps.path - Full path to the file
-         * @param {string} deps.text - Content to write
-         * @returns {Promise<void>}
-         */
-        this.writeText = async function ({path, text}) {
-            const dir = dirname(path);
-            await mkdir(dir, {recursive: true});
-            return writeFile(path, text, 'utf-8');
-        };
     }
 }
 
@@ -140,6 +82,5 @@ export const __deps__ = Object.freeze({
     default: Object.freeze({
         path: 'node:path',
         fs: 'node:fs',
-        tmplConfig: 'Fl32_Tmpl_Back_Config$',
     }),
 });

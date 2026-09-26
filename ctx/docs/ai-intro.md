@@ -1,7 +1,7 @@
 # AI Introduction
 
 - Path: `ctx/docs/ai-intro.md`
-- Changed: `20260923`
+- Changed: `20260926`
 
 ## Project Type
 
@@ -9,7 +9,7 @@ TeqCMS is a Node.js ESM package and CLI for a minimalist file-based multilingual
 
 ## Problem Space
 
-The package renders localized website templates and synchronizes translations through an OpenAI-compatible HTTP API while keeping content in files and Git.
+Agents author localized Markdown files in Git. TeqCMS renders them as HTML for people and can expose selected Markdown to agents.
 
 ## Product Role
 
@@ -17,7 +17,7 @@ TeqCMS is a TeqFW plugin and application host integration. It composes TeqFW DI,
 
 ## Primary Audience
 
-The primary audience is developers who integrate the CMS into Node.js websites and agents who maintain the package.
+The primary audience is agents building and maintaining websites, followed by developers and human readers.
 
 ## Technology Base
 
@@ -28,9 +28,9 @@ The primary audience is developers who integrate the CMS into Node.js websites a
 
 ## Distinguishing Characteristics
 
-- Content and translation state are file-based.
+- Localized content is file-based and directly maintained by agents.
 - The CLI is the composition root.
-- The translation gateway uses native Node.js `fetch` and parses the streaming `/chat/completions` response directly; no OpenAI SDK is required.
+- A finite CLI command generates discovery files; an optional web handler saves agent messages for the owner.
 
 ## What This Project Is Not
 

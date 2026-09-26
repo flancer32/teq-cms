@@ -1,7 +1,7 @@
 # Dependency Baseline
 
 - Path: `ctx/docs/environment/dependencies.md`
-- Changed: `20260923`
+- Changed: `20260926`
 
 The package metadata currently requires:
 
@@ -22,4 +22,4 @@ lockfile entry as development-only. A source checkout installed with
 `npm ci --omit=dev` therefore omits tmpl; published consumers resolve the
 runtime dependency from the published package manifest.
 
-Optional Markdown publication uses `marked` for body rendering and `yaml` for deterministic front-matter parsing. Both are runtime dependencies because a configured family can be served through the CMS web pipeline and translated by the CLI. Publication remains disabled until a family is configured.
+Optional Markdown publication uses `marked` for body rendering and `yaml` for deterministic front-matter parsing. Both are runtime dependencies because a configured family can be served through the CMS web pipeline and enumerated by the CLI. Publication remains disabled until a family is configured.
