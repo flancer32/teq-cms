@@ -45,6 +45,7 @@ declare global {
   type Fl32_Cms_Back_Publication_Policy = import("./src/Back/Publication/Policy.mjs").default;
   type Fl32_Cms_Back_Publication_Policy__Class = typeof import("./src/Back/Publication/Policy.mjs").default;
   type Fl32_Cms_Back_Publication_Presentation = {target: Fl32_Tmpl_Back_Dto_Target__DTO; template: string};
+  type Fl32_Cms_Back_Publication_Resource = {item: Fl32_Cms_Back_Publication_Item; representation: 'html'|'markdown'; url: string};
   type Fl32_Cms_Back_Publication_Representation = import("./src/Back/Publication/Representation.mjs").default;
   type Fl32_Cms_Back_Publication_Representation__Class = typeof import("./src/Back/Publication/Representation.mjs").default;
   type Fl32_Cms_Back_Publication_Routing = import("./src/Back/Publication/Routing.mjs").default;

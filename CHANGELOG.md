@@ -4,6 +4,10 @@
 
 ### Added
 
+- Sitemap representation selection through `TEQ_CMS__SITEMAP_REPRESENTATIONS`: HTML (default), Markdown, or both, with every distinct eligible source language, canonical alias deduplication, and Markdown discovery independent of HTML availability (issue #33).
+- Optional boolean publication `indexable` metadata to exclude sources from generated discovery while retaining public routing.
+- Shared catalog representation inventory and real CLI/HTTP discovery tests with XML parsing, deterministic generation, and canonical/alternate checks.
+
 - Shared CMS 404 responses and a terminal PROCESS handler, with optional localized
   host `404.html` templates, a replaceable DI presentation policy, safe template data,
   non-HTML Markdown/API/static errors, HEAD support, and no-store/noindex headers.

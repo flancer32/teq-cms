@@ -25,7 +25,7 @@ tmpl/web/publication.html      # shared presentation template
 web/assets/logo.svg           # static resource
 ```
 
-A source contains YAML front matter with nonempty `title`, `description`, and an ISO calendar `date`. Additional fields remain available to the host presentation:
+A source contains YAML front matter with nonempty `title`, `description`, and an ISO calendar `date`. Additional fields remain available to the host presentation. Optional `indexable: false` excludes that source from generated discovery while keeping it public; use a YAML boolean, not a quoted string:
 
 ```markdown
 ---
@@ -159,7 +159,7 @@ All HTML aliases share these canonical and alternate links. Engine failures are 
 {{#markdownAlternateUrl}}<link rel="alternate" type="text/markdown" href="{{{markdownAlternateUrl}}}">{{/markdownAlternateUrl}}
 ```
 
-`Fl32_Cms_Back_Publication_Catalog$` provides route-sorted `list({locale})` entries; in site mode `locale: ''` enumerates unlocalized sources without traversing maintained locale directories as neutral routes. `listHtml({locale})` applies presentation availability. `listNeutral()` deduplicates source routes and uses the same neutral selection as HTTP. Strict `Fl32_Cms_Back_Publication_Source$.read({locale, route})` diagnoses malformed sources; `readAvailable()` returns null for unavailable variants.
+`Fl32_Cms_Back_Publication_Catalog$` provides route-sorted `list({locale})` entries; in site mode `locale: ''` enumerates unlocalized sources without traversing maintained locale directories as neutral routes. `listHtml({locale})` applies presentation availability. `listNeutral()` deduplicates source routes and uses the same neutral selection as HTTP. `listRepresentations()` returns URL-sorted `{item, representation, url}` entries for distinct indexable source/format variants, with relative preferred URLs. Strict `Fl32_Cms_Back_Publication_Source$.read({locale, route})` diagnoses malformed sources; `readAvailable()` returns null for unavailable variants.
 
 ## Legacy family compatibility
 
@@ -177,6 +177,41 @@ An explicit host site policy combined with a nonempty legacy family list is reje
 
 Run `teq cms:generate` after content or host policy changes. It writes `web/robots.txt`, `web/llms.txt`, and `web/sitemap.xml`. The application root comes from the CLI host, not the working directory. Commit generated files with their content sources.
 
-`llms.txt` lists each available neutral Markdown resource once with an explicit `.md` URL; home uses `/index.md`. These links return Markdown even with browser headers. The sitemap lists canonical HTML from unlocalized sources in site mode and exact maintained locale sources with available presentations. Static exclusions, `.html` aliases, neutral aliases of localized HTML, and per-locale Markdown URLs are omitted. Sitemap addresses negotiate Markdown for agent headers; HTML canonical identity remains unchanged. Other ordinary site routes require host-owned sitemap integration.
+Choose sitemap representations in the CMS namespace:
+
+```dotenv
+TEQ_CMS__SITEMAP_REPRESENTATIONS=both
+```
+
+| Value | Sitemap scope |
+| --- | --- |
+| `html` | Default: available canonical HTML projections only. |
+| `markdown` | Every distinct eligible Markdown source variant, independently of HTML presentation. |
+| `both` | Both inventories, without equivalent aliases. |
+
+Invalid values fail startup/generation. Omitting the setting preserves the previous HTML-only output. This is a discovery preference; it does not change HTTP negotiation or guarantee separate search-engine indexing for both formats. [Google's sitemap guidance](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap) recommends preferred canonical URLs; the [sitemap protocol](https://www.sitemaps.org/protocol.html) requires absolute, escaped URLs.
+
+For bilingual `/about`, with English selected by neutral Markdown, mixed mode lists:
+
+```text
+/en/about       # English canonical HTML
+/ru/about       # Russian canonical HTML
+/about.md       # neutral Markdown selecting English
+/ru/about.md    # exact Russian Markdown
+```
+
+`/en/about.md` and extensionless Markdown spellings are aliases of the selected English source and are omitted; `.html` aliases are omitted too. We retain explicit `.md` discovery URLs so following a Markdown entry with browser headers still returns Markdown. HTML canonicals stay extensionless and still negotiate for agent headers.
+
+The same rules apply in site and family modes. Each valid exact source is considered even if the neutral route cannot select it. Neutral selection still prefers unlocalized → maintained `en` → tmpl default (families: `en` → default), independently of configured locale order and language headers. If no neutral source is available, eligible exact sources use `/{locale}/{route}.md`; missing/invalid translations never create fallback URLs. Authored unlocalized and localized sources are distinct variants, even with identical text.
+
+Home HTML uses `/` for unlocalized content and `/{locale}/` for exact localized content. Neutral home Markdown uses `/index.md`; other localized home sources use `/{locale}/index.md`. The selected localized neutral source's exact `.md` alias is omitted. `/index`, `.html`, and locale-root aliases do not add entries. Nested `section/index` stays explicit.
+
+HTML requires a valid source and readable, nonempty presentation through normal tmpl fallback. Missing HTML presentation removes only HTML; Markdown remains eligible. Engine errors during HTTP rendering remain request errors; generation checks structural presentation availability and does not execute every page template.
+
+`llms.txt` remains the compact agent-facing list of selected neutral Markdown resources, with explicit `.md` URLs (home `/index.md`). It is unchanged by sitemap format selection and does not enumerate every translation. These neutral URLs are the same ones used by HTML `markdownAlternateUrl` and by a Markdown-inclusive sitemap. HTML language alternates remain exact canonical HTML links.
+
+Set `indexable: false` in a source's front matter to exclude its representations from sitemap and, if selected by the neutral route, llms.txt. Absent/true keeps it discoverable. This does not make it private, block requests, change neutral selection, or suppress HTTP alternate links. Other indexable language sources still get their exact Markdown addresses; no substitute language is advertised at the excluded source's neutral URL.
+
+Generation uses the validated `BASE_URL` origin and writes unique, sorted absolute URLs with XML escaping. The inventory includes Markdown publications and their HTML projections only. Static exclusions, private files outside public trees, reserved endpoints, invalid sources and dotted sidecars are excluded. Ordinary standalone HTML pages, presentation templates, layouts, includes, assets and error templates such as `404.html` are not enumerated. Hosts needing standalone HTML discovery must supply explicit page eligibility in their separate integration; scanning the template tree is insufficient.
 
 Set `TEQ_CMS__AGENT_MESSAGE_ENABLED=true` to enable `GET /agent/message`. Send `X-Agent-Id` and `X-Agent-Message`; optionally configure `TEQ_CMS__AGENT_MESSAGE_TOKEN` and send `X-Agent-Token`. Accepted messages are stored privately under `var/teq-cms/agent-messages/`. The host owner handles notification and reply outside the CMS.

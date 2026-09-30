@@ -36,12 +36,13 @@ export default class Routing {
         /** @returns {Fl32_Cms_Back_Publication_Family[]} */
         this.getFamilies = () => mode === 'site' ? [{prefix: '', presentation: 'publication.html'}] : families;
         /**
-         * Stable neutral Markdown address; headers cannot change its representation.
+         * Stable Markdown address; headers cannot change its representation.
          * @param {object} deps
          * @param {string} deps.route
+         * @param {string} [deps.locale]
          * @returns {string}
          */
-        this.getMarkdownUrl = ({route}) => `/${route}.md`;
+        this.getMarkdownUrl = ({route, locale}) => locale ? `/${locale}/${route}.md` : `/${route}.md`;
         /**
          * @param {object} deps
          * @param {string} deps.route

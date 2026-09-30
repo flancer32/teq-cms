@@ -24,6 +24,10 @@ it('loads only a validated publication within its locale root', async () => {
         assert.equal(item.metadata.title, 'A');
         assert.equal(item.markdown, '# Body\n');
         assert.equal(item.html, '<h1>Body</h1>\n');
+        await fs.writeFile(file, '---\ntitle: A\ndescription: About A\ndate: 2026-09-23\nindexable: false\n---\n# Body\n');
+        assert.equal((await source.read({locale: 'en', route: 'notes/a'})).metadata.indexable, false);
+        await fs.writeFile(file, '---\ntitle: A\ndescription: About A\ndate: 2026-09-23\nindexable: "false"\n---\n# Body\n');
+        await assert.rejects(source.read({locale: 'en', route: 'notes/a'}), /indexable must be a boolean/);
         assert.equal(await source.read({locale: 'de', route: 'notes/a'}), null);
         assert.equal(await source.read({locale: 'en', route: 'private/a'}), null);
         await assert.rejects(source.read({locale: 'en', route: 'notes/../a'}));

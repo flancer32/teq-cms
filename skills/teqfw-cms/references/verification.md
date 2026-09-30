@@ -32,3 +32,10 @@ application root must come from `TeqFw_Cli_Config$.applicationRoot`.
 For package publication, inspect the `npm pack --dry-run` file list and confirm
 that `skills/teqfw-cms/SKILL.md` and its references are present while `test/`
 and `ctx/` remain excluded.
+
+For discovery changes, generate html/markdown/both in site and family modes. Parse
+sitemap XML and check uniqueness, configured origin, source/locale coverage and alias
+exclusion. Start the real CLI HTTP host and request every location with explicit HTML
+Accept; `.md` locations must still return Markdown, other canonicals HTML, directly
+with 200. Check missing HTML presentations, excluded resources, neutral alternate/llms
+agreement and identical output across repeated generation.

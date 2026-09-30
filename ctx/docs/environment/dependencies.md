@@ -1,7 +1,7 @@
 # Dependency Baseline
 
 - Path: `ctx/docs/environment/dependencies.md`
-- Changed: `20260926`
+- Changed: `20260930`
 
 The package metadata currently requires:
 
@@ -23,3 +23,5 @@ lockfile entry as development-only. A source checkout installed with
 runtime dependency from the published package manifest.
 
 Markdown publication uses `marked` for body rendering and `yaml` for deterministic front-matter parsing. Both are runtime dependencies because site-wide Markdown and legacy families are served through the CMS web pipeline and enumerated by the CLI. The default site mode requires no family configuration.
+
+`@xmldom/xmldom` is a development-only dependency for strict sitemap XML parsing and entity round-trip checks. Discovery generation has no XML runtime dependency.

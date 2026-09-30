@@ -65,6 +65,7 @@
   "devDependencies": {
     "@flancer32/teq-tmpl": "github:flancer32/teq-tmpl#main",
     "@types/node": "^20.19.43",
+    "@xmldom/xmldom": "^0.9.12",
     "typescript": "^5.9.3"
   },
   "teqfw": {

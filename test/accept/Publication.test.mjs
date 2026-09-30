@@ -56,7 +56,7 @@ async function fixture({presentationLocale = 'de', defaultLocale} = {defaultLoca
     const config = {
         getPublicationFamilies: () => [family],
         getAgentMessageEnabled: () => false,
-        getBaseUrl: () => 'https://example.test',
+        getBaseUrl: () => 'https://example.test', getSitemapRepresentations: () => 'html',
     };
     const policy = new Policy({config});
     const routing = new Routing({policy, config, tmplConfig});

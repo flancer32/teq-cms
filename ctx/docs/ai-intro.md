@@ -33,7 +33,7 @@ The primary audience is agents building and maintaining websites, followed by de
 - HTML language uses explicit URL locale, then supported `Accept-Language`, then `TEQFW_TMPL__DEFAULT_LOCALE`, including `.html` aliases. Authored unlocalized sources keep neutral HTML priority; otherwise the exact selected locale is required. Neutral Markdown retains unlocalized → English → default source preference.
 - Translations are version-controlled locale-specific Markdown files maintained by agents; TeqCMS has no LLM API translation service or translation state.
 - The CLI is the composition root.
-- A finite CLI command generates discovery files; an optional web handler saves agent messages for the owner.
+- A finite CLI command generates discovery files; sitemap formats are HTML by default, Markdown, or both, covering distinct source variants without aliases; llms.txt retains neutral Markdown scope; an optional web handler saves agent messages for the owner.
 
 ## What This Project Is Not
 

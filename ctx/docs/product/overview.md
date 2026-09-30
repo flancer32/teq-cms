@@ -18,7 +18,7 @@ Content and locale variants remain transparent, reproducible, and version-contro
 - Publish Markdown source for agents and render localized HTML projections for people.
 - Resolve locale-aware web requests and continue to support existing HTML templates.
 - Let agents author and translate locale-specific files directly, without an LLM API translation service in the CMS.
-- Generate `robots.txt`, `llms.txt`, and `sitemap.xml` from the maintained publication corpus through CLI commands where the source data allows it.
+- Generate `robots.txt`, `llms.txt`, and `sitemap.xml` from the maintained publication corpus through CLI commands where the source data allows it. Hosts select HTML, Markdown, or both for sitemap discovery; HTML-only remains the default. Distinct public source languages remain discoverable independently of HTML presentation availability.
 - Provide a standard GET request path for an agent to send a bounded message to the site owner.
 - Integrate with a host Node.js application.
 - Present missing human pages through optional host-owned localized templates while preserving HTTP 404 and non-HTML errors for agents, endpoints, and static resources.
@@ -63,4 +63,5 @@ Content and locale variants remain transparent, reproducible, and version-contro
 - Everything under `tmpl/web/` is public. Site-wide Markdown publication requires no family registration. Existing hosts may retain explicitly configured publication families as a compatibility mode.
 - The host application defines presentation and static routing policy in code through DI; deployment settings do not define route families in the new mode.
 - Markdown takes precedence over HTML templates, then static files in `web/`, then 404. A found invalid source or unavailable requested representation returns 404 without content substitution. Static exclusions bypass template processing entirely.
+- Discovery uses one preferred URL per source and representation, excluding aliases and explicitly non-indexable sources. Discovery preference does not make public content private or guarantee search-engine indexing. Standalone HTML templates are outside the generated publication inventory.
 - Generated discovery lists only public, valid sources; an agent message never exposes its content in public output or logs.

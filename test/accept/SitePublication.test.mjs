@@ -65,7 +65,7 @@ async function fixture(options = {}) {
     const locales = options.locales ?? ['en', 'de', 'ru'];
     const defaultLocale = 'defaultLocale' in options ? options.defaultLocale : 'de';
     const tmplConfig = {getRootPath: () => root, getAvailableLocales: () => locales, getDefaultLocale: () => defaultLocale};
-    const config = {getPublicationFamilies: () => [], getBaseUrl: () => 'https://example.test',
+    const config = {getPublicationFamilies: () => [], getBaseUrl: () => 'https://example.test', getSitemapRepresentations: () => 'html',
         getAgentMessageEnabled: () => true, getAgentMessageToken: () => undefined};
     // Host policy changes presentation by route, without configuration keys or a custom handler.
     const policy = new Policy({config});
@@ -272,6 +272,8 @@ it('supports unlocalized-only sites and ordinary HTML fallback without locale co
         const files = await app.generator.build();
         assert.match(files.llms, /- https:\/\/example.test\/about/);
         assert.doesNotMatch(files.sitemap, /<loc>/);
+        app.config.getSitemapRepresentations = () => 'both';
+        assert.match((await app.generator.build()).sitemap, /<loc>https:\/\/example.test\/about\.md<\/loc>/);
         await app.write('tmpl/web/publication.html', presentation);
         const html = await app.send('/about');
         assert.equal(html.status, 200);

@@ -70,6 +70,32 @@ export default class Fl32_Cms_Back_Publication_Catalog {
         };
 
         /**
+         * Inventory distinct source/representation identities using runtime availability.
+         * Neutral Markdown keeps its existing explicit address; other sources use exact locale URLs.
+         * @see https://github.com/flancer32/teq-cms/blob/main/ctx/docs/architecture/publication.md#discovery
+         * @returns {Promise<Fl32_Cms_Back_Publication_Resource[]>}
+         */
+        this.listRepresentations = async () => {
+            const neutral = new Map((await this.listNeutral()).map(item => [item.route, item.locale]));
+            /** @type {Fl32_Cms_Back_Publication_Resource[]} */
+            const resources = [];
+            for (const locale of [...(routing.isSite() ? [''] : []), ...tmplConfig.getAvailableLocales()]) {
+                for (const item of await this.list({locale})) {
+                    // Public delivery and discovery preference are independent.
+                    if (item.metadata.indexable === false) continue;
+                    const markdownLocale = neutral.get(item.route) === item.locale ? '' : item.locale;
+                    resources.push({item, representation: 'markdown',
+                        url: routing.getMarkdownUrl({route: item.route, locale: markdownLocale})});
+                    if (await this.getPresentation({item})) {
+                        resources.push({item, representation: 'html',
+                            url: routing.getUrl({route: item.route, locale: item.locale})});
+                    }
+                }
+            }
+            return resources.sort((a, b) => a.url < b.url ? -1 : a.url > b.url ? 1 : 0);
+        };
+
+        /**
          * Enumerate a source locale's public publications with validated metadata.
          * @param {object} deps
          * @param {string} deps.locale

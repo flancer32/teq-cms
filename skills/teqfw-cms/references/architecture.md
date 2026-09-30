@@ -44,3 +44,15 @@ Error language uses URL locale then default, with normal default/shared template
 fallback. Errors preserve status 404 and appropriate HTML/Markdown/JSON/plain
 formats, no-store/noindex headers, safe data, HEAD semantics and completed-response
 guards. See [custom 404 pages](../../../docs/errors.md).
+
+## Discovery inventory
+
+`Catalog.listRepresentations()` shares exact source eligibility, neutral Markdown
+selection and presentation availability with routing. `TEQ_CMS__SITEMAP_REPRESENTATIONS`
+selects html (default), markdown, or both. Preferred HTML is extensionless; selected
+neutral Markdown keeps its explicit `.md`, other locales use exact `.md`. Home/index
+aliases are deduplicated; nested indexes remain explicit. Markdown survives unavailable
+HTML. Boolean front matter `indexable: false` excludes source discovery without changing
+routing. llms.txt and HTML Markdown alternates retain neutral scope. Ordinary HTML,
+layouts, includes, errors and static/private/reserved resources are not publication
+inventory. The generator emits deterministic unique sorted absolute escaped URLs.

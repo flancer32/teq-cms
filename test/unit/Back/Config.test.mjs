@@ -19,6 +19,7 @@ describe('Fl32_Cms_Back_Config', () => {
         });
 
         assert.equal(config.getBaseUrl(), 'https://cms.test');
+        assert.equal(config.getSitemapRepresentations(), 'html');
         assert.equal(config.getAgentMessageEnabled(), false);
         assert.equal(config.getAgentMessageToken(), undefined);
         assert.deepEqual(config.getPublicationFamilies(), []);
@@ -60,4 +61,11 @@ describe('Fl32_Cms_Back_Config', () => {
         assert.equal('getPublicationMachineLocales' in obsolete, false);
         assert.deepEqual(obsolete.getPublicationFamilies(), []);
     });
+});
+
+it('validates sitemap representation selection without coercing invalid settings', () => {
+    const make = value => new Config({cast: {string: v => v, bool: () => undefined},
+        tmplConfig: {getAvailableLocales: () => []}, reader: {get: () => ({SITEMAP_REPRESENTATIONS: value})}});
+    for (const value of ['html', 'markdown', 'both']) assert.equal(make(value).getSitemapRepresentations(), value);
+    for (const value of ['', 'HTML', 'md', 'all', false, ['html']]) assert.throws(() => make(value), /SITEMAP_REPRESENTATIONS/);
 });

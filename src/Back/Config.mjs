@@ -15,6 +15,10 @@ export default class Fl32_Cms_Back_Config {
         const raw = reader.get('TEQ_CMS');
 
         const baseUrl = cast.string(raw.BASE_URL);
+        const sitemapRepresentations = raw.SITEMAP_REPRESENTATIONS ?? 'html';
+        if (!['html', 'markdown', 'both'].includes(sitemapRepresentations)) {
+            throw new Error('SITEMAP_REPRESENTATIONS must be html, markdown, or both.');
+        }
         const agentMessageEnabled = cast.bool(raw.AGENT_MESSAGE_ENABLED) ?? false;
         const agentMessageToken = cast.string(raw.AGENT_MESSAGE_TOKEN);
         const familiesInput = raw.PUBLICATION_FAMILIES ?? [];
@@ -42,6 +46,8 @@ export default class Fl32_Cms_Back_Config {
         }
         /** @returns {string|undefined} Canonical CMS base URL. */
         this.getBaseUrl = () => baseUrl;
+        /** @returns {'html'|'markdown'|'both'} Formats included in the sitemap. */
+        this.getSitemapRepresentations = () => /** @type {'html'|'markdown'|'both'} */ (sitemapRepresentations);
         /** @returns {boolean} Whether the agent message route is registered. */
         this.getAgentMessageEnabled = () => agentMessageEnabled;
         /** @returns {string|undefined} Optional shared token for agent messages. */

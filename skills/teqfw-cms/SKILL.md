@@ -54,6 +54,7 @@ snapshot; each package owns its typed projection through
 TeqCMS owns only the `TEQ_CMS` namespace:
 
 - `TEQ_CMS__BASE_URL` — canonical public base URL;
+- `TEQ_CMS__SITEMAP_REPRESENTATIONS` — `html` (default), `markdown`, or `both`; invalid values fail configuration;
 - `TEQ_CMS__PUBLICATION_FAMILIES` — legacy selected-section compatibility; new host route policy belongs in code;
 - `TEQ_CMS__AGENT_MESSAGE_ENABLED` — enables the private file inbox route;
 - `TEQ_CMS__AGENT_MESSAGE_TOKEN` — optional shared contact token.
@@ -126,9 +127,27 @@ applicable when no Markdown home exists.
 Canonical HTML links and locale alternates remain extensionless; home HTML uses
 `/{locale}/` or `/` for an unlocalized source. `markdownAlternateUrl` and
 `llms.txt` use explicit neutral `.md` addresses, including `/index.md` for home.
-The sitemap lists available canonical unlocalized and localized HTML; it omits
-neutral aliases of localized sources, `.html` aliases, and static exclusions.
-HTML availability shares the catalog presentation check.
+The sitemap defaults to canonical unlocalized and localized HTML; hosts may select
+Markdown-only or both. `Catalog.listRepresentations()` provides a shared inventory:
+Markdown does not require HTML presentation; each exact maintained source remains
+eligible independently of neutral selection. The neutral selected source uses its
+existing explicit `.md` address; other sources use exact `/{locale}/{route}.md`.
+Home uses neutral `/index.md` or exact `/{locale}/index.md`, while HTML uses `/`
+or `/{locale}/`. Deduplicate selected exact Markdown, extensionless Markdown,
+`.html` and root `/index` HTML aliases; keep nested index identities explicit.
+HTML alternates and neutral Markdown alternate/llms URLs retain their conventions.
+Missing/invalid exact sources never create translated or fallback URLs.
+
+Optional YAML boolean `indexable: false` excludes that source from sitemap and,
+when neutral-selected, llms.txt, without changing public delivery or neutral selection.
+Sitemap selection never expands llms.txt into a list of translations. Public Markdown
+sources remain distinct by locale even with identical text. Standalone HTML pages,
+layouts, includes, error presentations including `404.html`, assets, private files,
+reserved endpoints, static exclusions and invalid sources remain outside generated
+publication discovery. Standalone HTML needs explicit host eligibility, not a template
+scan. URLs use the configured origin, are unique, sorted and XML-escaped. Mixed
+format discovery does not guarantee separate search-engine indexing. See the
+[discovery guide](../../docs/publications.md#discovery-and-agent-contact).
 
 A nonempty legacy `PUBLICATION_FAMILIES` list selects families mode, preserving
 reserved prefixes, family presentations, and neutral `en → default` selection.

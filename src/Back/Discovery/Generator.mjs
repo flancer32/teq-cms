@@ -27,21 +27,14 @@ export default class Generator {
                 throw new Error('TEQ_CMS__BASE_URL must be an absolute HTTP URL without a path.');
             }
             const locales = tmplConfig.getAvailableLocales();
-            /** @type {string[]} */
-            const htmlUrls = [];
-            /** @type {string[]} */
-            const markdownUrls = [];
-            for (const locale of [...(routing.isSite() ? [''] : []), ...locales]) {
-                const items = await catalog.listHtml({locale});
-                for (const item of items) {
-                    htmlUrls.push(new URL(routing.getUrl({locale, route: item.route}), base).href);
-                }
-            }
-            for (const item of await catalog.listNeutral()) {
-                markdownUrls.push(new URL(routing.getMarkdownUrl({route: item.route}), base).href);
-            }
-            htmlUrls.sort();
-            markdownUrls.sort();
+            const selection = config.getSitemapRepresentations();
+            const inventory = await catalog.listRepresentations();
+            const sitemapUrls = [...new Set(inventory
+                .filter(resource => selection === 'both' || resource.representation === selection)
+                .map(resource => new URL(resource.url, base).href))].sort();
+            const markdownUrls = [...new Set((await catalog.listNeutral())
+                .filter(item => item.metadata.indexable !== false)
+                .map(item => new URL(routing.getMarkdownUrl({route: item.route}), base).href))].sort();
             const robots = `User-agent: *\nAllow: /\nSitemap: ${new URL('/sitemap.xml', base).href}\n`;
             const llms = [
                 '# Published Markdown',
@@ -59,7 +52,7 @@ export default class Generator {
             const sitemap = [
                 '<?xml version="1.0" encoding="UTF-8"?>',
                 '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-                ...htmlUrls.map(url => `  <url><loc>${escapeXml(url)}</loc></url>`),
+                ...sitemapUrls.map(url => `  <url><loc>${escapeXml(url)}</loc></url>`),
                 '</urlset>',
                 '',
             ].join('\n');

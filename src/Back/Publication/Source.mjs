@@ -164,6 +164,9 @@ export default class Fl32_Cms_Back_Publication_Source {
                 new Date(`${metadata.date}T00:00:00Z`).toISOString().slice(0, 10) !== metadata.date) {
                 throw new Error('Publication requires title, description and ISO date.');
             }
+            if (metadata.indexable !== undefined && typeof metadata.indexable !== 'boolean') {
+                throw new Error('Publication indexable must be a boolean when supplied.');
+            }
             const markdown = match[2];
             const html = marked.parse(markdown, {async: false});
             return {locale, route, family, source, metadata, markdown, html};

@@ -72,3 +72,22 @@ it('checks presentation loading and filters HTML without changing source enumera
         assert.equal((await catalog.list({locale: 'en'})).length, 1);
     }
 });
+
+it('assigns one Markdown discovery identity per source without hiding other locales', async () => {
+    const catalog = new Catalog({path, tmplConfig: {getRootPath: () => '/app', getAvailableLocales: () => ['ru', 'de']},
+        routing: {isSite: () => true, getMarkdownUrl: ({route, locale}) => `/${locale ? locale + '/' : ''}${route}.md`,
+            getUrl: ({route, locale}) => `/${locale ? locale + '/' : ''}${route === 'index' ? '' : route}`}});
+    const items = [
+        {route: 'index', locale: ''}, {route: 'index', locale: 'ru'},
+        {route: 'about', locale: 'ru'}, {route: 'about', locale: 'de'},
+        {route: 'other', locale: 'ru'}, {route: 'hidden', locale: 'de', metadata: {indexable: false}},
+    ].map(item => ({metadata: {}, ...item}));
+    catalog.list = async ({locale}) => items.filter(item => item.locale === locale);
+    catalog.listNeutral = async () => [items[0], items[3]];
+    catalog.getPresentation = async ({item}) => item.route === 'other' ? null : {};
+    const resources = await catalog.listRepresentations();
+    assert.deepEqual(resources.filter(item => item.representation === 'markdown').map(item => item.url),
+        ['/about.md', '/index.md', '/ru/about.md', '/ru/index.md', '/ru/other.md']);
+    assert.deepEqual(resources.filter(item => item.representation === 'html').map(item => item.url),
+        ['/', '/de/about', '/ru/', '/ru/about']);
+});

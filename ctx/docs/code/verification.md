@@ -1,7 +1,7 @@
 # Code Verification
 
 - Path: `ctx/docs/code/verification.md`
-- Changed: `20260926`
+- Changed: `20260930`
 
 The current project checks are:
 
@@ -25,3 +25,14 @@ Real CLI HTTP integration starts a temporary host on a random loopback port and
 checks ordinary pages, publications, static delivery and errors using the host-selected
 Nunjucks engine. This acceptance test requires permission to bind local sockets.
 Error HTML is absent from llms.txt and sitemap.xml.
+
+Discovery tests cover html/markdown/both (HTML default), bilingual and single-language
+sources, unlocalized and home/index identities, exact sources outside neutral selection,
+invalid higher-priority neutral sources, missing presentations independently of Markdown,
+non-indexable metadata, static exclusions, reserved endpoints and template exclusions.
+`DiscoveryHttp.test.mjs` invokes real cms:generate and web:start in temporary site/family
+hosts; a strict XML parser checks structure, unique sorted absolute locations, and XML
+entity round-trip. Every generated location is requested directly and checked for 200,
+no redirect, expected content type, canonical/alternate agreement and selected source.
+Repeated generation must produce identical files. XML parsing uses development-only
+`@xmldom/xmldom`; no XML runtime dependency is introduced.
