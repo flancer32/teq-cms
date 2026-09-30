@@ -8,12 +8,11 @@ it('blocks localized Markdown before source or template access', async () => {
     const handler = new Handler({
         config: {
             getPublicationFamilies: () => [{prefix: 'notes', presentation: 'page.html'}],
-            getPublicationMachineLocales: () => ['en'],
             getBaseUrl: () => 'https://example.test',
         },
         tmplConfig: {getAvailableLocales: () => ['en', 'de'], getDefaultLocale: () => 'de'},
-        source: {getFamily: () => ({prefix: 'notes', presentation: 'page.html'}), read: async () => { calls.push('read'); }},
-        dtoTarget: {create: value => value},
+        source: {getFamily: route => /^[A-Za-z0-9_/-]+$/.test(route) ? {prefix: 'notes', presentation: 'page.html'} : undefined, readAvailable: async () => { calls.push('read'); }},
+        catalog: {getPresentation: async () => { calls.push('presentation'); return null; }},
         render: {perform: async () => { calls.push('render'); return {resultCode: 'SUCCESS', content: ''}; }},
         respond: {
             isWritable: () => true,
@@ -26,7 +25,7 @@ it('blocks localized Markdown before source or template access', async () => {
     });
     assert.deepEqual(handler.getRegistrationInfo().before,
         ['Fl32_Cms_Back_Web_Handler_Template', 'TeqFw_Web_Back_Handler_Static']);
-    for (const url of ['/de/notes/story.md', '/notes/story.md', '/en/notes/%2e%2e/story.md', '/en/notes/story%2emd']) {
+    for (const url of ['/en/notes/story.md', '/xx/notes/story', '/de/notes/story.md', '/notes/story.md', '/en/notes/%2e%2e/story.md', '/en/notes/story%2emd']) {
         const context = {request: {url}, response: {}, completed: false};
         await handler.handle(context);
         assert.equal(context.response.status, 404);

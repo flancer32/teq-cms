@@ -2,7 +2,7 @@
 
 /**
  * @namespace Fl32_Cms_Back_Publication_Handler
- * @description Serves opted-in human and machine publication projections.
+ * @description Serves localized HTML projections and canonical neutral Markdown resources.
  * @implements TeqFw_Web_Back_Api_Handler
  */
 export default class Fl32_Cms_Back_Publication_Handler {
@@ -11,7 +11,7 @@ export default class Fl32_Cms_Back_Publication_Handler {
      * @param {Fl32_Cms_Back_Config} deps.config
      * @param {Fl32_Tmpl_Back_Config} deps.tmplConfig
      * @param {Fl32_Cms_Back_Publication_Source} deps.source
-     * @param {Fl32_Tmpl_Back_Dto_Target} deps.dtoTarget
+     * @param {Fl32_Cms_Back_Publication_Catalog} deps.catalog
      * @param {Fl32_Tmpl_Back_Service_Render} deps.render
      * @param {TeqFw_Web_Back_Helper_Respond} deps.respond
      * @param {TeqFw_Web_Back_Dto_Info__Factory} deps.dtoInfo
@@ -19,7 +19,7 @@ export default class Fl32_Cms_Back_Publication_Handler {
      * @param {TeqFw_Log_Provider} deps.logger
      * @param {typeof import('node:path')} deps.path
      */
-    constructor({config, tmplConfig, source, dtoTarget, render, respond, dtoInfo, STAGE, logger, path}) {
+    constructor({config, tmplConfig, source, catalog, render, respond, dtoInfo, STAGE, logger, path}) {
         const log = logger.forSource('Fl32_Cms_Back_Publication_Handler');
         const info = dtoInfo.create({
             name: 'Fl32_Cms_Back_Publication_Handler',
@@ -30,12 +30,6 @@ export default class Fl32_Cms_Back_Publication_Handler {
         const families = config.getPublicationFamilies();
         /** @type {string[]} */
         const locales = tmplConfig.getAvailableLocales();
-        /** @type {string[]} */
-        const configuredMachines = config.getPublicationMachineLocales();
-        const machines = configuredMachines;
-        if (machines.some(locale => !locales.includes(locale))) {
-            throw new Error('Publication machine locales must be maintained human locales.');
-        }
         if (families.length) {
             let base;
             try {
@@ -69,56 +63,38 @@ export default class Fl32_Cms_Back_Publication_Handler {
                 fail();
                 return;
             }
-            const markdownPath = path.posix.normalize(decodedPath).replace(/\/+$/, '');
-            if (markdownPath.endsWith('.md')) {
-                const unscoped = markdownPath.slice(1);
+            // Recognize reserved family paths before rejecting noncanonical spellings.
+            /** @param {string} value @returns {boolean} */
+            const ownsRoute = value => families.some(item => value.startsWith(`${item.prefix}/`));
+            /** @param {string} value @returns {boolean} */
+            const ownsPath = value => {
+                const unscoped = value.slice(1);
                 const scoped = unscoped.slice(unscoped.indexOf('/') + 1);
-                const publicationPath = families.some(item =>
-                    unscoped.startsWith(`${item.prefix}/`) || scoped.startsWith(`${item.prefix}/`));
-                if (publicationPath && (rawPath !== decodedPath || decodedPath !== markdownPath ||
-                    families.some(item => unscoped.startsWith(`${item.prefix}/`)))) {
-                    fail();
-                    return;
-                }
-            }
-            const match = /^\/([^/]+)\/(.+)$/.exec(rawPath);
-            if (!match) return;
-            if (!locales.includes(match[1])) {
-                if (families.some(item => match[2].startsWith(`${item.prefix}/`) && match[2].endsWith('.md'))) fail();
-                return;
-            }
-            const locale = match[1];
-            const rawRoute = match[2];
-            const isMarkdown = rawRoute.endsWith('.md');
-            const encodedRoute = isMarkdown ? rawRoute.slice(0, -3) : rawRoute;
-            let route;
-            try {
-                route = decodeURIComponent(encodedRoute);
-            } catch {
+                return ownsRoute(unscoped) || ownsRoute(scoped);
+            };
+            const normalized = path.posix.normalize(decodedPath).replace(/\/+$/, '');
+            if (!ownsPath(decodedPath) && !ownsPath(normalized)) return;
+            if (rawPath !== decodedPath || decodedPath !== normalized) {
                 fail();
                 return;
             }
+            const unscoped = rawPath.slice(1);
+            const neutral = ownsRoute(unscoped);
+            const split = unscoped.indexOf('/');
+            const locale = neutral ? undefined : unscoped.slice(0, split);
+            const route = neutral ? unscoped : unscoped.slice(split + 1);
             const family = source.getFamily(route);
-            if (!family) {
-                if (isMarkdown && families.some(/** @param {Fl32_Cms_Back_Publication_Family} item */ item =>
-                    encodedRoute.startsWith(`${item.prefix}/`))) fail();
-                return;
-            }
-            if (route !== encodedRoute) {
-                fail();
-                return;
-            }
-            if (isMarkdown && !machines.includes(locale)) {
+            if (!family || (locale !== undefined && !locales.includes(locale))) {
                 fail();
                 return;
             }
             try {
-                const item = await source.read({locale, route});
+                const item = locale === undefined ? await source.readNeutral({route}) : await source.readAvailable({locale, route});
                 if (!item) {
                     fail();
                     return;
                 }
-                if (isMarkdown) {
+                if (neutral) {
                     respond.code200_Ok({
                         res,
                         headers: {'content-type': 'text/markdown; charset=utf-8'},
@@ -127,24 +103,29 @@ export default class Fl32_Cms_Back_Publication_Handler {
                 } else {
                     const base = config.getBaseUrl();
                     if (!base) throw new Error('BASE_URL is required for publication rendering.');
-                    const target = dtoTarget.create({
-                        type: 'web',
-                        name: family.presentation,
-                        locales: {user: locale, app: tmplConfig.getDefaultLocale()},
-                    });
-                    const alternateUrls = Object.fromEntries(locales.map(/** @param {string} value */ value =>
-                        [value, new URL(`/${value}/${route}`, base).href]
-                    ));
+                    const presentation = await catalog.getPresentation({item});
+                    if (!presentation) {
+                        fail();
+                        return;
+                    }
+                    /** @type {Record<string, string>} */
+                    const alternateUrls = {};
+                    for (const value of locales) {
+                        const alternate = value === locale ? item : await source.readAvailable({locale: value, route});
+                        if (alternate && (value === locale || await catalog.getPresentation({item: alternate}))) {
+                            alternateUrls[value] = new URL(`/${value}/${route}`, base).href;
+                        }
+                    }
+                    const markdown = await source.readNeutral({route});
                     const data = {
                         publication: item,
                         locale,
                         allowedLocales: locales,
-                        canonicalUrl: alternateUrls[locale],
+                        canonicalUrl: new URL(`/${locale}/${route}`, base).href,
                         alternateUrls,
-                        markdownAlternateUrl: machines.includes(locale) ?
-                            new URL(`/${locale}/${route}.md`, base).href : undefined,
+                        markdownAlternateUrl: markdown ? new URL(`/${route}`, base).href : undefined,
                     };
-                    const result = await render.perform({target, data, options: {}});
+                    const result = await render.perform({...presentation, data, options: {}});
                     if (result.resultCode !== 'SUCCESS' || typeof result.content !== 'string') {
                         throw new Error(`Publication presentation failed: ${result.resultCode}`);
                     }
@@ -168,7 +149,7 @@ export const __deps__ = Object.freeze({
         config: 'Fl32_Cms_Back_Config$',
         tmplConfig: 'Fl32_Tmpl_Back_Config$',
         source: 'Fl32_Cms_Back_Publication_Source$',
-        dtoTarget: 'Fl32_Tmpl_Back_Dto_Target$',
+        catalog: 'Fl32_Cms_Back_Publication_Catalog$',
         render: 'Fl32_Tmpl_Back_Service_Render$',
         respond: 'TeqFw_Web_Back_Helper_Respond$',
         dtoInfo: 'TeqFw_Web_Back_Dto_Info__Factory$',

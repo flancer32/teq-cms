@@ -1,7 +1,7 @@
 # TeqCMS Process Host
 
 - Path: `ctx/docs/architecture/process-host.md`
-- Changed: `20260926`
+- Changed: `20260930`
 
 ## Purpose
 
@@ -30,8 +30,7 @@ TeqCMS must not import `@teqfw/cli/src/**` or invoke an internal launcher path f
 
 ## Configuration Lifecycle
 
-The host configurator provides ordered configuration Sources. `@teqfw/cli`
-loads them once before resolving lifecycle plugins and commands. The CMS CLI
+The CLI host supplies and loads configuration Sources once before resolving lifecycle plugins and commands. The standalone CMS configurator declares DI preprocessors and does not provide configuration Sources. The CMS CLI
 plugin then registers the agent-message, publication, static, and template handlers before `web:start`
 locks the pipeline. Typed package configuration components read their own
 namespaces through `TeqFw_Cfg_Reader$`.
@@ -46,9 +45,7 @@ it to the contract through DI using `TEQFW_TMPL__ENGINE` as a host composition
 setting. The tmpl package offers the engine contract and implementations; its
 typed configuration does not expose an engine selector.
 
-The platform-owned application root remains an open CLI contract. Until the
-platform exposes it to configuration Sources, the CMS uses the process working
-directory as the root fallback; this fallback is not a CMS configuration key.
+The CLI supplies `TeqFw_Cli_Config$.applicationRoot` as a computed runtime fact. Tmpl exposes it through `getRootPath()`, and CMS consumers use that accessor for content and output paths. The root is not inferred from the working directory by CMS components and is not a CMS configuration key.
 
 ## Invariants
 

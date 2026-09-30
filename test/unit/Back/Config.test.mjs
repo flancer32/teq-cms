@@ -5,6 +5,7 @@ import Config from '../../../src/Back/Config.mjs';
 describe('Fl32_Cms_Back_Config', () => {
     it('projects and defaults typed CMS settings', () => {
         const config = new Config({
+            tmplConfig: {getAvailableLocales: () => ['en', 'de', 'ru']},
             cast: {
                 string: value => typeof value === 'string' ? value : undefined,
                 bool: value => value === true || value === 'true' ? true : value === false || value === 'false' ? false : undefined,
@@ -21,11 +22,11 @@ describe('Fl32_Cms_Back_Config', () => {
         assert.equal(config.getAgentMessageEnabled(), false);
         assert.equal(config.getAgentMessageToken(), undefined);
         assert.deepEqual(config.getPublicationFamilies(), []);
-        assert.deepEqual(config.getPublicationMachineLocales(), []);
     });
 
     it('projects explicit publication families and rejects ambiguous prefixes', () => {
         const make = raw => new Config({
+            tmplConfig: {getAvailableLocales: () => ['en', 'de', 'ru']},
             cast: {
                 string: value => typeof value === 'string' ? value : undefined,
                 bool: value => value === true || value === 'true' ? true : value === false || value === 'false' ? false : undefined,
@@ -34,12 +35,10 @@ describe('Fl32_Cms_Back_Config', () => {
         });
         const config = make({
             PUBLICATION_FAMILIES: JSON.stringify([{prefix: 'journal', presentation: 'pages/article.html'}]),
-            PUBLICATION_MACHINE_LOCALES: 'en,ru',
             AGENT_MESSAGE_ENABLED: 'true',
             AGENT_MESSAGE_TOKEN: 'shared-secret',
         });
         assert.deepEqual(config.getPublicationFamilies(), [{prefix: 'journal', presentation: 'pages/article.html'}]);
-        assert.deepEqual(config.getPublicationMachineLocales(), ['en', 'ru']);
         assert.equal(config.getAgentMessageEnabled(), true);
         assert.equal(config.getAgentMessageToken(), 'shared-secret');
         assert.throws(() => make({PUBLICATION_FAMILIES: [{prefix: '../private', presentation: 'page.html'}]}));
@@ -47,6 +46,18 @@ describe('Fl32_Cms_Back_Config', () => {
             {prefix: 'journal', presentation: 'page.html'},
             {prefix: 'journal/long', presentation: 'page.html'},
         ]}));
-        assert.throws(() => make({PUBLICATION_MACHINE_LOCALES: '../en'}));
+        for (const prefix of ['en', 'ru/docs', 'de/stories/longform']) {
+            assert.throws(() => make({PUBLICATION_FAMILIES: [
+                {prefix: 'docs', presentation: 'page.html'}, {prefix, presentation: 'page.html'},
+            ]}), /must not begin with a maintained locale/);
+        }
+        assert.deepEqual(make({PUBLICATION_FAMILIES: [
+            {prefix: 'docs', presentation: 'page.html'},
+            {prefix: 'stories/longform', presentation: 'page.html'},
+        ]}).getPublicationFamilies().map(item => item.prefix), ['docs', 'stories/longform']);
+        // Obsolete keys are not projected or validated as CMS settings.
+        const obsolete = make({PUBLICATION_MACHINE_LOCALES: '../en'});
+        assert.equal('getPublicationMachineLocales' in obsolete, false);
+        assert.deepEqual(obsolete.getPublicationFamilies(), []);
     });
 });

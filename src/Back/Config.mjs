@@ -8,9 +8,10 @@ export default class Fl32_Cms_Back_Config {
     /**
      * @param {object} deps
      * @param {Fl32_Cms_Back_Helper_Cast} deps.cast
+     * @param {Fl32_Tmpl_Back_Config} deps.tmplConfig
      * @param {TeqFw_Cfg_Reader} deps.reader
      */
-    constructor({cast, reader}) {
+    constructor({cast, reader, tmplConfig}) {
         const raw = reader.get('TEQ_CMS');
 
         const baseUrl = cast.string(raw.BASE_URL);
@@ -36,15 +37,9 @@ export default class Fl32_Cms_Back_Config {
             prefixes.some(prefix => prefixes.some(other => other !== prefix && prefix.startsWith(`${other}/`)))) {
             throw new Error('Publication family prefixes must be unique and non-overlapping.');
         }
-        const machineInput = raw.PUBLICATION_MACHINE_LOCALES ?? [];
-        const machineLocales = Array.isArray(machineInput) ? machineInput :
-            typeof machineInput === 'string' ? machineInput.split(',').map(value => value.trim()).filter(Boolean) : [];
-        if (!machineLocales.every(value => typeof value === 'string' &&
-            /^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{2,8})*$/.test(value)) ||
-            new Set(machineLocales).size !== machineLocales.length) {
-            throw new Error('Invalid PUBLICATION_MACHINE_LOCALES.');
+        if (prefixes.some(prefix => tmplConfig.getAvailableLocales().includes(prefix.split('/')[0]))) {
+            throw new Error('Publication prefixes must not begin with a maintained locale.');
         }
-
         /** @returns {string|undefined} Canonical CMS base URL. */
         this.getBaseUrl = () => baseUrl;
         /** @returns {boolean} Whether the agent message route is registered. */
@@ -53,8 +48,6 @@ export default class Fl32_Cms_Back_Config {
         this.getAgentMessageToken = () => agentMessageToken;
         /** @returns {Fl32_Cms_Back_Publication_Family[]} */
         this.getPublicationFamilies = () => publicationFamilies;
-        /** @returns {string[]} */
-        this.getPublicationMachineLocales = () => machineLocales;
     }
 }
 
@@ -62,5 +55,6 @@ export const __deps__ = Object.freeze({
     default: Object.freeze({
         cast: 'Fl32_Cms_Back_Helper_Cast$',
         reader: 'TeqFw_Cfg_Reader$',
+        tmplConfig: 'Fl32_Tmpl_Back_Config$',
     }),
 });

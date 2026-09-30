@@ -1,7 +1,7 @@
 # Architecture Decisions
 
 - Path: `ctx/docs/architecture/decisions.md`
-- Changed: `20260923`
+- Changed: `20260930`
 
 ## Dependency Migration Checkpoint
 
@@ -32,4 +32,8 @@ application root is supplied by `TeqFw_Cli_Config$.applicationRoot` and is not a
 
 ## Markdown Publication Presentation
 
-Issue #29 uses a configured presentation template per publication family. TeqCMS supplies parsed metadata, rendered Markdown HTML, canonical and locale alternate URLs, and a Markdown alternate URL only for a public machine locale. The host template owns layout and page composition. The contract supports several non-overlapping route prefixes without a host adapter or a fixed article taxonomy.
+Each publication family uses a configured presentation template. TeqCMS supplies publication data and representation links under the contract in [publication.md](publication.md). The host template owns layout and page composition. The contract supports several non-overlapping route prefixes without a host adapter or a fixed article taxonomy.
+
+## Publication Resource and Locale
+
+Locale and representation are independent concerns. Explicit locale variants remain authored sources; localized HTML is a projection of the publication resource. The neutral Markdown resource follows the source preference defined in [the product model](../product/overview.md), using existing tmpl locale configuration. This keeps publication policy in TeqCMS without a separate language policy for agents or a translation service.

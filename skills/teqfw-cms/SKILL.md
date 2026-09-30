@@ -14,6 +14,14 @@ web pipeline, or discovery command. The host project's instructions and
 current source remain authoritative; this skill describes the package-owned
 boundary and the checks that protect it.
 
+## Content model
+
+Treat version-controlled Markdown as the primary authored content. Agents read,
+create, maintain, and translate those source files directly. Each locale variant
+is an explicit Markdown file maintained in Git; human-facing HTML is a derived
+projection. TeqCMS does not call an LLM API, run automatic translation jobs, or
+store translation state.
+
 ## Apply
 
 1. Read the host project's `AGENTS.md`, project context, package metadata, and
@@ -47,7 +55,6 @@ TeqCMS owns only the `TEQ_CMS` namespace:
 
 - `TEQ_CMS__BASE_URL` — canonical public base URL;
 - `TEQ_CMS__PUBLICATION_FAMILIES` — explicitly enabled route families;
-- `TEQ_CMS__PUBLICATION_MACHINE_LOCALES` — locales whose Markdown is public;
 - `TEQ_CMS__AGENT_MESSAGE_ENABLED` — enables the private file inbox route;
 - `TEQ_CMS__AGENT_MESSAGE_TOKEN` — optional shared contact token.
 
@@ -59,6 +66,35 @@ Do not add CMS aliases for those settings, read `process.env` in runtime
 components, or reintroduce the removed `TEQ_CMS_*` single-underscore names.
 The application root is a CLI runtime fact from `TeqFw_Cli_Config$`, not a CMS
 or template configuration setting.
+
+## Publication contract
+
+Family prefixes cannot overlap or begin with a maintained locale code.
+Configured families expose `/{prefix}/{route}` as canonical raw Markdown and
+`/{locale}/{prefix}/{route}` as exact-locale server-rendered HTML. For example:
+
+```text
+/docs/foo       → raw Markdown, source preference en → default
+/en/docs/foo    → English HTML
+/ru/docs/foo    → Russian HTML
+```
+
+Read sources at `tmpl/web/{locale}/{prefix}/{route}.md`. Agents maintain locale
+variants directly; TeqCMS does not translate or call an LLM API. The neutral
+resource prefers the maintained `en` source, then tmpl's default locale, then
+404. English need not be the human default. Localized HTML returns 404 when
+its exact source or readable, nonempty presentation template is absent. Localized `.md` URLs are unavailable. Routing is
+independent of User-Agent and client identity and preserves ordinary HTML
+routes. Markdown includes the authored front matter.
+
+Presentation data supplies the HTML projection's `canonicalUrl`,
+`alternateUrls` for available localized HTML, and `markdownAlternateUrl` for
+the neutral resource when available. HTML links and the sitemap share the
+presentation availability check with HTTP; neutral discovery is independent
+of presentation availability. `llms.txt` lists each neutral resource
+once; the sitemap lists available localized HTML independently. Source and
+catalog share source selection with HTTP and discovery. See the published
+[publication guide](../../docs/publications.md) for configuration and templates.
 
 ## Template engine boundary
 

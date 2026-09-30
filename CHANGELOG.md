@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Reject publication prefixes starting with maintained locale codes to prevent URL collisions.
+- Share presentation-template availability between HTTP, HTML alternates, and the sitemap; missing or empty templates leave neutral Markdown available.
+
+- Changed publication URLs: `/{prefix}/{route}` serves raw Markdown, preferring `en` then the tmpl default locale; localized URLs serve exact-locale HTML.
+- Removed the publication locale selector and its configuration accessor. Hosts must replace localized Markdown links with neutral resource links and regenerate discovery files.
+- Discovery now lists neutral resources once in `llms.txt` and available localized HTML in the sitemap; presentation links describe only available representations.
+- Agents maintain translated source files directly. TeqCMS has no translation command or LLM API integration.
+
 ## [0.8.0] - 2026-09-26
 
 - Raised the minimum `@teqfw/cli` dependency to `2.4.0`, which introduced declarative host Container policy configuration.

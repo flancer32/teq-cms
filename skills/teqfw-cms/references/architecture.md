@@ -1,6 +1,9 @@
 # TeqCMS Architecture
 
-TeqCMS is a file-based multilingual CMS composed as a TeqFW application.
+TeqCMS is a multilingual CMS composed as a TeqFW application. Version-controlled
+Markdown files are authored sources; human-facing HTML is rendered from them
+through host-owned presentation templates. Existing HTML template routes remain
+supported.
 Its runtime is DI-addressed and normally runs under the `@teqfw/cli` process
 host.
 
@@ -16,7 +19,7 @@ host.
 - TeqCMS owns the finite `cms:generate` command and publication discovery.
 - `@flancer32/teq-tmpl` owns localized template configuration, target and
   rendering contracts, and the available engine implementations.
-- Optional Markdown publication remains CMS-owned: safe source and catalog, a PROCESS handler ordered before template/static delivery, and machine-locale policy. The host supplies presentation templates. `Fl32_Cms_Back_Publication_Catalog$` provides route-sorted entries for indexes and discovery generation. An optional PROCESS handler accepts agent messages into a private inbox.
+- Optional Markdown publication remains CMS-owned: safe source and catalog, a PROCESS handler ordered before template/static delivery, and neutral source selection (`en`, then tmpl default, otherwise unavailable). Localized HTML uses the exact source locale; neutral URLs expose raw Markdown. The host supplies presentation templates. The catalog loads presentations through tmpl; HTTP, alternate links, and the sitemap require readable, nonempty templates as well as valid sources. `Fl32_Cms_Back_Publication_Catalog$` provides route-sorted entries for indexes and discovery generation. An optional PROCESS handler accepts agent messages into a private inbox.
 
 ## Composition rules
 

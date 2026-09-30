@@ -1,7 +1,7 @@
 {
   "name": "@flancer32/teq-cms",
   "version": "0.8.0",
-  "description": "Agent-first, file-based CMS for multilingual Markdown content and human-readable HTML.",
+  "description": "CMS built around agents and version-controlled Markdown, with derived HTML pages for people.",
   "type": "module",
   "keywords": [
     "teqfw",

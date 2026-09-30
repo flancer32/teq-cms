@@ -1,15 +1,15 @@
 # AI Introduction
 
 - Path: `ctx/docs/ai-intro.md`
-- Changed: `20260926`
+- Changed: `20260930`
 
 ## Project Type
 
-TeqCMS is a Node.js ESM package and CLI for a minimalist file-based multilingual CMS.
+TeqCMS is a Node.js ESM package and CLI for a multilingual CMS built around agents and Markdown.
 
 ## Problem Space
 
-Agents author localized Markdown files in Git. TeqCMS renders them as HTML for people and can expose selected Markdown to agents.
+Agents read, create, maintain, and translate Markdown content directly in Git. Locale variants are explicit Markdown files. TeqCMS publishes raw Markdown for agents and derives localized HTML projections for people.
 
 ## Product Role
 
@@ -28,7 +28,8 @@ The primary audience is agents building and maintaining websites, followed by de
 
 ## Distinguishing Characteristics
 
-- Localized content is file-based and directly maintained by agents.
+- Markdown is the primary authored content; HTML pages are derived presentations.
+- Translations are version-controlled locale-specific Markdown files maintained by agents; TeqCMS has no LLM API translation service or translation state.
 - The CLI is the composition root.
 - A finite CLI command generates discovery files; an optional web handler saves agent messages for the owner.
 

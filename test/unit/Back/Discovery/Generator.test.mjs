@@ -8,9 +8,9 @@ import Generator from '../../../../src/Back/Discovery/Generator.mjs';
 it('writes public discovery files from the configured Markdown corpus', async () => {
     const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cms-discovery-'));
     const generator = new Generator({
-        config: {getBaseUrl: () => 'https://example.test', getPublicationMachineLocales: () => ['en']},
+        config: {getBaseUrl: () => 'https://example.test'},
         tmplConfig: {getRootPath: () => root, getAvailableLocales: () => ['ru', 'en']},
-        catalog: {list: async ({locale}) => locale === 'en'
+        catalog: {listNeutral: async () => [{route: 'journal/first'}, {route: 'journal/second'}], listHtml: async ({locale}) => locale === 'en'
             ? [{route: 'journal/second'}, {route: 'journal/first'}]
             : [{route: 'journal/first'}]},
         fs, path,
@@ -22,9 +22,9 @@ it('writes public discovery files from the configured Markdown corpus', async ()
         const llms = await fs.readFile(path.join(root, 'web', 'llms.txt'), 'utf8');
         const sitemap = await fs.readFile(path.join(root, 'web', 'sitemap.xml'), 'utf8');
         assert.match(robots, /Sitemap: https:\/\/example\.test\/sitemap\.xml/);
-        assert.deepEqual(llms.match(/https:\/\/example\.test\/[^\s]+\.md/g), [
-            'https://example.test/en/journal/first.md',
-            'https://example.test/en/journal/second.md',
+        assert.deepEqual(llms.match(/https:\/\/example\.test\/[^\s]+/g), [
+            'https://example.test/journal/first',
+            'https://example.test/journal/second',
         ]);
         assert.match(sitemap, /https:\/\/example\.test\/ru\/journal\/first/);
         assert.doesNotMatch(sitemap, /\.md<\/loc>/);

@@ -1,15 +1,17 @@
 # Product Overview
 
 - Path: `ctx/docs/product/overview.md`
-- Changed: `20260926`
+- Changed: `20260930`
 
 ## Product Identity
 
-TeqCMS is an agent-first, file-based CMS for multilingual web applications.
+TeqCMS is a CMS built around agents and Markdown for multilingual web applications.
 
 ## Product Mission
 
-TeqCMS lets agents build and maintain web applications for other agents first and for people second. Markdown is the primary authored format for content that agents read; the CMS projects it to HTML for human readers. Content and locale variants remain transparent, reproducible, and version-controlled through files and Git, without a control panel or database.
+TeqCMS is a CMS built around agents and Markdown. Agents work directly with version-controlled Markdown content: reading it, creating it, maintaining it, and translating it. Human-facing web pages are projections of that content rather than its primary form.
+
+Content and locale variants remain transparent, reproducible, and version-controlled through files and Git, without a control panel or database.
 
 ## Product Scope
 
@@ -23,10 +25,13 @@ TeqCMS lets agents build and maintain web applications for other agents first an
 ## Product Model
 
 - Markdown files are authored sources. Their HTML projections are derived pages rendered by the server; HTML templates remain supported for layout and existing pages.
-- Request processing extracts locale and path, prepares data, and selects the appropriate template.
+- A publication is one content resource with explicit locale-specific Markdown sources. Locale selects content language; representation selects Markdown or HTML.
+- Localized publication URLs expose human-facing HTML projections; the locale-neutral URL is the canonical agent-facing Markdown resource. These representations are determined by the URL, independently of the client.
+- The locale-neutral resource prefers an English (`en`) source, then the site's default locale source. If neither exists, that resource is unavailable; no other locale is substituted. English need not be the default locale for human pages.
+- Localized HTML requires the source for the requested locale; another language does not substitute for a missing variant.
 - The host selects the template engine and supplies the website's templates.
   TeqCMS owns CMS-specific publication and communication settings.
-- Agents maintain translations as files in locale-specific template zones. The CMS does not call an LLM or track translation state in a database.
+- Agents create and maintain translations as ordinary version-controlled, locale-specific Markdown files. The CMS does not call an LLM API, run automatic translation jobs, or store translation state.
 - The CMS exposes only public Markdown sources through agent-readable routes and generated discovery files; private files and prompt sidecars are outside the publication corpus.
 
 ## Product Boundaries
@@ -49,7 +54,8 @@ TeqCMS lets agents build and maintain web applications for other agents first an
 ## Product Invariants
 
 - Content remains inspectable and version-controlled as files.
-- Each public locale variant is an explicit, reviewable authored file. Agents may produce those variants.
+- Markdown is the primary authored content form; human-facing HTML is its derived presentation.
+- Each public locale variant, including a translation, is an explicit, reviewable Markdown file maintained in version control.
 - The CMS remains an isolated package configured by its host application.
-- Markdown publication and source exposure follow explicit host configuration. Existing HTML routes keep their behavior.
+- Publication families require explicit host configuration. Existing non-publication HTML template routes keep their behavior.
 - Generated discovery lists only public, valid sources; an agent message never exposes its content in public output or logs.

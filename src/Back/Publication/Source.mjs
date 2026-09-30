@@ -29,6 +29,38 @@ export default class Fl32_Cms_Back_Publication_Source {
         );
 
         /**
+         * Treat unreadable or invalid variants as unavailable public representations.
+         * Strict callers can use read() to diagnose the underlying failure.
+         * @param {object} deps
+         * @param {string} deps.locale
+         * @param {string} deps.route
+         * @returns {Promise<Fl32_Cms_Back_Publication_Item|null>}
+         */
+        this.readAvailable = async ({locale, route}) => {
+            try {
+                return await this.read({locale, route});
+            } catch {
+                return null;
+            }
+        };
+
+        /**
+         * Select the canonical Markdown source using the site's maintained locales.
+         * @param {object} deps
+         * @param {string} deps.route
+         * @returns {Promise<Fl32_Cms_Back_Publication_Item|null>}
+         */
+        this.readNeutral = async ({route}) => {
+            const candidates = new Set(['en', tmplConfig.getDefaultLocale()]);
+            for (const locale of candidates) {
+                if (!locale || !locales.includes(locale)) continue;
+                const item = await this.readAvailable({locale, route});
+                if (item) return item;
+            }
+            return null;
+        };
+
+        /**
          * @param {object} deps
          * @param {string} deps.locale
          * @param {string} deps.route
@@ -50,7 +82,7 @@ export default class Fl32_Cms_Back_Publication_Source {
                 const realLocale = await fs.realpath(base);
                 realFile = await fs.realpath(file);
                 if (realLocale !== path.join(realRoot, locale) ||
-                    !realFile.startsWith(`${path.join(realLocale, family.prefix)}${path.sep}`)) {
+                    realFile !== path.join(realLocale, `${route}.md`)) {
                     throw new Error('Publication path escapes source root.');
                 }
             } catch (error) {

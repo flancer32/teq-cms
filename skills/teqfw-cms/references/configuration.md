@@ -12,7 +12,6 @@ TeqCMS reads only `TEQ_CMS` in `Fl32_Cms_Back_Config`:
 ```text
 TEQ_CMS__BASE_URL
 TEQ_CMS__PUBLICATION_FAMILIES
-TEQ_CMS__PUBLICATION_MACHINE_LOCALES
 TEQ_CMS__AGENT_MESSAGE_ENABLED
 TEQ_CMS__AGENT_MESSAGE_TOKEN
 ```
@@ -36,4 +35,4 @@ user configuration and cannot be overridden by an environment variable.
 
 Legacy single-underscore names such as `TEQ_CMS_BASE_URL` are unsupported.
 
-`PUBLICATION_FAMILIES` is a JSON array of `{prefix, presentation}` objects and defaults to an empty array, leaving Markdown publication disabled. `PUBLICATION_MACHINE_LOCALES` is a comma-separated locale list and defaults to empty. Configured publication requires an absolute `BASE_URL` without a path. The machine locales must be included in the template package's available human locales. `AGENT_MESSAGE_ENABLED` defaults to false. See `docs/publications.md` in the package for the full host guide.
+`PUBLICATION_FAMILIES` is a JSON array of `{prefix, presentation}` objects and defaults to an empty array, leaving Markdown publication disabled. Prefixes cannot overlap or begin with a maintained tmpl locale code; the latter is reserved for localized URLs. Configured publication requires an absolute `BASE_URL` without a path. Source locales come from the template package's available locales. Neutral Markdown prefers `en`, then tmpl's default locale; no CMS agent-locale configuration is needed. `AGENT_MESSAGE_ENABLED` defaults to false. See `docs/publications.md` in the package for the full host guide.

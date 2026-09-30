@@ -26,24 +26,18 @@ export default class Generator {
                 throw new Error('TEQ_CMS__BASE_URL must be an absolute HTTP URL without a path.');
             }
             const locales = tmplConfig.getAvailableLocales();
-            const configured = config.getPublicationMachineLocales();
-            /** @type {string[]} */
-            const machines = configured;
-            if (machines.some(locale => !locales.includes(locale))) {
-                throw new Error('Machine locales must be maintained locales.');
-            }
             /** @type {string[]} */
             const htmlUrls = [];
             /** @type {string[]} */
             const markdownUrls = [];
             for (const locale of locales) {
-                const items = await catalog.list({locale});
+                const items = await catalog.listHtml({locale});
                 for (const item of items) {
                     htmlUrls.push(new URL(`/${locale}/${item.route}`, base).href);
-                    if (machines.includes(locale)) {
-                        markdownUrls.push(new URL(`/${locale}/${item.route}.md`, base).href);
-                    }
                 }
+            }
+            for (const item of await catalog.listNeutral()) {
+                markdownUrls.push(new URL(`/${item.route}`, base).href);
             }
             htmlUrls.sort();
             markdownUrls.sort();
@@ -52,7 +46,6 @@ export default class Generator {
                 '# Published Markdown',
                 '',
                 `Human locales: ${locales.join(', ')}`,
-                `Machine-readable locales: ${machines.join(', ') || 'none'}`,
                 '',
                 ...markdownUrls.map(url => `- ${url}`),
                 '',

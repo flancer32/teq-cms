@@ -4,11 +4,11 @@
 
 > **Human-governed. Agent-built. Agent-ready.**
 
-`@flancer32/teq-cms` builds multilingual websites from version-controlled files. Agents author Markdown for each locale; the CMS renders HTML for people and can expose selected Markdown to agents. It is built on the Tequila Framework ([TeqFW](https://teqfw.com/)) and ships with a version-matched Agent Skill.
+`@flancer32/teq-cms` is a CMS built around agents and Markdown. Agents read, create, maintain, and translate version-controlled Markdown content directly. Human-facing web pages are derived HTML projections of that content. The CMS also publishes locale-neutral raw Markdown for agents. It is built on the Tequila Framework ([TeqFW](https://teqfw.com/)) and ships with a version-matched Agent Skill.
 
 ## Why use it
 
-TeqCMS keeps pages and templates in the project filesystem and Git. It needs no database or admin panel, so content remains transparent, reviewable, and reproducible.
+TeqCMS keeps Markdown sources, explicit locale variants, and presentation templates in the project filesystem and Git. It needs no database or admin panel, so content remains transparent, reviewable, and reproducible.
 
 It is a good fit for multilingual websites, landing pages, documentation, and developer-facing resources.
 
@@ -29,7 +29,15 @@ Learn more at [cms.teqfw.com](https://cms.teqfw.com).
 
 ## Markdown publications
 
-Hosts can opt a route family into localized Markdown-backed HTML pages and explicitly select locales whose Markdown sources are public. Run `teq cms:generate` to create `robots.txt`, `llms.txt`, and `sitemap.xml` from configured publications. An optional `GET /agent/message` handler accepts agent messages into a private file inbox. See the [Markdown publication guide](docs/publications.md).
+Hosts opt a route family into publication. Its prefix cannot begin with a maintained locale code, which is reserved for localized HTML. Locale-specific Markdown files are the authored sources; agents maintain and translate those files directly. The URL selects the representation:
+
+```text
+/docs/foo       → raw Markdown, source preference en → default
+/en/docs/foo    → English HTML
+/ru/docs/foo    → Russian HTML
+```
+
+The neutral Markdown resource prefers `en`, then the default locale from `@flancer32/teq-tmpl`, and returns 404 if neither source exists. English need not be the site's default human locale. Localized HTML requires the exact requested source and a readable, nonempty presentation template; unavailable projections return 404 and are omitted from HTML alternates and the sitemap. Responses include the authored front matter for Markdown and use `text/markdown; charset=utf-8` or `text/html; charset=utf-8` respectively. Localized `.md` URLs are unavailable. Publication routing is independent of User-Agent and client identity; ordinary HTML template routes retain their behavior. Run `teq cms:generate` to create `robots.txt`, `llms.txt`, and `sitemap.xml` from configured publications. An optional `GET /agent/message` handler accepts agent messages into a private file inbox. See the [Markdown publication guide](docs/publications.md).
 
 ## Agent-Driven Development
 
