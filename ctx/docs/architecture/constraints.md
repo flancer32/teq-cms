@@ -11,6 +11,6 @@
   its composition boundary.
 - Publication policy, source selection, and agent discovery remain CMS responsibilities; platform packages retain their infrastructure and template contracts.
 - Publication locale configuration belongs to `@flancer32/teq-tmpl`; TeqCMS uses its default locale for the source fallback after unlocalized and English sources in site mode and defines no separate agent locale setting.
-- Publication representation selection depends on the resource URL and remains independent of client identity. Existing non-publication HTML template behavior is unaffected.
+- Publication source priority must never be used as response-format selection. Explicit `.md`/`.html` overrides headers; extensionless publication requests use `Accept`, then agent classification from `User-Agent`, then HTML as the default. Static exclusions remain literal delivery.
 
 - Static exclusions and presentation selection belong to the host application's DI policy, not instance environment settings. Private content must be outside the public template and static trees.

@@ -31,14 +31,14 @@ export default class Generator {
             const htmlUrls = [];
             /** @type {string[]} */
             const markdownUrls = [];
-            for (const locale of locales) {
+            for (const locale of [...(routing.isSite() ? [''] : []), ...locales]) {
                 const items = await catalog.listHtml({locale});
                 for (const item of items) {
                     htmlUrls.push(new URL(routing.getUrl({locale, route: item.route}), base).href);
                 }
             }
             for (const item of await catalog.listNeutral()) {
-                markdownUrls.push(new URL(routing.getUrl({route: item.route}), base).href);
+                markdownUrls.push(new URL(routing.getMarkdownUrl({route: item.route}), base).href);
             }
             htmlUrls.sort();
             markdownUrls.sort();

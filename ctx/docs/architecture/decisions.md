@@ -36,7 +36,7 @@ Each publication family uses a configured presentation template. TeqCMS supplies
 
 ## Publication Resource and Locale
 
-Locale and representation are independent concerns. Explicit locale variants remain authored sources; localized HTML is a projection of the publication resource. The neutral Markdown resource follows the source preference defined in [the product model](../product/overview.md), using existing tmpl locale configuration. Explicit `.md` and `.html` suffixes select representations at the HTTP boundary while preserving extensionless canonical addresses and discovery. Neutral HTML uses the exact maintained tmpl default locale, independently of neutral Markdown source preference. This keeps publication policy in TeqCMS without a separate language policy for agents or a translation service.
+Locale and representation are independent concerns. Explicit locale variants remain authored sources; localized HTML is a projection of the publication resource. The neutral Markdown resource follows the source preference defined in [the product model](../product/overview.md), using existing tmpl locale configuration. Explicit `.md` and `.html` suffixes override headers at the HTTP boundary. Extensionless URLs negotiate representation by `Accept`, then `User-Agent`, defaulting to HTML for ambiguous clients. Extensionless neutral HTML and Markdown share neutral source selection; only explicit neutral `.html` requires the exact maintained tmpl default locale. HTML canonical addresses remain extensionless; guaranteed Markdown links use `.md`, including `/index.md` for home. This keeps publication policy in TeqCMS without a separate language policy for agents or a translation service.
 
 ## Site Publication Policy
 

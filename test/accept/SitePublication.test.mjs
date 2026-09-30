@@ -11,6 +11,7 @@ import {parseDocument} from 'yaml';
 import {marked} from 'marked';
 import * as mustache from 'mustache';
 import Policy from '../../src/Back/Publication/Policy.mjs';
+import Representation from '../../src/Back/Publication/Representation.mjs';
 import Routing from '../../src/Back/Publication/Routing.mjs';
 import Source from '../../src/Back/Publication/Source.mjs';
 import Catalog from '../../src/Back/Publication/Catalog.mjs';
@@ -76,7 +77,7 @@ async function fixture(options = {}) {
     const catalog = new Catalog({config, routing, tmplConfig, source, fs, path, dtoTarget, load});
     const respond = new Respond({http2});
     const rendered = [];
-    const handPublication = new Publication({config, routing, tmplConfig, source, catalog, respond, dtoInfo, STAGE, logger, path,
+    const handPublication = new Publication({config, routing, representation: new Representation(), tmplConfig, source, catalog, respond, dtoInfo, STAGE, logger, path,
         render: {perform: async params => { rendered.push(params); return render.perform(params); }}});
     const handStatic = new Static({registry: new Registry({configFactory: new StaticConfig({path}), logger}),
         fileService: new FileService({fs: fsSync, http2, path, logger, helpMime: new Mime(), resolver: new Resolver({path}), fallback: new Fallback({fs: fsSync, path})}),
@@ -118,7 +119,7 @@ it('publishes top-level and nested Markdown with the same corpus and canonical l
         await app.write('tmpl/web/de/about.html', 'OLD HTML');
         await app.write('web/about.html', 'OLD STATIC');
         for (const suffix of ['', '.md']) {
-            const res = await app.send(`/about${suffix}`);
+            const res = await app.send(`/about${suffix}`, {accept: 'text/markdown'});
             assert.equal(res.status, 200);
             assert.equal(res.headers['content-type'], 'text/markdown; charset=utf-8');
             assert.equal(res.body, text('Neutral'));
@@ -135,7 +136,7 @@ it('publishes top-level and nested Markdown with the same corpus and canonical l
                 assert.equal(data.publication.source, md.body);
                 assert.equal(data.canonicalUrl, `https://example.test/${locale}/about`);
                 assert.deepEqual(data.alternateUrls, {en: 'https://example.test/en/about', de: 'https://example.test/de/about'});
-                assert.equal(data.markdownAlternateUrl, 'https://example.test/about');
+                assert.equal(data.markdownAlternateUrl, 'https://example.test/about.md');
             }
         }
         assert.match((await app.send('/about.html')).body, /<h1>de<\/h1>/);
@@ -145,9 +146,9 @@ it('publishes top-level and nested Markdown with the same corpus and canonical l
         assert.equal((await app.send('/ru/about.md')).status, 404);
         assert.deepEqual(app.templateCalls, []);
         const files = await app.generator.build();
-        assert.deepEqual(files.llms.split('\n').filter(line => line.startsWith('- ')), ['- https://example.test/about', '- https://example.test/docs/nested/page']);
+        assert.deepEqual(files.llms.split('\n').filter(line => line.startsWith('- ')), ['- https://example.test/about.md', '- https://example.test/docs/nested/page.md']);
         assert.deepEqual([...files.sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(m => m[1]),
-            ['de/about', 'de/docs/nested/page', 'en/about', 'en/docs/nested/page'].map(p => `https://example.test/${p}`));
+            ['about', 'de/about', 'de/docs/nested/page', 'en/about', 'en/docs/nested/page'].map(p => `https://example.test/${p}`));
         for (const match of files.sitemap.matchAll(/<loc>(.*?)<\/loc>/g)) assert.equal((await app.send(new URL(match[1]).pathname)).status, 200);
         for (const item of await app.catalog.list({locale: ''})) assert.equal((await app.send(app.routing.getUrl(item))).status, 200);
     } finally { await fs.rm(app.root, {recursive: true, force: true}); }
@@ -162,19 +163,19 @@ it('uses Markdown, then HTML templates, then web static files for root and ordin
         assert.equal((await app.send('/')).status, 302);
         assert.equal((await app.send('/de/')).body, 'TEMPLATE HOME');
         await app.write('tmpl/web/index.md', text('ROOT MARKDOWN'));
-        for (const url of ['/', '/index', '/index.md']) assert.equal((await app.send(url)).body, text('ROOT MARKDOWN'));
+        for (const url of ['/', '/index', '/index.md']) assert.equal((await app.send(url, {accept: 'text/markdown'})).body, text('ROOT MARKDOWN'));
         await app.write('tmpl/web/en/index.md', text('English home'));
         for (const url of ['/en', '/en/', '/en/index', '/en/index.html']) {
             assert.equal((await app.send(url)).status, 200);
             assert.equal(app.rendered.at(-1).data.canonicalUrl, 'https://example.test/en/');
-            assert.equal(app.rendered.at(-1).data.markdownAlternateUrl, 'https://example.test/');
+            assert.equal(app.rendered.at(-1).data.markdownAlternateUrl, 'https://example.test/index.md');
         }
         assert.equal((await app.send('/en/index.md')).body, text('English home'));
         await app.write('tmpl/web/de/index.md', text('German home'));
         assert.match((await app.send('/index.html')).body, /German home/);
         assert.equal(app.rendered.at(-1).data.canonicalUrl, 'https://example.test/de/');
         const files = await app.generator.build();
-        assert.deepEqual(files.llms.split('\n').filter(line => line.startsWith('- ')), ['- https://example.test/']);
+        assert.deepEqual(files.llms.split('\n').filter(line => line.startsWith('- ')), ['- https://example.test/index.md']);
         assert.match(files.sitemap, /<loc>https:\/\/example.test\/en\/<\/loc>/);
         assert.doesNotMatch(files.sitemap, /index|\.html/);
         await app.write('tmpl/web/index.md', 'BROKEN MARKDOWN');
@@ -203,7 +204,7 @@ it('bypasses templates for static prefixes and discovery files while preserving 
         await app.write('tmpl/web/de/assets/missing.html', 'Must not fall back');
         assert.equal((await app.send('/assets/missing.html')).status, 404);
         await app.write('tmpl/web/assets-other/a.md', text('PUBLIC'));
-        assert.equal((await app.send('/assets-other/a')).body, text('PUBLIC'));
+        assert.equal((await app.send('/assets-other/a', {accept: 'text/markdown'})).body, text('PUBLIC'));
         for (const file of ['robots.txt', 'llms.txt', 'sitemap.xml']) {
             await app.write(`web/${file}`, `STATIC ${file}`);
             await app.write(`tmpl/web/de/${file}`, 'Must not template');
@@ -260,11 +261,60 @@ it('supports unlocalized-only sites and ordinary HTML fallback without locale co
         await app.write('tmpl/web/about.html', 'UNLOCALIZED ABOUT');
         assert.equal((await app.send('/about.html')).body, 'UNLOCALIZED ABOUT');
         await app.write('tmpl/web/about.md', text('Neutral only'));
-        assert.equal((await app.send('/about')).body, text('Neutral only'));
+        assert.equal((await app.send('/about', {accept: 'text/markdown'})).body, text('Neutral only'));
         assert.equal((await app.send('/about.md')).body, text('Neutral only'));
         assert.equal((await app.send('/about.html')).status, 404);
         const files = await app.generator.build();
         assert.match(files.llms, /- https:\/\/example.test\/about/);
         assert.doesNotMatch(files.sitemap, /<loc>/);
+        await app.write('tmpl/web/publication.html', presentation);
+        const html = await app.send('/about');
+        assert.equal(html.status, 200);
+        assert.match(html.body, /<main><h1>Neutral only<\/h1>/);
+        assert.equal(app.rendered.at(-1).data.locale, '');
+        assert.equal(app.rendered.at(-1).data.canonicalUrl, 'https://example.test/about');
+        assert.match((await app.generator.build()).sitemap, /<loc>https:\/\/example.test\/about<\/loc>/);
+    } finally { await fs.rm(app.root, {recursive: true, force: true}); }
+});
+
+it('selects format by explicit suffix before headers for both home and localized publications', async () => {
+    const app = await fixture();
+    try {
+        await app.write('web/index.html', 'STATIC MUST NOT WIN');
+        await app.write('tmpl/web/en/index.md', text('English home'));
+        await app.write('tmpl/web/de/index.md', text('German home'));
+        const browser = {'user-agent': 'Mozilla/5.0', accept: 'text/html,application/xhtml+xml,*/*;q=0.8'};
+        const agent = {'user-agent': 'ExampleBot/1.0', accept: '*/*'};
+        for (const url of ['/', '/index', '/en', '/en/', '/en/index']) {
+            const human = await app.send(url, browser);
+            assert.equal(human.headers['content-type'], 'text/html; charset=utf-8', url);
+            assert.match(human.body, /<h1>English home<\/h1>/);
+            assert.equal(human.headers.vary, 'Accept, User-Agent');
+            assert.equal(app.rendered.at(-1).data.canonicalUrl, 'https://example.test/en/');
+            const machine = await app.send(url, agent);
+            assert.equal(machine.body, text('English home'), url);
+            assert.equal(machine.headers.vary, 'Accept, User-Agent');
+            assert.equal((await app.send(url, {...browser, accept: 'text/markdown'})).body, text('English home'));
+            assert.equal((await app.send(url, {...agent, accept: 'text/html'})).headers['content-type'], 'text/html; charset=utf-8');
+        }
+        for (const url of ['/index.md', '/en/index.md']) {
+            const res = await app.send(url, browser);
+            assert.equal(res.body, text('English home'));
+            assert.equal(res.headers.vary, undefined);
+        }
+        for (const [url, label] of [['/index.html', 'German home'], ['/en/index.html', 'English home']]) {
+            const res = await app.send(url, {...agent, accept: 'text/markdown'});
+            assert.equal(res.headers['content-type'], 'text/html; charset=utf-8');
+            assert.match(res.body, new RegExp(`<h1>${label}</h1>`));
+            assert.equal(res.headers.vary, undefined);
+        }
+        const rejected = await app.send('/', {accept: 'text/markdown;q=0,text/html;q=0'});
+        assert.equal(rejected.status, 406);
+        assert.equal(rejected.headers.vary, 'Accept, User-Agent');
+        await app.write('tmpl/web/de/publication.html', '');
+        const unavailable = await app.send('/', browser);
+        assert.equal(unavailable.status, 404);
+        assert.equal(unavailable.headers.vary, 'Accept, User-Agent');
+        assert.equal((await app.send('/', agent)).status, 200);
     } finally { await fs.rm(app.root, {recursive: true, force: true}); }
 });

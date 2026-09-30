@@ -24,6 +24,8 @@ it('preserves segment boundaries and shares static exclusions with the public co
     assert.equal(routing.isPublicRoute('about'), true);
     assert.equal(routing.isPublicRoute('docs/nested/page'), true);
     assert.equal(routing.getUrl({route: 'index'}), '/');
+    assert.equal(routing.getMarkdownUrl({route: 'index'}), '/index.md');
+    assert.equal(routing.getMarkdownUrl({route: 'docs/page'}), '/docs/page.md');
     assert.equal(routing.getUrl({route: 'index', locale: 'en'}), '/en/');
     assert.equal(routing.getUrl({route: 'docs/index', locale: 'en'}), '/en/docs/index');
     assert.equal(make('families').getUrl({route: 'docs/index'}), '/docs/index');

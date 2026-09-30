@@ -15,6 +15,7 @@ import Locale from '../../node_modules/@flancer32/teq-tmpl/src/Back/Helper/Local
 import Load from '../../node_modules/@flancer32/teq-tmpl/src/Back/Service/Load.js';
 import Render from '../../node_modules/@flancer32/teq-tmpl/src/Back/Service/Render.js';
 import Policy from '../../src/Back/Publication/Policy.mjs';
+import Representation from '../../src/Back/Publication/Representation.mjs';
 import Routing from '../../src/Back/Publication/Routing.mjs';
 import StaticRoute from '../../src/Back/Web/Handler/StaticRoute.mjs';
 import Source from '../../src/Back/Publication/Source.mjs';
@@ -69,7 +70,7 @@ async function fixture({presentationLocale = 'de', defaultLocale} = {defaultLoca
     const respond = new Respond({http2});
     const rendered = [];
     const handler = new Handler({
-        config, routing, tmplConfig, source, catalog, respond, dtoInfo: info, STAGE, logger, path,
+        config, routing, representation: new Representation(), tmplConfig, source, catalog, respond, dtoInfo: info, STAGE, logger, path,
         render: {perform: async value => {
             rendered.push(value);
             return render.perform(value);
@@ -125,24 +126,30 @@ describe('Markdown publication through the CMS plugin and web pipeline', () => {
             }
             assert.equal(app.rendered.length, 3);
             assert.equal(app.rendered[0].target.name, 'publication.html');
-            assert.equal(app.rendered[0].data.markdownAlternateUrl, 'https://example.test/journal/2026/hello');
-            assert.equal(app.rendered[1].data.markdownAlternateUrl, 'https://example.test/journal/2026/hello');
+            assert.equal(app.rendered[0].data.markdownAlternateUrl, 'https://example.test/journal/2026/hello.md');
+            assert.equal(app.rendered[1].data.markdownAlternateUrl, 'https://example.test/journal/2026/hello.md');
             for (const [index, locale] of locales.entries()) {
                 assert.equal(app.rendered[index].data.canonicalUrl, `https://example.test/${locale}/journal/2026/hello`);
                 assert.equal(app.rendered[index].data.publication.locale, locale);
             }
             assert.deepEqual(Object.keys(app.rendered[0].data.alternateUrls), locales);
-            const raw = await app.send('/journal/2026/hello');
+            const raw = await app.send('/journal/2026/hello', {accept: 'text/markdown'});
             assert.equal(raw.status, 200);
             assert.equal(raw.headers['content-type'], 'text/markdown; charset=utf-8');
             assert.equal(raw.body, '---\ntitle: en title\ndescription: en description\ndate: 2026-09-23\n---\n# en body\n');
             assert.equal((await app.send('/en/journal/2026/hello.md')).body, raw.body);
             assert.equal(app.rendered.length, 3);
-            for (const userAgent of ['Mozilla/5.0', 'ExampleAgent/1.0']) {
+            for (const userAgent of ['ExampleBot/1.0', 'ExampleAgent/1.0']) {
                 const result = await app.send('/journal/2026/hello', {'user-agent': userAgent});
                 assert.equal(result.body, raw.body);
                 assert.equal(result.headers['content-type'], raw.headers['content-type']);
             }
+            const human = await app.send('/journal/2026/hello', {'user-agent': 'Mozilla/5.0'});
+            assert.equal(human.headers['content-type'], 'text/html; charset=utf-8');
+            assert.equal(human.headers.vary, 'Accept, User-Agent');
+            assert.equal(app.rendered.at(-1).data.publication.source, raw.body);
+            assert.equal((await app.send('/ru/journal/2026/hello', {'user-agent': 'ExampleBot'})).body,
+                '---\ntitle: ru title\ndescription: ru description\ndate: 2026-09-23\n---\n# ru body\n');
             assert.equal((await app.send('/de/journal/2026/hello.md')).status, 200);
             assert.equal((await app.send('/ru/journal/2026/hello.md')).status, 200);
             assert.equal((await app.send('/journal/2026/hello.md')).body, raw.body);
@@ -166,7 +173,7 @@ describe('Markdown publication through the CMS plugin and web pipeline', () => {
             for (const locale of locales) await app.write(locale, route, text(locale));
             const before = await app.generator.build();
             for (const suffix of ['', '.md']) {
-                const result = await app.send(`/${route}${suffix}?tracking=1`);
+                const result = await app.send(`/${route}${suffix}?tracking=1`, {accept: 'text/markdown'});
                 assert.equal(result.status, 200);
                 assert.equal(result.headers['content-type'], 'text/markdown; charset=utf-8');
                 assert.equal(result.body, text('en'));
@@ -190,7 +197,7 @@ describe('Markdown publication through the CMS plugin and web pipeline', () => {
                     assert.match(result.body, new RegExp(`<h1>${locale} source</h1>`));
                     assert.ok(result.body.includes(`<link rel="canonical" href="${input.data.canonicalUrl}">`));
                     assert.deepEqual(input.data.alternateUrls, Object.fromEntries(locales.map(value => [value, `https://example.test/${value}/${route}`])));
-                    assert.equal(input.data.markdownAlternateUrl, `https://example.test/${route}`);
+                    assert.equal(input.data.markdownAlternateUrl, `https://example.test/${route}.md`);
                 }
             }
             const neutralHtml = await app.send(`/${route}.html`);
@@ -200,7 +207,7 @@ describe('Markdown publication through the CMS plugin and web pipeline', () => {
             assert.equal(app.rendered.at(-1).data.publication.source, text('de'));
             assert.equal(app.rendered.at(-1).data.canonicalUrl, `https://example.test/de/${route}`);
             assert.deepEqual(await app.generator.build(), before);
-            assert.deepEqual(before.llms.split('\n').filter(line => line.startsWith('- ')), [`- https://example.test/${route}`]);
+            assert.deepEqual(before.llms.split('\n').filter(line => line.startsWith('- ')), [`- https://example.test/${route}.md`]);
             assert.deepEqual([...before.sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(match => match[1]),
                 ['de', 'en', 'ru'].map(locale => `https://example.test/${locale}/${route}`));
             assert.deepEqual(app.calls, []);
@@ -231,9 +238,9 @@ describe('Markdown publication through the CMS plugin and web pipeline', () => {
             await app.write('ru', 'journal/other-only', text('ru'));
             await app.write('en', 'journal/shared', text('en'));
             await app.write('de', 'journal/shared', text('de'));
-            assert.equal((await app.send('/journal/default-only')).body, text('de'));
-            assert.equal((await app.send('/journal/shared')).body, text('en'));
-            assert.equal((await app.send('/journal/other-only')).status, 404);
+            assert.equal((await app.send('/journal/default-only', {accept: 'text/markdown'})).body, text('de'));
+            assert.equal((await app.send('/journal/shared', {accept: 'text/markdown'})).body, text('en'));
+            assert.equal((await app.send('/journal/other-only', {accept: 'text/markdown'})).status, 404);
             for (const suffix of ['', '.md', '.html']) assert.equal((await app.send(`/journal/missing${suffix}`)).status, 404);
             assert.equal((await app.send('/journal/other-only.md')).status, 404);
             assert.equal((await app.send('/journal/other-only.html')).status, 404);
@@ -248,7 +255,7 @@ describe('Markdown publication through the CMS plugin and web pipeline', () => {
             assert.deepEqual(app.rendered.at(-1).data.alternateUrls, {
                 de: 'https://example.test/de/journal/default-only',
             });
-            assert.equal(app.rendered.at(-1).data.markdownAlternateUrl, 'https://example.test/journal/default-only');
+            assert.equal(app.rendered.at(-1).data.markdownAlternateUrl, 'https://example.test/journal/default-only.md');
             assert.equal((await app.send('/ru/journal/other-only')).status, 200);
             assert.deepEqual(app.rendered.at(-1).data.alternateUrls, {
                 ru: 'https://example.test/ru/journal/other-only',
@@ -257,14 +264,14 @@ describe('Markdown publication through the CMS plugin and web pipeline', () => {
             const files = await app.generator.build();
             const markdownUrls = files.llms.split('\n').filter(line => line.startsWith('- ')).map(line => line.slice(2));
             assert.deepEqual(markdownUrls, [
-                'https://example.test/journal/default-only', 'https://example.test/journal/shared',
+                'https://example.test/journal/default-only.md', 'https://example.test/journal/shared.md',
             ]);
             for (const url of markdownUrls) assert.equal((await app.send(new URL(url).pathname)).status, 200);
             assert.deepEqual([...files.sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(match => match[1]), [
                 'https://example.test/de/journal/default-only', 'https://example.test/de/journal/shared',
                 'https://example.test/en/journal/shared', 'https://example.test/ru/journal/other-only',
             ]);
-            assert.doesNotMatch(files.llms, /other-only|\.md|Machine/);
+            assert.doesNotMatch(files.llms, /other-only|Machine/);
             assert.deepEqual(app.calls, []);
         } finally {
             await fs.rm(app.root, {recursive: true, force: true});
@@ -289,8 +296,8 @@ describe('Markdown publication through the CMS plugin and web pipeline', () => {
                 assert.equal((await app.send('/journal/presentation.md')).status, 200);
                 const files = await app.generator.build();
                 assert.deepEqual([...files.sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(match => match[1]), ['https://example.test/en/journal/presentation']);
-                assert.match(files.llms, /- https:\/\/example.test\/journal\/presentation/);
-                assert.equal((await app.send('/journal/presentation')).status, 200);
+                assert.match(files.llms, /- https:\/\/example.test\/journal\/presentation\.md/);
+                assert.equal((await app.send('/journal/presentation', {accept: 'text/markdown'})).status, 200);
             };
             await checkUnavailable();
             await fs.writeFile(defaultTemplate, '   \n');
@@ -315,12 +322,12 @@ describe('Markdown publication through the CMS plugin and web pipeline', () => {
             await app.write('en', 'journal/partial', 'Invalid front matter');
             await app.write('de', 'journal/partial', valid);
             await app.write('ru', 'journal/partial', '---\ntitle: Broken\n---\nPrivate body');
-            assert.equal((await app.send('/journal/partial')).body, valid);
+            assert.equal((await app.send('/journal/partial', {accept: 'text/markdown'})).body, valid);
             assert.equal((await app.send('/en/journal/partial')).status, 404);
             assert.equal((await app.send('/de/journal/partial')).status, 200);
             assert.deepEqual(app.rendered.at(-1).data.alternateUrls, {de: 'https://example.test/de/journal/partial'});
             const files = await app.generator.build();
-            assert.deepEqual(files.llms.split('\n').filter(line => line.startsWith('- ')), ['- https://example.test/journal/partial']);
+            assert.deepEqual(files.llms.split('\n').filter(line => line.startsWith('- ')), ['- https://example.test/journal/partial.md']);
             assert.deepEqual([...files.sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(match => match[1]), ['https://example.test/de/journal/partial']);
             await assert.rejects(app.source.read({locale: 'en', route: 'journal/partial'}), /front matter/);
         } finally {
@@ -340,7 +347,7 @@ describe('Markdown publication through the CMS plugin and web pipeline', () => {
                 assert.equal((await app.send(url)).status, 404);
             }
             assert.equal((await app.send('/en/journal/%2e%2e/hidden')).status, 404);
-            assert.equal((await app.send('/journal/%ZZ')).status, 404);
+            assert.equal((await app.send('/journal/%ZZ', {accept: 'text/markdown'})).status, 404);
             await fs.writeFile(path.join(secret, 'outside.md'), '---\ntitle: Outside\ndescription: Outside\ndate: 2026-09-23\n---\nSECRET\n');
             await fs.symlink(path.join(secret, 'outside.md'), path.join(app.root, 'tmpl', 'web', 'en', 'journal', 'outside.md'));
             for (const prefix of ['', '/en']) {

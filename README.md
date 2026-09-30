@@ -32,19 +32,22 @@ Learn more at [cms.teqfw.com](https://cms.teqfw.com).
 Everything under `tmpl/web/` is public. Markdown publication spans the site by default, without route-family registration. Agents maintain unlocalized and locale-specific sources directly in Git:
 
 ```text
-/about          → neutral Markdown: unlocalized → en → default
-/about.md       → neutral Markdown alias
+/about          → headers select HTML or Markdown; source: unlocalized → en → default
+/about.md       → guaranteed neutral Markdown
 /en/about.md    → exact English Markdown
-/en/about       → canonical English HTML
+/en/about       → headers select English HTML or Markdown
 /en/about.html  → English HTML alias
 /about.html     → HTML from the exact maintained default locale
-/               → neutral index.md resource
-/en/            → English index.md projection
+/               → headers select index.md as HTML or Markdown
+/index.md       → guaranteed neutral home Markdown
+/en/            → headers select English home HTML or Markdown
 ```
 
-Markdown takes priority over ordinary templates, then static files in `web/`, then 404. A found invalid source or unavailable requested representation returns 404. Static prefixes such as `/assets/` bypass templating and use only `web/assets/`; missing files return 404.
+Explicit `.md` or `.html` overrides HTTP headers. Extensionless publication URLs use explicit `Accept` preference first, then `User-Agent` hints: agents receive Markdown, people receive HTML, and ambiguous clients default to HTML. Responses vary by `Accept, User-Agent`.
 
-The host defines static prefixes and presentation selection in code by substituting `Fl32_Cms_Back_Publication_Policy$` through DI. The default presentation is `publication.html`. Localized content is exact; presentation templates may use normal tmpl fallback. Markdown includes front matter. HTML canonical/alternate links and generated discovery omit aliases.
+Markdown sources take priority over ordinary templates, then static files in `web/`, then 404. A found invalid source or unavailable requested representation returns 404. Static prefixes such as `/assets/` bypass templating and use only `web/assets/`; missing files return 404.
+
+The host defines static prefixes and presentation selection in code by substituting `Fl32_Cms_Back_Publication_Policy$` through DI. The default presentation is `publication.html`. Localized content is exact; presentation templates may use normal tmpl fallback. Markdown includes front matter. HTML canonical and locale links stay extensionless. Markdown alternate links and `llms.txt` use explicit `.md` addresses; the sitemap lists available canonical HTML.
 
 A nonempty legacy `PUBLICATION_FAMILIES` list retains the previous selected-section mode. Run `teq cms:generate` to generate discovery files. See the [publication guide](docs/publications.md) for host policy, main-page behavior, source validation, migration, and the optional private agent inbox.
 

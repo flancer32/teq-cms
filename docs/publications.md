@@ -45,16 +45,18 @@ Authored Markdown and embedded HTML are trusted public site content. TeqCMS does
 
 | URL | Representation | Source selection |
 | --- | --- | --- |
-| `/about` | Canonical neutral Markdown | Unlocalized, then maintained `en`, then tmpl default |
-| `/about.md` | Neutral Markdown alias | Same selection |
+| `/about` | Negotiated HTML or Markdown | Unlocalized, then maintained `en`, then tmpl default |
+| `/about.md` | Guaranteed neutral Markdown | Same selection |
 | `/en/about.md` | Exact English Markdown | `tmpl/web/en/about.md` only |
-| `/en/about` | Canonical English HTML | Same exact English source |
+| `/en/about` | Negotiated English HTML or Markdown | Same exact English source |
 | `/en/about.html` | English HTML alias | Same exact English source |
 | `/about.html` | Default-locale HTML alias | Exact maintained tmpl default source only |
 
-Nested paths use the same rules. Markdown responses include the entire authored file, including front matter, with `text/markdown; charset=utf-8`. HTML uses `text/html; charset=utf-8`. Available aliases return 200 directly, without redirects. Routing is independent of User-Agent and client identity.
+Nested paths use the same rules. Markdown responses include the entire authored file, including front matter, with `text/markdown; charset=utf-8`. HTML uses `text/html; charset=utf-8`. Available aliases return 200 directly, without redirects. Explicit `.md` or `.html` always overrides headers. For extensionless publication URLs, `Accept` preference for `text/markdown` versus `text/html` or `application/xhtml+xml` selects the format by `q` weight (default `1`). Equal, missing, or wildcard-only preferences use `User-Agent`: recognized bots, agents, and command-line clients receive Markdown; browsers and unknown clients receive HTML. For example, `curl -H 'Accept: text/html' https://example.com/` renders HTML despite curl's agent hint. `curl -H 'Accept: text/markdown' https://example.com/` returns the authored home source.
 
-Unlocalized content does not substitute for a missing requested locale. Neutral `.html` returns 404 if the default locale is absent, unmaintained, or has no valid source. HTML also requires a readable, nonempty presentation; the presentation template may use tmpl's normal template fallback, which does not substitute Markdown content.
+A supported representation explicitly rejected with `q=0` is excluded; rejecting both returns 406. Extensionless publication responses send `Vary: Accept, User-Agent`, including representation-unavailable 404 and negotiation 406. Client classification is a delivery hint, not access control.
+
+Extensionless neutral requests select the same neutral source for either format; HTML therefore can render an unlocalized or English source even with another default locale. Unlocalized content does not substitute for a missing requested locale. Neutral `.html` returns 404 if the default locale is absent, unmaintained, or has no valid source. HTML also requires a readable, nonempty presentation; the presentation template may use tmpl's normal template fallback, which does not substitute Markdown content.
 
 A found corrupt, unreadable, or unsafe highest-priority neutral source returns 404 instead of silently falling through to another language. A missing neutral candidate proceeds to the next candidate. Missing exact sources and unavailable HTML representations return 404 when the publication exists in another eligible source locale.
 
@@ -62,7 +64,7 @@ Only one terminal lowercase `.md` or `.html` representation suffix is supported.
 
 ## Main page and delivery priority
 
-In site mode `index.md` has canonical route `/` for neutral Markdown and `/{locale}/` for localized HTML. `/index`, `/index.md`, `/index.html`, and localized `/index` forms are aliases. `/{locale}` and `/{locale}/` both address the localized home projection. `/index.html` retains the neutral HTML default-locale policy. Nested `docs/index.md` has the explicit route `/docs/index`; no implicit nested directory index publication is introduced.
+In site mode `/` addresses `index.md` and negotiates HTML or Markdown; `/index.md` guarantees neutral Markdown. Human requests to `/{locale}/` render localized HTML; agent requests read the exact localized source. Unlocalized HTML uses canonical `/`. `/index`, `/index.md`, `/index.html`, and localized `/index` forms are aliases. `/{locale}` and `/{locale}/` both address the localized home projection. `/index.html` retains the neutral HTML default-locale policy. Nested `docs/index.md` has the explicit route `/docs/index`; no implicit nested directory index publication is introduced.
 
 For ordinary requests the order is:
 
@@ -71,7 +73,7 @@ For ordinary requests the order is:
 3. Static files under `web/`.
 4. 404.
 
-Therefore `tmpl/web/index.md` handles `/` even if `web/index.html` exists. With no Markdown home, an HTML template can handle the request; ordinary locale redirects remain applicable. If only `web/index.html` exists, `/` serves that file. Template lookup supports the requested locale, the default locale, and the unlocalized template directory.
+Therefore `tmpl/web/index.md` handles `/` even if `web/index.html` exists: people receive its rendered HTML and agents receive raw Markdown. Markdown source priority does not force a Markdown HTTP response. With no Markdown home, an HTML template can handle the request; ordinary locale redirects remain applicable. If only `web/index.html` exists, `/` serves that file. Template lookup supports the requested locale, the default locale, and the unlocalized template directory.
 
 ## Host routing policy through DI
 
@@ -132,9 +134,9 @@ Provide the policy-selected presentation in `tmpl/web/{locale}/`, the default lo
 | `publication.markdown` | Body Markdown. |
 | `publication.html` | Derived body HTML. |
 | `publication.route`, `publication.locale`, `publication.family` | Logical identity and resolved presentation descriptor. |
-| `canonicalUrl` | Extensionless HTML URL for the resolved locale; home uses `/{locale}/`. |
+| `canonicalUrl` | Extensionless HTML URL for the source locale; unlocalized home uses `/`, localized home uses `/{locale}/`. |
 | `alternateUrls` | Canonical HTML URLs for locales with valid sources and available presentations. |
-| `markdownAlternateUrl` | Canonical neutral Markdown URL when available; home uses `/`. |
+| `markdownAlternateUrl` | Guaranteed neutral Markdown URL ending in `.md` when available; home uses `/index.md`. |
 
 All HTML aliases share these canonical and alternate links. Engine failures are logged and return 404. For example, a Mustache presentation can emit:
 
@@ -163,6 +165,6 @@ An explicit host site policy combined with a nonempty legacy family list is reje
 
 Run `teq cms:generate` after content or host policy changes. It writes `web/robots.txt`, `web/llms.txt`, and `web/sitemap.xml`. The application root comes from the CLI host, not the working directory. Commit generated files with their content sources.
 
-`llms.txt` lists each available canonical neutral Markdown URL once. The sitemap lists canonical localized HTML across maintained locales with valid sources and available presentations. Static exclusions, suffix aliases, neutral HTML aliases, and per-locale Markdown aliases are omitted. Other ordinary site routes require host-owned sitemap integration.
+`llms.txt` lists each available neutral Markdown resource once with an explicit `.md` URL; home uses `/index.md`. These links return Markdown even with browser headers. The sitemap lists canonical HTML from unlocalized sources in site mode and exact maintained locale sources with available presentations. Static exclusions, `.html` aliases, neutral aliases of localized HTML, and per-locale Markdown URLs are omitted. Sitemap addresses negotiate Markdown for agent headers; HTML canonical identity remains unchanged. Other ordinary site routes require host-owned sitemap integration.
 
 Set `TEQ_CMS__AGENT_MESSAGE_ENABLED=true` to enable `GET /agent/message`. Send `X-Agent-Id` and `X-Agent-Message`; optionally configure `TEQ_CMS__AGENT_MESSAGE_TOKEN` and send `X-Agent-Token`. Accepted messages are stored privately under `var/teq-cms/agent-messages/`. The host owner handles notification and reply outside the CMS.

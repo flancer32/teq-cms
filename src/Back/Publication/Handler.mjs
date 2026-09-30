@@ -2,7 +2,8 @@
 
 /**
  * @namespace Fl32_Cms_Back_Publication_Handler
- * @description Serves localized HTML projections and canonical neutral Markdown resources.
+ * @description Serves publications with explicit or header-selected representations.
+ * @see https://github.com/flancer32/teq-cms/blob/main/ctx/docs/architecture/publication.md
  * @implements TeqFw_Web_Back_Api_Handler
  */
 export default class Fl32_Cms_Back_Publication_Handler {
@@ -10,6 +11,7 @@ export default class Fl32_Cms_Back_Publication_Handler {
      * @param {object} deps
      * @param {Fl32_Cms_Back_Config} deps.config
      * @param {Fl32_Cms_Back_Publication_Routing} deps.routing
+     * @param {Fl32_Cms_Back_Publication_Representation} deps.representation
      * @param {Fl32_Tmpl_Back_Config} deps.tmplConfig
      * @param {Fl32_Cms_Back_Publication_Source} deps.source
      * @param {Fl32_Cms_Back_Publication_Catalog} deps.catalog
@@ -20,7 +22,7 @@ export default class Fl32_Cms_Back_Publication_Handler {
      * @param {TeqFw_Log_Provider} deps.logger
      * @param {typeof import('node:path')} deps.path
      */
-    constructor({config, routing, tmplConfig, source, catalog, render, respond, dtoInfo, STAGE, logger, path}) {
+    constructor({config, routing, representation, tmplConfig, source, catalog, render, respond, dtoInfo, STAGE, logger, path}) {
         const log = logger.forSource('Fl32_Cms_Back_Publication_Handler');
         const info = dtoInfo.create({
             name: 'Fl32_Cms_Back_Publication_Handler',
@@ -51,10 +53,12 @@ export default class Fl32_Cms_Back_Publication_Handler {
         this.handle = async context => {
             if (!families.length || !respond.isWritable(context.response)) return;
             const {request: req, response: res} = context;
+            /** @type {Record<string, string>} */
+            let representationHeaders = {};
             const rawPath = (req.url ?? '').split('?')[0];
             /** @returns {void} */
             const fail = () => {
-                respond.code404_NotFound({res});
+                respond.code404_NotFound({res, headers: representationHeaders});
                 context.completed = true;
             };
             let decodedPath;
@@ -93,8 +97,11 @@ export default class Fl32_Cms_Back_Publication_Handler {
             // Strip one supported representation suffix; Source still validates the logical route.
             const suffix = /\.(md|html)$/.exec(resource);
             const route = (suffix ? resource.slice(0, -suffix[0].length) : resource) || (home ? 'index' : '');
-            const html = suffix ? suffix[1] === 'html' : !neutral;
-            const locale = neutral && html ? tmplConfig.getDefaultLocale() : requestedLocale;
+            // See ctx/docs/architecture/publication.md: source priority and format are separate.
+            const selected = representation.select({suffix: suffix?.[1], headers: req.headers ?? {}});
+            const html = selected === 'html';
+            if (!suffix) representationHeaders = {vary: 'Accept, User-Agent'};
+            const locale = neutral && suffix?.[1] === 'html' ? tmplConfig.getDefaultLocale() : requestedLocale;
             const family = source.getFamily(route);
             // Non-publication file types continue to ordinary delivery.
             if (!family && routing.isSite() && !suffix && /\.[A-Za-z0-9]+$/.test(resource)) return;
@@ -104,7 +111,13 @@ export default class Fl32_Cms_Back_Publication_Handler {
             }
             try {
                 if (routing.isSite() && !(await source.hasRoute({route}))) return;
-                if ((locale !== undefined && !locales.includes(locale)) || (html && !locale)) {
+                if (selected === null) {
+                    res.writeHead(406, {...representationHeaders, 'content-type': 'text/plain; charset=utf-8'});
+                    res.end('Not Acceptable');
+                    context.completed = true;
+                    return;
+                }
+                if ((locale !== undefined && !locales.includes(locale)) || (suffix?.[1] === 'html' && neutral && !locale)) {
                     fail();
                     return;
                 }
@@ -116,10 +129,11 @@ export default class Fl32_Cms_Back_Publication_Handler {
                 if (!html) {
                     respond.code200_Ok({
                         res,
-                        headers: {'content-type': 'text/markdown; charset=utf-8'},
+                        headers: {...representationHeaders, 'content-type': 'text/markdown; charset=utf-8'},
                         body: item.source,
                     });
                 } else {
+                    const renderLocale = item.locale;
                     const base = config.getBaseUrl();
                     if (!base) throw new Error('BASE_URL is required for publication rendering.');
                     const presentation = await catalog.getPresentation({item});
@@ -130,19 +144,19 @@ export default class Fl32_Cms_Back_Publication_Handler {
                     /** @type {Record<string, string>} */
                     const alternateUrls = {};
                     for (const value of locales) {
-                        const alternate = value === locale ? item : await source.readAvailable({locale: value, route});
-                        if (alternate && (value === locale || await catalog.getPresentation({item: alternate}))) {
+                        const alternate = value === renderLocale ? item : await source.readAvailable({locale: value, route});
+                        if (alternate && (value === renderLocale || await catalog.getPresentation({item: alternate}))) {
                             alternateUrls[value] = new URL(routing.getUrl({locale: value, route}), base).href;
                         }
                     }
                     const markdown = await source.readNeutral({route});
                     const data = {
                         publication: item,
-                        locale,
+                        locale: renderLocale,
                         allowedLocales: locales,
-                        canonicalUrl: new URL(routing.getUrl({locale, route}), base).href,
+                        canonicalUrl: new URL(routing.getUrl({locale: renderLocale, route}), base).href,
                         alternateUrls,
-                        markdownAlternateUrl: markdown ? new URL(routing.getUrl({route}), base).href : undefined,
+                        markdownAlternateUrl: markdown ? new URL(routing.getMarkdownUrl({route}), base).href : undefined,
                     };
                     const result = await render.perform({...presentation, data, options: {}});
                     if (result.resultCode !== 'SUCCESS' || typeof result.content !== 'string') {
@@ -150,7 +164,7 @@ export default class Fl32_Cms_Back_Publication_Handler {
                     }
                     respond.code200_Ok({
                         res,
-                        headers: {'content-type': 'text/html; charset=utf-8'},
+                        headers: {...representationHeaders, 'content-type': 'text/html; charset=utf-8'},
                         body: result.content,
                     });
                 }
@@ -167,6 +181,7 @@ export const __deps__ = Object.freeze({
     default: Object.freeze({
         config: 'Fl32_Cms_Back_Config$',
         routing: 'Fl32_Cms_Back_Publication_Routing$',
+        representation: 'Fl32_Cms_Back_Publication_Representation$',
         tmplConfig: 'Fl32_Tmpl_Back_Config$',
         source: 'Fl32_Cms_Back_Publication_Source$',
         catalog: 'Fl32_Cms_Back_Publication_Catalog$',

@@ -93,14 +93,15 @@ and HTML require exact locale sources. Neutral `.html` uses only the maintained
 default locale source. Presentation-template fallback never changes content language.
 
 ```text
-/about          → canonical neutral Markdown
-/about.md       → neutral Markdown alias
+/about          → negotiated HTML or Markdown from the neutral source
+/about.md       → guaranteed neutral Markdown
 /en/about.md    → exact English Markdown
-/en/about       → canonical English HTML
+/en/about       → negotiated English HTML or Markdown
 /en/about.html  → English HTML alias
 /about.html     → default-locale HTML alias
-/               → neutral index.md
-/en/            → exact English index.md HTML
+/               → negotiated neutral home HTML or Markdown
+/index.md       → guaranteed neutral home Markdown
+/en/            → negotiated exact English home HTML or Markdown
 ```
 
 `/index` forms are aliases of the root identity; nested `docs/index` remains
@@ -108,17 +109,24 @@ explicit. Only supported terminal lowercase representation suffixes are removed
 at the HTTP boundary. Source APIs accept strict logical routes. Keep traversal,
 source symlink, locale, and metadata validation intact.
 
-HTTP order is Markdown, ordinary templates, then `web/` static delivery, then
+Explicit `.md` or `.html` overrides headers. Extensionless publication URLs use
+explicit `Accept` preference, then `User-Agent` hints: Markdown for agents, HTML
+for people, with HTML as the ambiguous-client default. Send `Vary: Accept, User-Agent`
+for negotiated responses. Extensionless neutral HTML projects the same neutral
+source as Markdown; explicit neutral `.html` retains exact default-locale selection.
+
+HTTP source order is Markdown, ordinary templates, then `web/` static delivery, then
 404. A wholly absent Markdown route continues to lower tiers; an authored but
 invalid or unavailable publication does not. Unlocalized `index.md` therefore
 wins over `web/index.html` for `/`. Ordinary template locale redirects remain
 applicable when no Markdown home exists.
 
 Canonical HTML links and locale alternates remain extensionless; home HTML uses
-`/{locale}/`, neutral home Markdown uses `/`. `markdownAlternateUrl` is the
-neutral canonical address when available. `llms.txt` lists each neutral resource
-once; the sitemap lists available localized HTML. Neither enumerates aliases or
-static exclusions. HTML availability shares the catalog presentation check.
+`/{locale}/` or `/` for an unlocalized source. `markdownAlternateUrl` and
+`llms.txt` use explicit neutral `.md` addresses, including `/index.md` for home.
+The sitemap lists available canonical unlocalized and localized HTML; it omits
+neutral aliases of localized sources, `.html` aliases, and static exclusions.
+HTML availability shares the catalog presentation check.
 
 A nonempty legacy `PUBLICATION_FAMILIES` list selects families mode, preserving
 reserved prefixes, family presentations, and neutral `en → default` selection.

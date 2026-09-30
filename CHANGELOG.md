@@ -16,6 +16,11 @@
 - Extend ordinary template-name lookup to requested, default, and unlocalized template trees.
 - Update context, usage documentation, and consumer skill with host policy composition and migration guidance.
 
+### Fixed
+
+- Separate Markdown source priority from response format: explicit `.md`/`.html` overrides headers; extensionless publication URLs use Accept, then User-Agent hints, returning Markdown to agents and HTML to people with cache variation.
+- Use explicit `.md` URLs for Markdown alternates and llms.txt, including `/index.md` for home; include available unlocalized HTML in sitemap.xml.
+
 ### Verification
 
 - Cover site-wide URL forms, exact sources, root priority, host-selected presentations, static exclusions, safety, canonical discovery, and real CLI DI policy substitution.
@@ -50,6 +55,11 @@
 - Treat unreadable or malformed public source variants as unavailable, preserving neutral source fallback and omitting invalid variants from discovery.
 - Reject source symlink aliases and paths outside the configured source tree.
 - Align process-host documentation with CLI-owned configuration Sources and application-root resolution.
+
+### Fixed
+
+- Separate Markdown source priority from response format: explicit `.md`/`.html` overrides headers; extensionless publication URLs use Accept, then User-Agent hints, returning Markdown to agents and HTML to people with cache variation.
+- Use explicit `.md` URLs for Markdown alternates and llms.txt, including `/index.md` for home; include available unlocalized HTML in sitemap.xml.
 
 ### Verification
 

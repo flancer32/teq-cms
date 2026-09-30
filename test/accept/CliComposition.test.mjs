@@ -41,7 +41,7 @@ describe('TeqCMS CLI composition', () => {
             });
             const llms = await fs.readFile(path.join(root, 'web/llms.txt'), 'utf8');
             assert.deepEqual(llms.split('\n').filter(line => line.startsWith('- ')), [
-                '- https://example.test/docs/fallback', '- https://example.test/docs/shared',
+                '- https://example.test/docs/fallback.md', '- https://example.test/docs/shared.md',
             ]);
             const sitemap = await fs.readFile(path.join(root, 'web/sitemap.xml'), 'utf8');
             assert.match(sitemap, /https:\/\/example.test\/ru\/docs\/other/);
@@ -85,7 +85,7 @@ it('generates site discovery with a host policy substituted through real CLI DI 
             '--host', '@flancer32/teq-cms', '--host-root', root, 'cms:generate'], {cwd: os.tmpdir(), timeout: 15000, env: {PATH: process.env.PATH}});
         await run();
         const initial = await fs.readFile(path.join(root, 'web/llms.txt'), 'utf8');
-        assert.match(initial, /- https:\/\/example.test\/\n/);
+        assert.match(initial, /- https:\/\/example.test\/index\.md\n/);
         assert.match(initial, /\/files\/hidden/);
         assert.doesNotMatch(initial, /\/assets\//);
         const pkg = JSON.parse(await fs.readFile(path.join(root, 'package.json'), 'utf8'));
@@ -109,11 +109,11 @@ it('generates site discovery with a host policy substituted through real CLI DI 
         await run();
         const llms = await fs.readFile(path.join(root, 'web/llms.txt'), 'utf8');
         assert.deepEqual(llms.split('\n').filter(line => line.startsWith('- ')), [
-            '- https://example.test/', '- https://example.test/about', '- https://example.test/docs/page',
+            '- https://example.test/about.md', '- https://example.test/docs/page.md', '- https://example.test/index.md',
         ]);
         const sitemap = await fs.readFile(path.join(root, 'web/sitemap.xml'), 'utf8');
         assert.deepEqual([...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(match => match[1]), [
-            'https://example.test/de/about', 'https://example.test/en/', 'https://example.test/en/about', 'https://example.test/en/docs/page',
+            'https://example.test/', 'https://example.test/de/about', 'https://example.test/en/', 'https://example.test/en/about', 'https://example.test/en/docs/page',
         ]);
         assert.doesNotMatch(sitemap, /assets|files|index|\.md|\.html/);
     } finally { await fs.rm(root, {recursive: true, force: true}); }
