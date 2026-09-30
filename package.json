@@ -1,6 +1,6 @@
 {
   "name": "@flancer32/teq-cms",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "CMS built around agents and version-controlled Markdown, with derived HTML pages for people.",
   "type": "module",
   "keywords": [
