@@ -32,7 +32,8 @@ it('accepts an agent message through the CMS web pipeline before page handlers',
             ({name: 'TeqFw_Web_Back_Handler_Static', stage: STAGE.PROCESS}), handle: async () => {}},
         handTmpl: {getRegistrationInfo: () =>
             ({name: 'Fl32_Cms_Back_Web_Handler_Template', stage: STAGE.PROCESS}), handle: async () => {}},
-        handPublication: {}, dtoSource: {create: value => value},
+        handStaticRoute: {getRegistrationInfo: () => ({name: 'static-route', stage: STAGE.PROCESS}), handle: async () => {}},
+        handPublication: {getRegistrationInfo: () => ({name: 'publication', stage: STAGE.PROCESS}), handle: async () => {}}, dtoSource: {create: value => value},
         tmplConfig: {getRootPath: () => '/application'}, path,
     });
     await plugin.onStartup();

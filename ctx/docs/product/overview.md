@@ -27,12 +27,12 @@ Content and locale variants remain transparent, reproducible, and version-contro
 - Markdown files are authored sources. Their HTML projections are derived pages rendered by the server; HTML templates remain supported for layout and existing pages.
 - A publication is one content resource with explicit locale-specific Markdown sources. Locale selects content language; representation selects Markdown or HTML.
 - Extensionless localized publication URLs expose human-facing HTML projections; the extensionless locale-neutral URL is the canonical agent-facing Markdown resource. Explicit Markdown and HTML addresses expose the same publication without changing these canonical identities. The URL determines representation independently of the client.
-- The locale-neutral Markdown resource prefers an English (`en`) source, then the site's default locale source. If neither exists, that resource is unavailable; no other locale is substituted. English need not be the default locale for human pages.
+- In site mode the locale-neutral Markdown resource prefers an unlocalized source, then an English (`en`) source, then the site's default locale source. Legacy families retain the English then default preference. If no eligible candidate exists, that resource is unavailable; no other locale is substituted. English need not be the default locale for human pages.
 - Explicit localized Markdown and all localized HTML require the source for the requested locale; another language does not substitute for a missing variant. Neutral HTML uses only the site default locale source and is unavailable without a maintained default locale or its valid source.
 - The host selects the template engine and supplies the website's templates.
   TeqCMS owns CMS-specific publication and communication settings.
 - Agents create and maintain translations as ordinary version-controlled, locale-specific Markdown files. The CMS does not call an LLM API, run automatic translation jobs, or store translation state.
-- The CMS exposes only public Markdown sources through agent-readable routes and generated discovery files; private files and prompt sidecars are outside the publication corpus.
+- The CMS exposes only public Markdown sources through agent-readable routes and generated discovery files; private files must be kept outside the public trees, and dotted prompt sidecars are outside the Markdown publication corpus.
 
 ## Product Boundaries
 
@@ -57,5 +57,7 @@ Content and locale variants remain transparent, reproducible, and version-contro
 - Markdown is the primary authored content form; human-facing HTML is its derived presentation.
 - Each public locale variant, including a translation, is an explicit, reviewable Markdown file maintained in version control.
 - The CMS remains an isolated package configured by its host application.
-- Publication families require explicit host configuration. Existing non-publication HTML template routes keep their behavior.
+- Everything under `tmpl/web/` is public. Site-wide Markdown publication requires no family registration. Existing hosts may retain explicitly configured publication families as a compatibility mode.
+- The host application defines presentation and static routing policy in code through DI; deployment settings do not define route families in the new mode.
+- Markdown takes precedence over HTML templates, then static files in `web/`, then 404. A found invalid source or unavailable requested representation returns 404 without content substitution. Static exclusions bypass template processing entirely.
 - Generated discovery lists only public, valid sources; an agent message never exposes its content in public output or logs.

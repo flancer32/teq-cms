@@ -14,6 +14,8 @@ it('loads only a validated publication within its locale root', async () => {
         await fs.mkdir(path.dirname(file), {recursive: true});
         await fs.writeFile(file, '---\ntitle: A\ndescription: About A\ndate: 2026-09-23\n---\n# Body\n');
         const source = new Source({
+        routing: {isSite: () => false, isStatic: () => false, isEndpoint: () => false, isPublicRoute: () => true, getFamilies: () => [{prefix: "notes", presentation: "page.html"}], getUrl: ({locale, route}) => locale ? `/${locale}/${route}` : `/${route}`},
+        policy: {getPresentationName: () => "page.html"},
             fs, path, marked, parseDocument,
             tmplConfig: {getAvailableLocales: () => ['en', 'de'], getRootPath: () => root},
             config: {getPublicationFamilies: () => [{prefix: 'notes', presentation: 'page.html'}]},
@@ -46,6 +48,8 @@ it('selects only English or the optional tmpl default for neutral resources', as
         await write('de', 'fallback');
         await write('ru', 'other');
         const make = defaultLocale => new Source({
+        routing: {isSite: () => false, isStatic: () => false, isEndpoint: () => false, isPublicRoute: () => true, getFamilies: () => [{prefix: "notes", presentation: "page.html"}], getUrl: ({locale, route}) => locale ? `/${locale}/${route}` : `/${route}`},
+        policy: {getPresentationName: () => "page.html"},
             fs, path, marked, parseDocument,
             tmplConfig: {getRootPath: () => root, getAvailableLocales: () => ['en', 'de', 'ru'], getDefaultLocale: () => defaultLocale},
             config: {getPublicationFamilies: () => [{prefix: 'notes', presentation: 'page.html'}]},

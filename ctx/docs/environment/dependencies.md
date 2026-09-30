@@ -22,4 +22,4 @@ lockfile entry as development-only. A source checkout installed with
 `npm ci --omit=dev` therefore omits tmpl; published consumers resolve the
 runtime dependency from the published package manifest.
 
-Optional Markdown publication uses `marked` for body rendering and `yaml` for deterministic front-matter parsing. Both are runtime dependencies because a configured family can be served through the CMS web pipeline and enumerated by the CLI. Publication remains disabled until a family is configured.
+Markdown publication uses `marked` for body rendering and `yaml` for deterministic front-matter parsing. Both are runtime dependencies because site-wide Markdown and legacy families are served through the CMS web pipeline and enumerated by the CLI. The default site mode requires no family configuration.

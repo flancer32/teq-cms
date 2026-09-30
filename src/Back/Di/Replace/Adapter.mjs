@@ -58,11 +58,14 @@ export default class Fl32_Cms_Back_Di_Replace_Adapter {
                     fallbackLocale: localeBaseWeb,
                 });
                 const root = tmplConfig.getRootPath();
-                const baseDir = join(root, 'tmpl', 'web', localeBaseWeb);
-                const tmplPath = await helpFile.resolveTemplateName({
-                    baseDir,
-                    cleanPath,
-                });
+                let tmplPath;
+                for (const candidate of new Set([locale, localeBaseWeb, ''])) {
+                    if (candidate === undefined) continue;
+                    tmplPath = await helpFile.resolveTemplateName({
+                        baseDir: join(root, 'tmpl', 'web', candidate), cleanPath,
+                    });
+                    if (tmplPath) break;
+                }
                 if (tmplPath) {
 
                     target = dtoTmplTarget.create({
@@ -77,7 +80,7 @@ export default class Fl32_Cms_Back_Di_Replace_Adapter {
                     const rawBaseUrl = config.getBaseUrl();
                     const baseUrl = (rawBaseUrl || `//${req.headers.host || 'localhost'}`).replace(/\/+$/, '');
 
-                    const canonicalUrl = `${baseUrl}/${localeBaseWeb}/${tmplPath}`;
+                    const canonicalUrl = localeBaseWeb ? `${baseUrl}/${localeBaseWeb}/${tmplPath}` : `${baseUrl}/${tmplPath}`;
                     /** @type {Record<string, string>} */
                     const alternateUrls = {};
                     for (const loc of localeAllowed) {

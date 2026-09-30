@@ -35,11 +35,17 @@ declare global {
   type Fl32_Cms_Back_Publication_Handler = import("./src/Back/Publication/Handler.mjs").default;
   type Fl32_Cms_Back_Publication_Handler__Class = typeof import("./src/Back/Publication/Handler.mjs").default;
   type Fl32_Cms_Back_Publication_Item = {locale: string; route: string; family: Fl32_Cms_Back_Publication_Family; source: string; metadata: {[key: string]: unknown}; markdown: string; html: string};
+  type Fl32_Cms_Back_Publication_Policy = import("./src/Back/Publication/Policy.mjs").default;
+  type Fl32_Cms_Back_Publication_Policy__Class = typeof import("./src/Back/Publication/Policy.mjs").default;
   type Fl32_Cms_Back_Publication_Presentation = {target: Fl32_Tmpl_Back_Dto_Target__DTO; template: string};
+  type Fl32_Cms_Back_Publication_Routing = import("./src/Back/Publication/Routing.mjs").default;
+  type Fl32_Cms_Back_Publication_Routing__Class = typeof import("./src/Back/Publication/Routing.mjs").default;
   type Fl32_Cms_Back_Publication_Source = import("./src/Back/Publication/Source.mjs").default;
   type Fl32_Cms_Back_Publication_Source__Class = typeof import("./src/Back/Publication/Source.mjs").default;
   type Fl32_Cms_Back_Web_Handler_AgentMessage = import("./src/Back/Web/Handler/AgentMessage.mjs").default;
   type Fl32_Cms_Back_Web_Handler_AgentMessage__Class = typeof import("./src/Back/Web/Handler/AgentMessage.mjs").default;
+  type Fl32_Cms_Back_Web_Handler_StaticRoute = import("./src/Back/Web/Handler/StaticRoute.mjs").default;
+  type Fl32_Cms_Back_Web_Handler_StaticRoute__Class = typeof import("./src/Back/Web/Handler/StaticRoute.mjs").default;
   type Fl32_Cms_Back_Web_Handler_Template = import("./src/Back/Web/Handler/Template.mjs").default;
   type Fl32_Cms_Back_Web_Handler_Template__Class = typeof import("./src/Back/Web/Handler/Template.mjs").default;
 }

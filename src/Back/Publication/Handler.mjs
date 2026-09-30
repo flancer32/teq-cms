@@ -9,6 +9,7 @@ export default class Fl32_Cms_Back_Publication_Handler {
     /**
      * @param {object} deps
      * @param {Fl32_Cms_Back_Config} deps.config
+     * @param {Fl32_Cms_Back_Publication_Routing} deps.routing
      * @param {Fl32_Tmpl_Back_Config} deps.tmplConfig
      * @param {Fl32_Cms_Back_Publication_Source} deps.source
      * @param {Fl32_Cms_Back_Publication_Catalog} deps.catalog
@@ -19,7 +20,7 @@ export default class Fl32_Cms_Back_Publication_Handler {
      * @param {TeqFw_Log_Provider} deps.logger
      * @param {typeof import('node:path')} deps.path
      */
-    constructor({config, tmplConfig, source, catalog, render, respond, dtoInfo, STAGE, logger, path}) {
+    constructor({config, routing, tmplConfig, source, catalog, render, respond, dtoInfo, STAGE, logger, path}) {
         const log = logger.forSource('Fl32_Cms_Back_Publication_Handler');
         const info = dtoInfo.create({
             name: 'Fl32_Cms_Back_Publication_Handler',
@@ -27,13 +28,13 @@ export default class Fl32_Cms_Back_Publication_Handler {
             before: ['Fl32_Cms_Back_Web_Handler_Template', 'TeqFw_Web_Back_Handler_Static'],
         });
         /** @type {Fl32_Cms_Back_Publication_Family[]} */
-        const families = config.getPublicationFamilies();
+        const families = routing.getFamilies();
         /** @type {string[]} */
         const locales = tmplConfig.getAvailableLocales();
         if (families.length) {
             let base;
             try {
-                base = new URL(config.getBaseUrl() ?? '');
+                base = new URL(config.getBaseUrl() ?? (routing.isSite() ? 'http://localhost' : ''));
             } catch {
                 throw new Error('Publication requires an absolute BASE_URL without a path.');
             }
@@ -72,28 +73,41 @@ export default class Fl32_Cms_Back_Publication_Handler {
                 const scoped = unscoped.slice(unscoped.indexOf('/') + 1);
                 return ownsRoute(unscoped) || ownsRoute(scoped);
             };
-            const normalized = path.posix.normalize(decodedPath).replace(/\/+$/, '');
-            if (!ownsPath(decodedPath) && !ownsPath(normalized)) return;
+            if (routing.isEndpoint(decodedPath)) {
+                if (rawPath !== decodedPath || !config.getAgentMessageEnabled()) fail();
+                return;
+            }
+            if (routing.isStatic(decodedPath)) return;
+            const home = routing.isSite() && (decodedPath === '/' || locales.some(value => decodedPath === `/${value}/` || decodedPath === `/${value}`));
+            const normalized = home ? decodedPath : path.posix.normalize(decodedPath).replace(/\/+$/, '');
+            if (!routing.isSite() && !ownsPath(decodedPath) && !ownsPath(normalized)) return;
             if (rawPath !== decodedPath || decodedPath !== normalized) {
                 fail();
                 return;
             }
             const unscoped = rawPath.slice(1);
-            const neutral = ownsRoute(unscoped);
+            const neutral = routing.isSite() ? !locales.includes(unscoped.split('/')[0]) : ownsRoute(unscoped);
             const split = unscoped.indexOf('/');
-            const requestedLocale = neutral ? undefined : unscoped.slice(0, split);
-            const resource = neutral ? unscoped : unscoped.slice(split + 1);
+            const requestedLocale = neutral ? undefined : split < 0 ? unscoped : unscoped.slice(0, split);
+            const resource = neutral ? unscoped : split < 0 ? '' : unscoped.slice(split + 1);
             // Strip one supported representation suffix; Source still validates the logical route.
             const suffix = /\.(md|html)$/.exec(resource);
-            const route = suffix ? resource.slice(0, -suffix[0].length) : resource;
+            const route = (suffix ? resource.slice(0, -suffix[0].length) : resource) || (home ? 'index' : '');
             const html = suffix ? suffix[1] === 'html' : !neutral;
             const locale = neutral && html ? tmplConfig.getDefaultLocale() : requestedLocale;
             const family = source.getFamily(route);
-            if (!family || (locale !== undefined && !locales.includes(locale)) || (html && !locale)) {
+            // Non-publication file types continue to ordinary delivery.
+            if (!family && routing.isSite() && !suffix && /\.[A-Za-z0-9]+$/.test(resource)) return;
+            if (!family) {
                 fail();
                 return;
             }
             try {
+                if (routing.isSite() && !(await source.hasRoute({route}))) return;
+                if ((locale !== undefined && !locales.includes(locale)) || (html && !locale)) {
+                    fail();
+                    return;
+                }
                 const item = locale === undefined ? await source.readNeutral({route}) : await source.readAvailable({locale, route});
                 if (!item) {
                     fail();
@@ -118,7 +132,7 @@ export default class Fl32_Cms_Back_Publication_Handler {
                     for (const value of locales) {
                         const alternate = value === locale ? item : await source.readAvailable({locale: value, route});
                         if (alternate && (value === locale || await catalog.getPresentation({item: alternate}))) {
-                            alternateUrls[value] = new URL(`/${value}/${route}`, base).href;
+                            alternateUrls[value] = new URL(routing.getUrl({locale: value, route}), base).href;
                         }
                     }
                     const markdown = await source.readNeutral({route});
@@ -126,9 +140,9 @@ export default class Fl32_Cms_Back_Publication_Handler {
                         publication: item,
                         locale,
                         allowedLocales: locales,
-                        canonicalUrl: new URL(`/${locale}/${route}`, base).href,
+                        canonicalUrl: new URL(routing.getUrl({locale, route}), base).href,
                         alternateUrls,
-                        markdownAlternateUrl: markdown ? new URL(`/${route}`, base).href : undefined,
+                        markdownAlternateUrl: markdown ? new URL(routing.getUrl({route}), base).href : undefined,
                     };
                     const result = await render.perform({...presentation, data, options: {}});
                     if (result.resultCode !== 'SUCCESS' || typeof result.content !== 'string') {
@@ -152,6 +166,7 @@ export default class Fl32_Cms_Back_Publication_Handler {
 export const __deps__ = Object.freeze({
     default: Object.freeze({
         config: 'Fl32_Cms_Back_Config$',
+        routing: 'Fl32_Cms_Back_Publication_Routing$',
         tmplConfig: 'Fl32_Tmpl_Back_Config$',
         source: 'Fl32_Cms_Back_Publication_Source$',
         catalog: 'Fl32_Cms_Back_Publication_Catalog$',

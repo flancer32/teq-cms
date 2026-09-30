@@ -29,18 +29,24 @@ Learn more at [cms.teqfw.com](https://cms.teqfw.com).
 
 ## Markdown publications
 
-Hosts opt a route family into publication. Its prefix cannot begin with a maintained locale code, which is reserved for localized representations. Locale-specific Markdown files are the authored sources; agents maintain and translate those files directly. The URL selects the representation:
+Everything under `tmpl/web/` is public. Markdown publication spans the site by default, without route-family registration. Agents maintain unlocalized and locale-specific sources directly in Git:
 
 ```text
-/docs/foo       → canonical raw Markdown, source preference en → default
-/docs/foo.md    → neutral Markdown alias
-/en/docs/foo.md → exact English Markdown
-/en/docs/foo    → canonical English HTML
-/en/docs/foo.html → English HTML alias
-/docs/foo.html  → HTML from the exact tmpl default locale
+/about          → neutral Markdown: unlocalized → en → default
+/about.md       → neutral Markdown alias
+/en/about.md    → exact English Markdown
+/en/about       → canonical English HTML
+/en/about.html  → English HTML alias
+/about.html     → HTML from the exact maintained default locale
+/               → neutral index.md resource
+/en/            → English index.md projection
 ```
 
-The neutral Markdown resource prefers `en`, then the default locale from `@flancer32/teq-tmpl`, and returns 404 if neither source exists. English need not be the site's default human locale. Localized HTML requires the exact requested source and a readable, nonempty presentation template; unavailable projections return 404 and are omitted from HTML alternates and the sitemap. Responses include the authored front matter for Markdown and use `text/markdown; charset=utf-8` or `text/html; charset=utf-8` respectively. Localized `.md` serves the exact source; localized `.html` renders it. Neutral `.html` requires the exact maintained tmpl default locale source, without content fallback. All HTML aliases use extensionless localized canonical links; discovery omits aliases. Publication routing is independent of User-Agent and client identity; ordinary HTML template routes retain their behavior. Run `teq cms:generate` to create `robots.txt`, `llms.txt`, and `sitemap.xml` from configured publications. An optional `GET /agent/message` handler accepts agent messages into a private file inbox. See the [Markdown publication guide](docs/publications.md).
+Markdown takes priority over ordinary templates, then static files in `web/`, then 404. A found invalid source or unavailable requested representation returns 404. Static prefixes such as `/assets/` bypass templating and use only `web/assets/`; missing files return 404.
+
+The host defines static prefixes and presentation selection in code by substituting `Fl32_Cms_Back_Publication_Policy$` through DI. The default presentation is `publication.html`. Localized content is exact; presentation templates may use normal tmpl fallback. Markdown includes front matter. HTML canonical/alternate links and generated discovery omit aliases.
+
+A nonempty legacy `PUBLICATION_FAMILIES` list retains the previous selected-section mode. Run `teq cms:generate` to generate discovery files. See the [publication guide](docs/publications.md) for host policy, main-page behavior, source validation, migration, and the optional private agent inbox.
 
 ## Agent-Driven Development
 

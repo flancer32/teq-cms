@@ -14,6 +14,9 @@ import FileLoad from '../../node_modules/@flancer32/teq-tmpl/src/Back/Act/File/L
 import Locale from '../../node_modules/@flancer32/teq-tmpl/src/Back/Helper/Locale.js';
 import Load from '../../node_modules/@flancer32/teq-tmpl/src/Back/Service/Load.js';
 import Render from '../../node_modules/@flancer32/teq-tmpl/src/Back/Service/Render.js';
+import Policy from '../../src/Back/Publication/Policy.mjs';
+import Routing from '../../src/Back/Publication/Routing.mjs';
+import StaticRoute from '../../src/Back/Web/Handler/StaticRoute.mjs';
 import Source from '../../src/Back/Publication/Source.mjs';
 import Catalog from '../../src/Back/Publication/Catalog.mjs';
 import Generator from '../../src/Back/Discovery/Generator.mjs';
@@ -50,21 +53,23 @@ async function fixture({presentationLocale = 'de', defaultLocale} = {defaultLoca
         getAgentMessageEnabled: () => false,
         getBaseUrl: () => 'https://example.test',
     };
-    const source = new Source({fs, path, tmplConfig, config, parseDocument, marked});
+    const policy = new Policy({config});
+    const routing = new Routing({policy, config, tmplConfig});
+    const source = new Source({fs, path, tmplConfig, config, routing, policy, parseDocument, marked});
     const actFind = new Find({fs: fsSync, path, config: tmplConfig, log: logger, helpLocale: new Locale()});
     const actLoad = new FileLoad({fsPromises: fs, log: logger});
     const load = new Load({log: logger, actFind, actLoad});
     const dtoTarget = {create: value => value};
-    const catalog = new Catalog({fs, path, tmplConfig, config, source, dtoTarget, load});
+    const catalog = new Catalog({fs, path, tmplConfig, config, routing, source, dtoTarget, load});
     const presentationFile = path.join(root, 'tmpl/web', presentationLocale, family.presentation);
     await fs.mkdir(path.dirname(presentationFile), {recursive: true});
     await fs.writeFile(presentationFile, presentation);
     const render = new Render({log: logger, actFind, actLoad, engine: new Mustache({mustache, log: logger})});
-    const generator = new Generator({config, catalog, tmplConfig, fs, path});
+    const generator = new Generator({config, routing, catalog, tmplConfig, fs, path});
     const respond = new Respond({http2});
     const rendered = [];
     const handler = new Handler({
-        config, tmplConfig, source, catalog, respond, dtoInfo: info, STAGE, logger, path,
+        config, routing, tmplConfig, source, catalog, respond, dtoInfo: info, STAGE, logger, path,
         render: {perform: async value => {
             rendered.push(value);
             return render.perform(value);
@@ -85,7 +90,7 @@ async function fixture({presentationLocale = 'de', defaultLocale} = {defaultLoca
     });
     const plugin = new Plugin({
         pipeline, handLog: {getRegistrationInfo: () => ({name: 'log', stage: STAGE.INIT}), handle: async () => {}},
-        handStatic: staticHandler, handTmpl: templateHandler, handPublication: handler,
+        handStatic: staticHandler, handStaticRoute: new StaticRoute({routing, handStatic: staticHandler, respond, dtoInfo: info, STAGE, path}), handTmpl: templateHandler, handPublication: handler,
         handAgentMessage: {},
         dtoSource: {create: value => value}, tmplConfig, config, path,
     });

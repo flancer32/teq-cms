@@ -54,7 +54,7 @@ snapshot; each package owns its typed projection through
 TeqCMS owns only the `TEQ_CMS` namespace:
 
 - `TEQ_CMS__BASE_URL` — canonical public base URL;
-- `TEQ_CMS__PUBLICATION_FAMILIES` — explicitly enabled route families;
+- `TEQ_CMS__PUBLICATION_FAMILIES` — legacy selected-section compatibility; new host route policy belongs in code;
 - `TEQ_CMS__AGENT_MESSAGE_ENABLED` — enables the private file inbox route;
 - `TEQ_CMS__AGENT_MESSAGE_TOKEN` — optional shared contact token.
 
@@ -69,35 +69,63 @@ or template configuration setting.
 
 ## Publication contract
 
-Family prefixes cannot overlap or begin with a maintained locale code.
-Configured families expose `/{prefix}/{route}` as canonical raw Markdown and
-`/{locale}/{prefix}/{route}` as exact-locale server-rendered HTML. For example:
+Everything under `tmpl/web/` is public. Site mode is the default when the legacy
+family list is empty; it needs no family registration or environment mode key.
+Keep private files outside the public template and static trees. The host defines
+route policy in code by substituting `Fl32_Cms_Back_Publication_Policy$`:
+
+- `getMode()` returns `site` or `families`;
+- `getStaticPrefixes()` returns safe absolute prefixes ending in `/`;
+- `getPresentationName({route, locale})` selects a safe relative `.html` presentation.
+
+The default policy uses `/assets/` for static-only delivery and
+`publication.html` for presentation. `Fl32_Cms_Back_Publication_Routing$`
+validates and shares policy interpretation across Source, Catalog, HTTP, and
+discovery. Static prefixes match whole segments and bypass template lookup;
+missing files return 404. Discovery files are always static-only and the
+optional agent endpoint retains its reserved URL.
+
+Sources reside at `tmpl/web/{route}.md` or `tmpl/web/{locale}/{route}.md`.
+An unlocalized source has `locale: ''`. Neutral Markdown prefers unlocalized,
+then maintained `en`, then tmpl default. A found invalid higher-priority source
+returns 404 instead of silently selecting another language. Localized Markdown
+and HTML require exact locale sources. Neutral `.html` uses only the maintained
+default locale source. Presentation-template fallback never changes content language.
 
 ```text
-/docs/foo       → canonical raw Markdown, source preference en → default
-/docs/foo.md    → neutral Markdown alias
-/en/docs/foo.md → exact English Markdown
-/en/docs/foo    → canonical English HTML
-/en/docs/foo.html → English HTML alias
-/docs/foo.html  → HTML from the exact tmpl default locale
+/about          → canonical neutral Markdown
+/about.md       → neutral Markdown alias
+/en/about.md    → exact English Markdown
+/en/about       → canonical English HTML
+/en/about.html  → English HTML alias
+/about.html     → default-locale HTML alias
+/               → neutral index.md
+/en/            → exact English index.md HTML
 ```
 
-Read sources at `tmpl/web/{locale}/{prefix}/{route}.md`. Agents maintain locale
-variants directly; TeqCMS does not translate or call an LLM API. The neutral
-resource prefers the maintained `en` source, then tmpl's default locale, then
-404. English need not be the human default. Localized HTML returns 404 when
-its exact source or readable, nonempty presentation template is absent. Localized `.md` serves the exact valid source without a presentation. Localized `.html` renders that same source; neutral `.html` uses only the maintained tmpl default locale and returns 404 if it or its valid source is absent. HTTP removes one terminal lowercase representation suffix before strict logical-route validation; Source APIs remain extensionless. Routing is
-independent of User-Agent and client identity and preserves ordinary HTML
-routes. Markdown includes the authored front matter.
+`/index` forms are aliases of the root identity; nested `docs/index` remains
+explicit. Only supported terminal lowercase representation suffixes are removed
+at the HTTP boundary. Source APIs accept strict logical routes. Keep traversal,
+source symlink, locale, and metadata validation intact.
 
-Presentation data supplies the HTML projection's `canonicalUrl`,
-`alternateUrls` for available localized HTML, and `markdownAlternateUrl` for
-the neutral resource when available. HTML links and the sitemap share the
-presentation availability check with HTTP; neutral discovery is independent
-of presentation availability. `llms.txt` lists each neutral resource
-once; the sitemap lists available localized HTML independently. Canonical and HTML alternate links stay extensionless for every alias; discovery omits suffix aliases, neutral HTML aliases, and localized Markdown URLs. Source and
-catalog share source selection with HTTP and discovery. See the published
-[publication guide](../../docs/publications.md) for configuration and templates.
+HTTP order is Markdown, ordinary templates, then `web/` static delivery, then
+404. A wholly absent Markdown route continues to lower tiers; an authored but
+invalid or unavailable publication does not. Unlocalized `index.md` therefore
+wins over `web/index.html` for `/`. Ordinary template locale redirects remain
+applicable when no Markdown home exists.
+
+Canonical HTML links and locale alternates remain extensionless; home HTML uses
+`/{locale}/`, neutral home Markdown uses `/`. `markdownAlternateUrl` is the
+neutral canonical address when available. `llms.txt` lists each neutral resource
+once; the sitemap lists available localized HTML. Neither enumerates aliases or
+static exclusions. HTML availability shares the catalog presentation check.
+
+A nonempty legacy `PUBLICATION_FAMILIES` list selects families mode, preserving
+reserved prefixes, family presentations, and neutral `en → default` selection.
+Explicit site policy plus a nonempty legacy list is rejected. Remove the legacy
+setting to migrate to site publication; new host policy belongs in code.
+See the [publication guide](../../docs/publications.md) for the DI composition
+example, URL matrix, source rules, and main-page handling.
 
 ## Template engine boundary
 

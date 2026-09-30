@@ -8,6 +8,7 @@ import Generator from '../../../../src/Back/Discovery/Generator.mjs';
 it('writes public discovery files from the configured Markdown corpus', async () => {
     const root = await fs.mkdtemp(path.join(os.tmpdir(), 'cms-discovery-'));
     const generator = new Generator({
+        routing: {isSite: () => false, isStatic: () => false, isEndpoint: () => false, isPublicRoute: () => true, getFamilies: () => [{prefix: "notes", presentation: "page.html"}], getUrl: ({locale, route}) => locale ? `/${locale}/${route}` : `/${route}`},
         config: {getBaseUrl: () => 'https://example.test'},
         tmplConfig: {getRootPath: () => root, getAvailableLocales: () => ['ru', 'en']},
         catalog: {listNeutral: async () => [{route: 'journal/first'}, {route: 'journal/second'}], listHtml: async ({locale}) => locale === 'en'

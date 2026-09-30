@@ -12,6 +12,6 @@ configuration Sources before resolving those components.
 
 Runtime areas include configuration, web request handling, template rendering, publication discovery, and a private file inbox for optional agent messages.
 
-Optional Markdown publication is a CMS-owned area. It reads opted-in localized sources, exposes a deterministic catalog, renders human pages through the selected tmpl engine, and exposes a locale-neutral Markdown resource for each publication with an eligible source. The CLI generates static discovery files. See [publication.md](publication.md).
+Markdown publication is a CMS-owned area. By default it reads the public unlocalized and localized template tree without family registration; a host-owned DI policy defines presentation and static-only prefixes. Legacy configured families remain supported. It exposes a deterministic catalog, renders human pages through the selected tmpl engine, and exposes a locale-neutral Markdown resource for each publication with an eligible source. The CLI generates static discovery files. See [publication.md](publication.md).
 
 The standalone host currently starts through `@teqfw/cli`, and the CMS lifecycle plugin registers its handlers before `@teqfw/web` locks the pipeline.

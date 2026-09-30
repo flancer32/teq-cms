@@ -8,6 +8,7 @@ it('enumerates only opted-in Markdown files in stable route order', async () => 
     const file = name => ({name, isFile: () => true, isDirectory: () => false, isSymbolicLink: () => false});
     const directory = name => ({name, isFile: () => false, isDirectory: () => true, isSymbolicLink: () => false});
     const catalog = new Catalog({
+        routing: {isSite: () => false, isStatic: () => false, isEndpoint: () => false, isPublicRoute: () => true, getFamilies: () => [{prefix: "notes", presentation: "page.html"}], getUrl: ({locale, route}) => locale ? `/${locale}/${route}` : `/${route}`},
         fs: {realpath: async value => value, readdir: async dir => dir.endsWith('/notes')
             ? [file('z.md'), file('ignored.txt'), directory('inner'), {name: 'leak.md', isSymbolicLink: () => true}]
             : dir.endsWith('/notes/inner') ? [file('a.md')] : []},
@@ -26,6 +27,7 @@ it('deduplicates candidate routes and delegates neutral selection to Source', as
     const calls = [];
     const file = name => ({name, isFile: () => true, isDirectory: () => false, isSymbolicLink: () => false});
     const catalog = new Catalog({
+        routing: {isSite: () => false, isStatic: () => false, isEndpoint: () => false, isPublicRoute: () => true, getFamilies: () => [{prefix: "notes", presentation: "page.html"}], getUrl: ({locale, route}) => locale ? `/${locale}/${route}` : `/${route}`},
         fs: {realpath: async value => value, readdir: async dir => dir.endsWith('/en/notes')
             ? [file('shared.md')] : [file('shared.md'), file('default.md')]},
         path,
@@ -47,6 +49,7 @@ it('checks presentation loading and filters HTML without changing source enumera
     let result = {resultCode: 'SUCCESS', template: '<article>Page</article>'};
     const targets = [];
     const catalog = new Catalog({
+        routing: {isSite: () => false, isStatic: () => false, isEndpoint: () => false, isPublicRoute: () => true, getFamilies: () => [{prefix: "notes", presentation: "page.html"}], getUrl: ({locale, route}) => locale ? `/${locale}/${route}` : `/${route}`},
         fs: {realpath: async value => value, readdir: async () => [
             {name: 'a.md', isFile: () => true, isDirectory: () => false, isSymbolicLink: () => false},
         ]},

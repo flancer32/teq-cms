@@ -69,7 +69,7 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
                         }
                     );
 
-                    if (!hasLocale) {
+                    if (!hasLocale && (typedTarget.locales.user || tmplConfig.getDefaultLocale())) {
                         // TODO: move this code to TeqFw_Web_Back_Helper_Respond
                         const loc = typedTarget.locales.user ?? tmplConfig.getDefaultLocale();
                         const newLoc = url.startsWith('/') ? `/${loc}${url}` : `/${loc}/${url}`;

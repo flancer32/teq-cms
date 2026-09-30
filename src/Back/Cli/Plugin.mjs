@@ -10,6 +10,7 @@ export default class Fl32_Cms_Back_Cli_Plugin {
      * @param {TeqFw_Web_Back_PipelineEngine} deps.pipeline
      * @param {TeqFw_Web_Back_Handler_Pre_Log} deps.handLog
      * @param {TeqFw_Web_Back_Handler_Static} deps.handStatic
+     * @param {Fl32_Cms_Back_Web_Handler_StaticRoute} deps.handStaticRoute
      * @param {Fl32_Cms_Back_Web_Handler_Template} deps.handTmpl
      * @param {Fl32_Cms_Back_Publication_Handler} deps.handPublication
      * @param {Fl32_Cms_Back_Web_Handler_AgentMessage} deps.handAgentMessage
@@ -18,7 +19,7 @@ export default class Fl32_Cms_Back_Cli_Plugin {
      * @param {Fl32_Cms_Back_Config} deps.config
      * @param {typeof import('node:path')} deps.path
      */
-    constructor({pipeline, handLog, handStatic, handTmpl, handPublication, handAgentMessage, dtoSource, tmplConfig, config, path}) {
+    constructor({pipeline, handLog, handStatic, handStaticRoute, handTmpl, handPublication, handAgentMessage, dtoSource, tmplConfig, config, path}) {
         /**
          * Registers CMS handlers before the web command starts.
          *
@@ -35,7 +36,8 @@ export default class Fl32_Cms_Back_Cli_Plugin {
             pipeline.addHandler(handLog);
             pipeline.addHandler(handStatic);
             pipeline.addHandler(handTmpl);
-            if (config.getPublicationFamilies().length) pipeline.addHandler(handPublication);
+            pipeline.addHandler(handStaticRoute);
+            pipeline.addHandler(handPublication);
             if (config.getAgentMessageEnabled()) pipeline.addHandler(handAgentMessage);
         };
 
@@ -53,6 +55,7 @@ export const __deps__ = Object.freeze({
         pipeline: 'TeqFw_Web_Back_PipelineEngine$',
         handLog: 'TeqFw_Web_Back_Handler_Pre_Log$',
         handStatic: 'TeqFw_Web_Back_Handler_Static$',
+        handStaticRoute: 'Fl32_Cms_Back_Web_Handler_StaticRoute$',
         handTmpl: 'Fl32_Cms_Back_Web_Handler_Template$',
         handPublication: 'Fl32_Cms_Back_Publication_Handler$',
         handAgentMessage: 'Fl32_Cms_Back_Web_Handler_AgentMessage$',

@@ -37,3 +37,9 @@ Each publication family uses a configured presentation template. TeqCMS supplies
 ## Publication Resource and Locale
 
 Locale and representation are independent concerns. Explicit locale variants remain authored sources; localized HTML is a projection of the publication resource. The neutral Markdown resource follows the source preference defined in [the product model](../product/overview.md), using existing tmpl locale configuration. Explicit `.md` and `.html` suffixes select representations at the HTTP boundary while preserving extensionless canonical addresses and discovery. Neutral HTML uses the exact maintained tmpl default locale, independently of neutral Markdown source preference. This keeps publication policy in TeqCMS without a separate language policy for agents or a translation service.
+
+## Site Publication Policy
+
+The public template tree defines the site corpus. Family registration is no longer required in the default mode. Route and presentation decisions belong to host code through the replaceable publication Policy contract. Deployment configuration retains base URL and private-contact settings; the old family list is retained only for compatibility.
+
+Markdown precedes ordinary templates and static files. Static policy prefixes bypass all templating, while a found invalid Markdown source returns 404. Unlocalized `index.md` owns the neutral home address. Routing owns canonical identity shared by HTTP and discovery, including root index aliases.

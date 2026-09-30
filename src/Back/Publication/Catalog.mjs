@@ -2,7 +2,7 @@
 
 /**
  * @namespace Fl32_Cms_Back_Publication_Catalog
- * @description Deterministic catalog of opted-in Markdown publications.
+ * @description Deterministic catalog of public Markdown publications.
  */
 export default class Fl32_Cms_Back_Publication_Catalog {
     /**
@@ -10,12 +10,12 @@ export default class Fl32_Cms_Back_Publication_Catalog {
      * @param {typeof import('node:fs/promises')} deps.fs
      * @param {typeof import('node:path')} deps.path
      * @param {Fl32_Tmpl_Back_Config} deps.tmplConfig
-     * @param {Fl32_Cms_Back_Config} deps.config
+     * @param {Fl32_Cms_Back_Publication_Routing} deps.routing
      * @param {Fl32_Cms_Back_Publication_Source} deps.source
      * @param {Fl32_Tmpl_Back_Dto_Target} deps.dtoTarget
      * @param {Fl32_Tmpl_Back_Service_Load} deps.load
      */
-    constructor({fs, path, tmplConfig, config, source, dtoTarget, load}) {
+    constructor({fs, path, tmplConfig, routing, source, dtoTarget, load}) {
         const root = path.resolve(tmplConfig.getRootPath(), 'tmpl', 'web');
 
         /**
@@ -57,7 +57,7 @@ export default class Fl32_Cms_Back_Publication_Catalog {
          */
         this.listNeutral = async () => {
             const routes = new Set();
-            for (const locale of tmplConfig.getAvailableLocales()) {
+            for (const locale of [...(routing.isSite() ? [''] : []), ...tmplConfig.getAvailableLocales()]) {
                 for (const item of await this.list({locale})) routes.add(item.route);
             }
             /** @type {Fl32_Cms_Back_Publication_Item[]} */
@@ -70,13 +70,13 @@ export default class Fl32_Cms_Back_Publication_Catalog {
         };
 
         /**
-         * Enumerate a locale's opted-in publications with validated metadata.
+         * Enumerate a source locale's public publications with validated metadata.
          * @param {object} deps
          * @param {string} deps.locale
          * @returns {Promise<Fl32_Cms_Back_Publication_Item[]>}
          */
         this.list = async ({locale}) => {
-            if (!/^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{2,8})*$/.test(locale) ||
+            if (locale === '' ? !routing.isSite() : !/^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{2,8})*$/.test(locale) ||
                 !tmplConfig.getAvailableLocales().includes(locale)) throw new Error('Invalid publication locale.');
             let realLocale;
             try {
@@ -89,7 +89,7 @@ export default class Fl32_Cms_Back_Publication_Catalog {
             }
             /** @type {Fl32_Cms_Back_Publication_Item[]} */
             const publications = [];
-            for (const family of config.getPublicationFamilies()) {
+            for (const family of routing.getFamilies()) {
                 const directory = path.join(root, locale, family.prefix);
                 let realDirectory;
                 try {
@@ -113,10 +113,12 @@ export default class Fl32_Cms_Back_Publication_Catalog {
                     for (const entry of entries) {
                         if (entry.isSymbolicLink()) continue;
                         const file = path.join(dir, entry.name);
-                        if (entry.isDirectory() && /^[A-Za-z0-9_-]+$/.test(entry.name)) {
+                        if (entry.isDirectory() && /^[A-Za-z0-9_-]+$/.test(entry.name) &&
+                            !(locale === '' && dir === root && tmplConfig.getAvailableLocales().includes(entry.name))) {
                             await scan(file);
                         } else if (entry.isFile() && /^[A-Za-z0-9_-]+\.md$/.test(entry.name)) {
                             const route = path.relative(realLocale, file).replaceAll(path.sep, '/').slice(0, -3);
+                            if (!routing.isPublicRoute(route)) continue;
                             const publication = await source.readAvailable({locale, route});
                             if (publication) publications.push(publication);
                         }
@@ -134,7 +136,7 @@ export const __deps__ = Object.freeze({
         fs: 'node:fs/promises',
         path: 'node:path',
         tmplConfig: 'Fl32_Tmpl_Back_Config$',
-        config: 'Fl32_Cms_Back_Config$',
+        routing: 'Fl32_Cms_Back_Publication_Routing$',
         source: 'Fl32_Cms_Back_Publication_Source$',
         dtoTarget: 'Fl32_Tmpl_Back_Dto_Target$',
         load: 'Fl32_Tmpl_Back_Service_Load$',

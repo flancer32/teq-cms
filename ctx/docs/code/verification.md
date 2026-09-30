@@ -15,4 +15,4 @@ The current project checks are:
 - `teqfw-platform .` — source-to-unit-test topology validation.
 - `adsm-ctx validate .` — cognitive-context structure validation.
 
-Publication and agent-message acceptance tests exercise the CMS plugin with the real web pipeline. Generator unit tests verify discovery output and refusal to replace symlink targets. A local `web:start` smoke check can verify the CLI host, template engine, static delivery, and HTTP content types when sockets are available.
+Site-publication tests exercise real tmpl rendering, the ordinary template adapter, static-file delivery, host policy, root priority, and HTTP/discovery agreement. CLI tests verify host DI substitution as well as legacy-family generation. Publication and agent-message acceptance tests exercise the CMS plugin with the real web pipeline. Generator unit tests verify discovery output and refusal to replace symlink targets. A local `web:start` smoke check can verify the CLI host, template engine, static delivery, and HTTP content types when sockets are available.

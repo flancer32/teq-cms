@@ -6,6 +6,7 @@ import path from 'node:path';
 it('blocks invalid locales and unsafe logical routes before source or template access', async () => {
     const calls = [];
     const handler = new Handler({
+        routing: {isSite: () => false, isStatic: () => false, isEndpoint: () => false, isPublicRoute: () => true, getFamilies: () => [{prefix: "notes", presentation: "page.html"}], getUrl: ({locale, route}) => locale ? `/${locale}/${route}` : `/${route}`},
         config: {
             getPublicationFamilies: () => [{prefix: 'notes', presentation: 'page.html'}],
             getBaseUrl: () => 'https://example.test',

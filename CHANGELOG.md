@@ -1,5 +1,25 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Publish root-level and nested Markdown across the public `tmpl/web/` tree by default without family registration (issue #31).
+- Add a replaceable host DI policy for publication mode, presentation names, and static-only URL prefixes; keep deployment settings separate from route policy.
+- Support unlocalized neutral sources and root index publication with canonical `/` and localized `/{locale}/` links.
+
+### Changed
+
+- Use Markdown, ordinary templates, then `web/` static files, then 404; found invalid Markdown does not fall through to legacy HTML.
+- Deliver static exclusions and discovery files directly through the standard web static handler, terminating missing files with 404.
+- Retain nonempty `PUBLICATION_FAMILIES` as legacy compatibility mode; reject explicit site policy combined with legacy families.
+- Extend ordinary template-name lookup to requested, default, and unlocalized template trees.
+- Update context, usage documentation, and consumer skill with host policy composition and migration guidance.
+
+### Verification
+
+- Cover site-wide URL forms, exact sources, root priority, host-selected presentations, static exclusions, safety, canonical discovery, and real CLI DI policy substitution.
+
 ## [0.9.1] - 2026-09-30
 
 ### Fixed

@@ -8,12 +8,13 @@ export default class Generator {
     /**
      * @param {object} deps
      * @param {Fl32_Cms_Back_Config} deps.config
+     * @param {Fl32_Cms_Back_Publication_Routing} deps.routing
      * @param {Fl32_Cms_Back_Publication_Catalog} deps.catalog
      * @param {Fl32_Tmpl_Back_Config} deps.tmplConfig
      * @param {typeof import('node:fs/promises')} deps.fs
      * @param {typeof import('node:path')} deps.path
      */
-    constructor({config, catalog, tmplConfig, fs, path}) {
+    constructor({config, routing, catalog, tmplConfig, fs, path}) {
         /**
          * @returns {Promise<Fl32_Cms_Back_Discovery_Files>}
          */
@@ -33,11 +34,11 @@ export default class Generator {
             for (const locale of locales) {
                 const items = await catalog.listHtml({locale});
                 for (const item of items) {
-                    htmlUrls.push(new URL(`/${locale}/${item.route}`, base).href);
+                    htmlUrls.push(new URL(routing.getUrl({locale, route: item.route}), base).href);
                 }
             }
             for (const item of await catalog.listNeutral()) {
-                markdownUrls.push(new URL(`/${item.route}`, base).href);
+                markdownUrls.push(new URL(routing.getUrl({route: item.route}), base).href);
             }
             htmlUrls.sort();
             markdownUrls.sort();
@@ -101,6 +102,7 @@ export default class Generator {
 export const __deps__ = Object.freeze({
     default: Object.freeze({
         config: 'Fl32_Cms_Back_Config$',
+        routing: 'Fl32_Cms_Back_Publication_Routing$',
         catalog: 'Fl32_Cms_Back_Publication_Catalog$',
         tmplConfig: 'Fl32_Tmpl_Back_Config$',
         fs: 'node:fs/promises',
