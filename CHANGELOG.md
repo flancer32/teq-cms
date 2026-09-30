@@ -1,14 +1,26 @@
 # Changelog
 
-## Unreleased
+## [0.9.0] - 2026-09-30
+
+### Changed
+
+- Changed publication URLs: `/{prefix}/{route}` serves raw Markdown, preferring `en` then the tmpl default locale; localized URLs serve exact-locale HTML.
+- Removed `TEQ_CMS__PUBLICATION_MACHINE_LOCALES` and its configuration accessor. Hosts must replace localized Markdown links with neutral resource links and regenerate discovery files.
+- Discovery now lists neutral resources once in `llms.txt` and available localized HTML in the sitemap; presentation links describe only available representations.
+- Agents maintain translated source files directly. TeqCMS has no translation command or LLM API integration.
+- Clarified the product mission throughout the cognitive context, README, publication guide, consumer skill, and npm description: agents work directly with version-controlled Markdown as primary content, while human-facing HTML is its derived presentation.
+
+### Fixed
 
 - Reject publication prefixes starting with maintained locale codes to prevent URL collisions.
 - Share presentation-template availability between HTTP, HTML alternates, and the sitemap; missing or empty templates leave neutral Markdown available.
+- Treat unreadable or malformed public source variants as unavailable, preserving neutral source fallback and omitting invalid variants from discovery.
+- Reject source symlink aliases and paths outside the configured source tree.
+- Align process-host documentation with CLI-owned configuration Sources and application-root resolution.
 
-- Changed publication URLs: `/{prefix}/{route}` serves raw Markdown, preferring `en` then the tmpl default locale; localized URLs serve exact-locale HTML.
-- Removed the publication locale selector and its configuration accessor. Hosts must replace localized Markdown links with neutral resource links and regenerate discovery files.
-- Discovery now lists neutral resources once in `llms.txt` and available localized HTML in the sitemap; presentation links describe only available representations.
-- Agents maintain translated source files directly. TeqCMS has no translation command or LLM API integration.
+### Verification
+
+- Expand regression coverage for neutral source preference, unavailable variants, presentation fallback, discovery consistency, reserved locale prefixes, and the real CLI host path.
 
 ## [0.8.0] - 2026-09-26
 
