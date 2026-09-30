@@ -137,6 +137,29 @@ setting to migrate to site publication; new host policy belongs in code.
 See the [publication guide](../../docs/publications.md) for the DI composition
 example, URL matrix, source rules, and main-page handling.
 
+## Error responses
+
+CMS registers `Fl32_Cms_Back_Web_Handler_NotFound` after normal PROCESS handlers,
+including the actual static handler. Additional host handlers must declare
+`before: ['Fl32_Cms_Back_Web_Handler_NotFound']` and register before locking.
+Explicit publication/static 404 outcomes use `Fl32_Cms_Back_Web_Error_Respond$`;
+unavailable publications never continue into successful template/static fallback.
+
+Optional host templates use `tmpl/web/{locale}/404.html`, with tmpl default/shared
+fallback and the host-selected engine. Error language is URL locale then default,
+not Accept-Language. Replace `Fl32_Cms_Back_Web_Error_Policy$` and implement
+`getTemplateName({status, locale, path})` for safe section-specific `.html` names.
+No per-template environment settings or required startup templates are introduced.
+
+Branded GET/HEAD page errors retain HTTP 404 at the original URL; Markdown, API,
+reserved endpoint and static misses retain non-HTML representations. Errors send
+no-store and noindex headers; HEAD has no body. Templates receive only safe error
+status/title, statusCode, locale and allowedLocales, without publication links or
+request/configuration data. Missing/empty/unreadable/failing templates yield a
+nonrecursive plain 404. Completed and closed responses are untouched. Error HTML
+is outside the Markdown catalog/discovery. Generic pipeline 500 handling is unchanged.
+See [custom 404 pages](../../docs/errors.md) for the complete consumer contract.
+
 ## Template engine boundary
 
 The host application chooses the concrete template engine. The tmpl package

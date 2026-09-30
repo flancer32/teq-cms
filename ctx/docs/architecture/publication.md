@@ -70,6 +70,14 @@ The family presentation template receives publication data (source, metadata, Ma
 
 The HTTP handler removes exactly one terminal lowercase `.md` or `.html` suffix before validating the logical route. Source APIs continue to accept only extensionless logical routes. Other extensions, chained suffixes, encoded paths, traversal, repeated separators, and trailing separators remain unavailable; an alias cannot expose arbitrary files.
 
+## Missing Resources
+
+Explicit publication failures use the shared CMS [error response contract](errors.md),
+keeping status 404 and the selected error representation without ordinary delivery
+fallback. Error presentation may fall back to another template locale; this never
+substitutes publication content. Error templates are HTML presentations, not catalog
+sources or discovery resources.
+
 ## Discovery
 
 The finite `cms:generate` command writes `robots.txt`, `llms.txt`, and `sitemap.xml` into the host's `web/` directory. Discovery uses only public, valid publications from the policy-selected corpus; regeneration is required after source changes.

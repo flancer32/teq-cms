@@ -44,3 +44,8 @@ The primary audience is agents building and maintaining websites, followed by de
 ## Reading Angle
 
 Read `product/overview.md`, then `architecture/overview.md`, `environment/dependencies.md`, and `code/verification.md`.
+
+404 delivery is owned by the shared CMS error service and terminal PROCESS handler.
+Host `tmpl/web/{locale}/404.html` is optional; errors use URL locale then default,
+not publication Accept-Language selection. Read [error responses](architecture/errors.md)
+before changing error routing, host policy, representation or cache behavior.

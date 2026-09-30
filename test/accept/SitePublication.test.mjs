@@ -1,3 +1,6 @@
+import ErrorPolicy from '../../src/Back/Web/Error/Policy.mjs';
+import ErrorRespond from '../../src/Back/Web/Error/Respond.mjs';
+import NotFound from '../../src/Back/Web/Handler/NotFound.mjs';
 import {it} from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -76,8 +79,10 @@ async function fixture(options = {}) {
     const dtoTarget = {create: value => value};
     const catalog = new Catalog({config, routing, tmplConfig, source, fs, path, dtoTarget, load});
     const respond = new Respond({http2});
+    const errors = new ErrorRespond({policy: new ErrorPolicy(), routing, representation: new Representation(), tmplConfig, render, respond, logger});
+    const handNotFound = new NotFound({errors, dtoInfo: dtoInfo, STAGE});
     const rendered = [];
-    const handPublication = new Publication({config, routing, helpWeb: new Web({http2, tmplConfig}), representation: new Representation(), tmplConfig, source, catalog, respond, dtoInfo, STAGE, logger, path,
+    const handPublication = new Publication({config, routing, helpWeb: new Web({http2, tmplConfig}), representation: new Representation(), tmplConfig, source, catalog, respond, errors, dtoInfo, STAGE, logger, path,
         render: {perform: async params => { rendered.push(params); return render.perform(params); }}});
     const handStatic = new Static({registry: new Registry({configFactory: new StaticConfig({path}), logger}),
         fileService: new FileService({fs: fsSync, http2, path, logger, helpMime: new Mime(), resolver: new Resolver({path}), fallback: new Fallback({fs: fsSync, path})}),
@@ -90,8 +95,8 @@ async function fixture(options = {}) {
     const accepted = [];
     const handAgentMessage = new AgentMessage({config, inbox: {accept: async record => accepted.push(record)}, dtoInfo, STAGE, logger});
     const pipeline = new Pipeline({dtoRequestContextFactory: {create: () => ({})}, logger, respond, helpOrder: new Kahn(), STAGE});
-    const plugin = new Plugin({pipeline, config, tmplConfig, path, dtoSource: {create: value => value}, handStatic, handTmpl, handPublication,
-        handStaticRoute: new StaticRoute({routing, handStatic, respond, dtoInfo, STAGE, path}), handAgentMessage,
+    const plugin = new Plugin({handNotFound,pipeline, config, tmplConfig, path, dtoSource: {create: value => value}, handStatic, handTmpl, handPublication,
+        handStaticRoute: new StaticRoute({routing, handStatic, respond, errors, dtoInfo, STAGE, path}), handAgentMessage,
         handLog: {getRegistrationInfo: () => ({name: 'log', stage: STAGE.INIT}), handle: async () => {}}});
     await plugin.onStartup();
     pipeline.lockHandlers();
@@ -365,4 +370,36 @@ it('selects human publication language from URL, then Accept-Language, then defa
             assert.equal((await app.send('/', {...browser, 'accept-language': 'ru'})).status, 404);
         } finally { await fs.rm(app.root, {recursive: true, force: true}); }
     }
+});
+
+it('shares branded 404 delivery for terminal, invalid publication and static misses without discovery entries', async () => {
+    const app = await fixture({defaultLocale: 'en'});
+    try {
+        await app.write('tmpl/web/en/publication.html', presentation);
+        for (const locale of ['en', 'ru']) await app.write(`tmpl/web/${locale}/404.html`,
+            `<h1>${locale} 404</h1>{{#canonicalUrl}}CANONICAL{{/canonicalUrl}}{{#publication}}PUBLICATION{{/publication}}`);
+        for (const [url, expected] of [['/en/missing', 'en'], ['/ru/missing', 'ru'], ['/missing', 'en']]) {
+            const res = await app.send(url, {'accept-language': 'ru', accept: 'text/html'});
+            assert.equal(res.status, 404);
+            assert.equal(res.body, `<h1>${expected} 404</h1>`);
+            assert.equal(res.headers['cache-control'], 'no-store');
+            assert.equal(res.headers.location, undefined);
+        }
+        await app.write('tmpl/web/ru/broken.md', 'invalid front matter');
+        await app.write('web/ru/broken.html', 'UNSAFE SUCCESS');
+        assert.equal((await app.send('/ru/broken.html')).body, '<h1>ru 404</h1>');
+        assert.equal((await app.send('/ru/broken.md')).headers['content-type'], 'text/markdown; charset=utf-8');
+        assert.equal((await app.send('/assets/missing.html')).body, 'Not Found');
+        assert.equal((await app.send('/robots.txt')).body, 'Not Found');
+        assert.equal((await app.send('/agent/message/')).status, 404);
+        await app.write('tmpl/web/en/ok.md', text('Success'));
+        assert.equal((await app.send('/en/ok.html')).status, 200);
+        const files = await app.generator.build();
+        assert.doesNotMatch(files.sitemap + files.llms, /404/);
+        await fs.rm(path.join(app.root, 'tmpl/web/ru/404.html'));
+        assert.equal((await app.send('/ru/missing.html')).body, '<h1>en 404</h1>');
+        await fs.rm(path.join(app.root, 'tmpl/web/en/404.html'));
+        await app.write('tmpl/web/404.html', '<h1>Shared 404</h1>');
+        assert.equal((await app.send('/ru/missing.html')).body, '<h1>Shared 404</h1>');
+    } finally { await fs.rm(app.root, {recursive: true, force: true}); }
 });

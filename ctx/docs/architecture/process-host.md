@@ -31,7 +31,7 @@ TeqCMS must not import `@teqfw/cli/src/**` or invoke an internal launcher path f
 ## Configuration Lifecycle
 
 The CLI host supplies and loads configuration Sources once before resolving lifecycle plugins and commands. The standalone CMS configurator declares DI preprocessors and does not provide configuration Sources. The CMS CLI
-plugin then registers the agent-message, publication, static, and template handlers before `web:start`
+plugin then registers the agent-message, publication, static, template, and terminal 404 handlers before `web:start`
 locks the pipeline. Typed package configuration components read their own
 namespaces through `TeqFw_Cfg_Reader$`.
 

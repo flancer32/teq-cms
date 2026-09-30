@@ -10,12 +10,13 @@ export default class StaticRoute {
      * @param {object} deps
      * @param {Fl32_Cms_Back_Publication_Routing} deps.routing
      * @param {TeqFw_Web_Back_Handler_Static} deps.handStatic
+     * @param {Fl32_Cms_Back_Web_Error_Respond} deps.errors
      * @param {TeqFw_Web_Back_Helper_Respond} deps.respond
      * @param {TeqFw_Web_Back_Dto_Info__Factory} deps.dtoInfo
      * @param {TeqFw_Web_Back_Enum_Stage} deps.STAGE
      * @param {typeof import('node:path')} deps.path
      */
-    constructor({routing, handStatic, respond, dtoInfo, STAGE, path}) {
+    constructor({routing, handStatic, respond, errors, dtoInfo, STAGE, path}) {
         const info = dtoInfo.create({name: 'Fl32_Cms_Back_Web_Handler_StaticRoute', stage: STAGE.PROCESS,
             before: ['Fl32_Cms_Back_Publication_Handler', 'Fl32_Cms_Back_Web_Handler_Template', 'TeqFw_Web_Back_Handler_Static']});
         /** @returns {object} */
@@ -31,8 +32,7 @@ export default class StaticRoute {
             if (!routing.isStatic(decoded) && !routing.isStatic(normalized)) return;
             if (raw === decoded && decoded === normalized) await handStatic.handle(context);
             if (!context.completed) {
-                respond.code404_NotFound({res: context.response});
-                context.completed = true;
+                await errors.send({context, kind: 'static'});
             }
         };
     }
@@ -43,6 +43,7 @@ export const __deps__ = Object.freeze({
         routing: 'Fl32_Cms_Back_Publication_Routing$',
         handStatic: 'TeqFw_Web_Back_Handler_Static$',
         respond: 'TeqFw_Web_Back_Helper_Respond$',
+        errors: 'Fl32_Cms_Back_Web_Error_Respond$',
         dtoInfo: 'TeqFw_Web_Back_Dto_Info__Factory$',
         STAGE: 'TeqFw_Web_Back_Enum_Stage$',
         path: 'node:path',

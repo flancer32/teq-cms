@@ -18,6 +18,7 @@ it('blocks invalid locales and unsafe logical routes before source or template a
         source: {getFamily: route => /^[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*$/.test(route) ? {prefix: 'notes', presentation: 'page.html'} : undefined, readAvailable: async () => { calls.push('read'); }},
         catalog: {getPresentation: async () => { calls.push('presentation'); return null; }},
         render: {perform: async () => { calls.push('render'); return {resultCode: 'SUCCESS', content: ''}; }},
+        errors: {send: async ({context}) => { context.response.status = 404; context.completed = true; }},
         respond: {
             isWritable: () => true,
             code404_NotFound: ({res}) => { res.status = 404; },

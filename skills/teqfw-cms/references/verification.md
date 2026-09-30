@@ -7,6 +7,7 @@ changes crossing package boundaries.
 
 ```text
 npm test
+npm run typecheck
 teqfw-esm-validator src --profile base
 git diff --check
 npm pack --dry-run
@@ -19,8 +20,11 @@ the validator target remains `src/`.
 
 Start the application through the package script or the local CLI executable,
 then request `/` and a localized page such as `/en/index.html`. Confirm that
-the root redirects to the default locale, the localized response is successful,
-and the rendered page contains the expected locale links.
+the root follows the host source hierarchy (Markdown, ordinary template, static,
+404), the localized response is successful, and the page contains expected locale
+links. Test unknown localized and neutral URLs with the optional host 404 templates,
+explicit Markdown and static misses, HEAD, and missing/broken error templates.
+The real CLI HTTP acceptance test requires permission to bind a loopback socket.
 
 When validating template-root behavior, omit `TEQFW_TMPL__ROOT_PATH`: the
 application root must come from `TeqFw_Cli_Config$.applicationRoot`.

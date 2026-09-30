@@ -1,3 +1,6 @@
+import ErrorPolicy from '../../src/Back/Web/Error/Policy.mjs';
+import ErrorRespond from '../../src/Back/Web/Error/Respond.mjs';
+import NotFound from '../../src/Back/Web/Handler/NotFound.mjs';
 import Web from '../../src/Back/Helper/Web.mjs';
 import {describe, it} from 'node:test';
 import assert from 'node:assert/strict';
@@ -69,9 +72,11 @@ async function fixture({presentationLocale = 'de', defaultLocale} = {defaultLoca
     const render = new Render({log: logger, actFind, actLoad, engine: new Mustache({mustache, log: logger})});
     const generator = new Generator({config, routing, catalog, tmplConfig, fs, path});
     const respond = new Respond({http2});
+    const errors = new ErrorRespond({policy: new ErrorPolicy(), routing, representation: new Representation(), tmplConfig, render, respond, logger});
+    const handNotFound = new NotFound({errors, dtoInfo: info, STAGE});
     const rendered = [];
     const handler = new Handler({
-        config, routing, helpWeb: new Web({http2, tmplConfig}), representation: new Representation(), tmplConfig, source, catalog, respond, dtoInfo: info, STAGE, logger, path,
+        config, routing, helpWeb: new Web({http2, tmplConfig}), representation: new Representation(), tmplConfig, source, catalog, respond, errors, dtoInfo: info, STAGE, logger, path,
         render: {perform: async value => {
             rendered.push(value);
             return render.perform(value);
@@ -90,9 +95,9 @@ async function fixture({presentationLocale = 'de', defaultLocale} = {defaultLoca
     const pipeline = new Pipeline({
         dtoRequestContextFactory: {create: () => ({})}, logger, respond, helpOrder: new Kahn(), STAGE,
     });
-    const plugin = new Plugin({
+    const plugin = new Plugin({handNotFound,
         pipeline, handLog: {getRegistrationInfo: () => ({name: 'log', stage: STAGE.INIT}), handle: async () => {}},
-        handStatic: staticHandler, handStaticRoute: new StaticRoute({routing, handStatic: staticHandler, respond, dtoInfo: info, STAGE, path}), handTmpl: templateHandler, handPublication: handler,
+        handStatic: staticHandler, handStaticRoute: new StaticRoute({routing, handStatic: staticHandler, respond, errors, dtoInfo: info, STAGE, path}), handTmpl: templateHandler, handPublication: handler,
         handAgentMessage: {},
         dtoSource: {create: value => value}, tmplConfig, config, path,
     });

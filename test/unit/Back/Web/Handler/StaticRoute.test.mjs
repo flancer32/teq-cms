@@ -8,6 +8,7 @@ it('terminates static exclusions without template fallback and rejects encoded o
     const handler = new StaticRoute({
         routing: {isEndpoint: () => false, isStatic: value => value.startsWith('/assets/')},
         handStatic: {handle: async context => { calls.push(context.request.url); }},
+        errors: {send: async ({context}) => { context.response.status = 404; context.completed = true; }},
         respond: {isWritable: () => true, code404_NotFound: ({res}) => { res.status = 404; }},
         dtoInfo: {create: value => value}, STAGE: {PROCESS: 'PROCESS'}, path,
     });

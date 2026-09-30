@@ -21,6 +21,7 @@ Content and locale variants remain transparent, reproducible, and version-contro
 - Generate `robots.txt`, `llms.txt`, and `sitemap.xml` from the maintained publication corpus through CLI commands where the source data allows it.
 - Provide a standard GET request path for an agent to send a bounded message to the site owner.
 - Integrate with a host Node.js application.
+- Present missing human pages through optional host-owned localized templates while preserving HTTP 404 and non-HTML errors for agents, endpoints, and static resources.
 
 ## Product Model
 

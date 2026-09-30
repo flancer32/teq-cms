@@ -74,3 +74,5 @@ Each TeqFW package is both a practical software component and a working demonstr
 ## License
 
 Apache-2.0 © Alex Gusev — [https://github.com/flancer64](https://github.com/flancer64)
+
+See [custom 404 pages](docs/errors.md) for localized host templates, error representations, cache policy, and terminal-handler ordering.

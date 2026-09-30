@@ -4,6 +4,10 @@
 
 ### Added
 
+- Shared CMS 404 responses and a terminal PROCESS handler, with optional localized
+  host `404.html` templates, a replaceable DI presentation policy, safe template data,
+  non-HTML Markdown/API/static errors, HEAD support, and no-store/noindex headers.
+- Real CLI HTTP coverage and consumer guidance for branded missing pages.
 - Publish root-level and nested Markdown across the public `tmpl/web/` tree by default without family registration (issue #31).
 - Add a replaceable host DI policy for publication mode, presentation names, and static-only URL prefixes; keep deployment settings separate from route policy.
 - Support unlocalized neutral sources and root index publication with canonical `/` and localized `/{locale}/` links.

@@ -14,12 +14,13 @@ host.
 - `bootstrap/di-config.mjs` is the standalone host's pre-DI composition
   boundary. It is dynamically imported before DI and therefore cannot use DI.
 - `Fl32_Cms_Back_Cli_Plugin` participates in lifecycle startup and registers
-  the CMS static, logging, and template handlers in the web pipeline.
+  CMS logging, publication, template, static, optional agent handlers, and a
+  terminal 404 handler in the web pipeline.
 - `@teqfw/web` owns the long-running `web:start` command.
 - TeqCMS owns the finite `cms:generate` command and publication discovery.
 - `@flancer32/teq-tmpl` owns localized template configuration, target and
   rendering contracts, and the available engine implementations.
-- Site-wide Markdown publication is CMS-owned and is enabled by default without family registration. The host substitutes `Fl32_Cms_Back_Publication_Policy$` to select presentation names and static-only prefixes in code. Routing, Source, Catalog, HTTP, and discovery share that policy. Neutral sources prefer unlocalized, then maintained `en`, then tmpl default; localized representations require exact sources. Markdown source selection precedes templates and static files, while static exclusions bypass templates. Source priority does not select response format: explicit `.md`/`.html` overrides headers; extensionless URLs use `Accept`, then `User-Agent` hints, defaulting to HTML. Neutral extensionless HTML and Markdown share source selection; explicit neutral `.html` uses the default locale. Markdown discovery and alternate links use explicit `.md`. Root `index` has canonical `/` and localized `/{locale}/` addresses. Nonempty legacy families retain their previous semantics. See the publication guide for source eligibility, alias rules, and migration.
+- Site-wide Markdown publication is CMS-owned and is enabled by default without family registration. The host substitutes `Fl32_Cms_Back_Publication_Policy$` to select presentation names and static-only prefixes in code. Routing, Source, Catalog, HTTP, and discovery share that policy. Neutral sources prefer unlocalized, then maintained `en`, then tmpl default; localized representations require exact sources. Markdown source selection precedes templates and static files, while static exclusions bypass templates. Source priority does not select response format: explicit `.md`/`.html` overrides headers; extensionless URLs use `Accept`, then `User-Agent` hints, defaulting to HTML. HTML language uses URL locale, supported Accept-Language, then tmpl default, including neutral `.html`. Neutral HTML prefers an authored unlocalized source, otherwise the exact selected locale. Neutral Markdown retains its independent source preference. Markdown discovery and alternate links use explicit `.md`. Root `index` has canonical `/` and localized `/{locale}/` addresses. Nonempty legacy families retain their previous semantics. See the publication guide for source eligibility, alias rules, and migration.
 
 ## Composition rules
 
@@ -37,3 +38,9 @@ another mapping that implements the same contract.
 The application root is supplied as the CLI runtime value
 `TeqFw_Cli_Config$.applicationRoot`. It is not a CMS setting and should not be
 replaced with a `TEQ_CMS` or `TEQFW_TMPL` root-path key.
+
+CMS shared 404 presentation uses optional host `404.html` templates through tmpl.
+Error language uses URL locale then default, with normal default/shared template
+fallback. Errors preserve status 404 and appropriate HTML/Markdown/JSON/plain
+formats, no-store/noindex headers, safe data, HEAD semantics and completed-response
+guards. See [custom 404 pages](../../../docs/errors.md).

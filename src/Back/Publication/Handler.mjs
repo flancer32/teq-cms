@@ -17,13 +17,14 @@ export default class Fl32_Cms_Back_Publication_Handler {
      * @param {Fl32_Cms_Back_Publication_Source} deps.source
      * @param {Fl32_Cms_Back_Publication_Catalog} deps.catalog
      * @param {Fl32_Tmpl_Back_Service_Render} deps.render
+     * @param {Fl32_Cms_Back_Web_Error_Respond} deps.errors
      * @param {TeqFw_Web_Back_Helper_Respond} deps.respond
      * @param {TeqFw_Web_Back_Dto_Info__Factory} deps.dtoInfo
      * @param {TeqFw_Web_Back_Enum_Stage} deps.STAGE
      * @param {TeqFw_Log_Provider} deps.logger
      * @param {typeof import('node:path')} deps.path
      */
-    constructor({config, routing, helpWeb, representation, tmplConfig, source, catalog, render, respond, dtoInfo, STAGE, logger, path}) {
+    constructor({config, routing, helpWeb, representation, tmplConfig, source, catalog, render, respond, errors, dtoInfo, STAGE, logger, path}) {
         const log = logger.forSource('Fl32_Cms_Back_Publication_Handler');
         const info = dtoInfo.create({
             name: 'Fl32_Cms_Back_Publication_Handler',
@@ -57,16 +58,13 @@ export default class Fl32_Cms_Back_Publication_Handler {
             /** @type {Record<string, string>} */
             let representationHeaders = {};
             const rawPath = (req.url ?? '').split('?')[0];
-            /** @returns {void} */
-            const fail = () => {
-                respond.code404_NotFound({res, headers: representationHeaders});
-                context.completed = true;
-            };
+            /** @returns {Promise<void>} */
+            const fail = () => errors.send({context, headers: representationHeaders});
             let decodedPath;
             try {
                 decodedPath = decodeURIComponent(rawPath);
             } catch {
-                fail();
+                await fail();
                 return;
             }
             // Recognize reserved family paths before rejecting noncanonical spellings.
@@ -79,7 +77,7 @@ export default class Fl32_Cms_Back_Publication_Handler {
                 return ownsRoute(unscoped) || ownsRoute(scoped);
             };
             if (routing.isEndpoint(decodedPath)) {
-                if (rawPath !== decodedPath || !config.getAgentMessageEnabled()) fail();
+                if (rawPath !== decodedPath || !config.getAgentMessageEnabled()) await fail();
                 return;
             }
             if (routing.isStatic(decodedPath)) return;
@@ -87,7 +85,7 @@ export default class Fl32_Cms_Back_Publication_Handler {
             const normalized = home ? decodedPath : path.posix.normalize(decodedPath).replace(/\/+$/, '');
             if (!routing.isSite() && !ownsPath(decodedPath) && !ownsPath(normalized)) return;
             if (rawPath !== decodedPath || decodedPath !== normalized) {
-                fail();
+                await fail();
                 return;
             }
             const unscoped = rawPath.slice(1);
@@ -114,7 +112,7 @@ export default class Fl32_Cms_Back_Publication_Handler {
             // Non-publication file types continue to ordinary delivery.
             if (!family && routing.isSite() && !suffix && /\.[A-Za-z0-9]+$/.test(resource)) return;
             if (!family) {
-                fail();
+                await fail();
                 return;
             }
             try {
@@ -126,13 +124,13 @@ export default class Fl32_Cms_Back_Publication_Handler {
                     return;
                 }
                 if (!neutral && locale !== undefined && !locales.includes(locale)) {
-                    fail();
+                    await fail();
                     return;
                 }
                 const item = neutral && html ? await source.readHtml({locale, route})
                     : locale === undefined ? await source.readNeutral({route}) : await source.readAvailable({locale, route});
                 if (!item) {
-                    fail();
+                    await fail();
                     return;
                 }
                 if (!html) {
@@ -147,7 +145,7 @@ export default class Fl32_Cms_Back_Publication_Handler {
                     if (!base) throw new Error('BASE_URL is required for publication rendering.');
                     const presentation = await catalog.getPresentation({item});
                     if (!presentation) {
-                        fail();
+                        await fail();
                         return;
                     }
                     /** @type {Record<string, string>} */
@@ -180,7 +178,7 @@ export default class Fl32_Cms_Back_Publication_Handler {
                 context.completed = true;
             } catch (error) {
                 log.error('Publication request failed.', {err: error});
-                fail();
+                await fail();
             }
         };
     }
@@ -197,6 +195,7 @@ export const __deps__ = Object.freeze({
         catalog: 'Fl32_Cms_Back_Publication_Catalog$',
         render: 'Fl32_Tmpl_Back_Service_Render$',
         respond: 'TeqFw_Web_Back_Helper_Respond$',
+        errors: 'Fl32_Cms_Back_Web_Error_Respond$',
         dtoInfo: 'TeqFw_Web_Back_Dto_Info__Factory$',
         STAGE: 'TeqFw_Web_Back_Enum_Stage$',
         logger: 'TeqFw_Log_Provider$',

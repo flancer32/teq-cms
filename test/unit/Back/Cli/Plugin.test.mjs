@@ -13,6 +13,7 @@ describe('Fl32_Cms_Back_Cli_Plugin', () => {
             handTmpl: 'template',
             handStaticRoute: 'static-route',
             handPublication: 'publication',
+            handNotFound: 'not-found',
             dtoSource: {create: value => { calls.push(['source', value]); return 'source'; }},
             tmplConfig: {getRootPath: () => '/application'},
             config: {getPublicationFamilies: () => [], getAgentMessageEnabled: () => false},
@@ -29,6 +30,7 @@ describe('Fl32_Cms_Back_Cli_Plugin', () => {
             ['handler', 'template'],
             ['handler', 'static-route'],
             ['handler', 'publication'],
+            ['handler', 'not-found'],
         ]);
     });
 });

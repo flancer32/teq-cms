@@ -1,4 +1,11 @@
 declare global {
+  type Fl32_Cms_Back_Web_Error_Policy = import("./src/Back/Web/Error/Policy.mjs").default;
+  type Fl32_Cms_Back_Web_Error_Policy__Class = typeof import("./src/Back/Web/Error/Policy.mjs").default;
+  type Fl32_Cms_Back_Web_Error_Respond = import("./src/Back/Web/Error/Respond.mjs").default;
+  type Fl32_Cms_Back_Web_Error_Respond__Class = typeof import("./src/Back/Web/Error/Respond.mjs").default;
+  type Fl32_Cms_Back_Web_Handler_NotFound = import("./src/Back/Web/Handler/NotFound.mjs").default;
+  type Fl32_Cms_Back_Web_Handler_NotFound__Class = typeof import("./src/Back/Web/Handler/NotFound.mjs").default;
+
   type Fl32_Cms_Back_Agent_Inbox = import("./src/Back/Agent/Inbox.mjs").default;
   type Fl32_Cms_Back_Agent_Inbox__Class = typeof import("./src/Back/Agent/Inbox.mjs").default;
   type Fl32_Cms_Back_Api_Adapter = import("./src/Back/Api/Adapter.mjs").default;
