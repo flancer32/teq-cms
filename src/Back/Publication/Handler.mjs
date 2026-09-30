@@ -81,10 +81,15 @@ export default class Fl32_Cms_Back_Publication_Handler {
             const unscoped = rawPath.slice(1);
             const neutral = ownsRoute(unscoped);
             const split = unscoped.indexOf('/');
-            const locale = neutral ? undefined : unscoped.slice(0, split);
-            const route = neutral ? unscoped : unscoped.slice(split + 1);
+            const requestedLocale = neutral ? undefined : unscoped.slice(0, split);
+            const resource = neutral ? unscoped : unscoped.slice(split + 1);
+            // Strip one supported representation suffix; Source still validates the logical route.
+            const suffix = /\.(md|html)$/.exec(resource);
+            const route = suffix ? resource.slice(0, -suffix[0].length) : resource;
+            const html = suffix ? suffix[1] === 'html' : !neutral;
+            const locale = neutral && html ? tmplConfig.getDefaultLocale() : requestedLocale;
             const family = source.getFamily(route);
-            if (!family || (locale !== undefined && !locales.includes(locale))) {
+            if (!family || (locale !== undefined && !locales.includes(locale)) || (html && !locale)) {
                 fail();
                 return;
             }
@@ -94,7 +99,7 @@ export default class Fl32_Cms_Back_Publication_Handler {
                     fail();
                     return;
                 }
-                if (neutral) {
+                if (!html) {
                     respond.code200_Ok({
                         res,
                         headers: {'content-type': 'text/markdown; charset=utf-8'},

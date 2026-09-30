@@ -26,9 +26,9 @@ Content and locale variants remain transparent, reproducible, and version-contro
 
 - Markdown files are authored sources. Their HTML projections are derived pages rendered by the server; HTML templates remain supported for layout and existing pages.
 - A publication is one content resource with explicit locale-specific Markdown sources. Locale selects content language; representation selects Markdown or HTML.
-- Localized publication URLs expose human-facing HTML projections; the locale-neutral URL is the canonical agent-facing Markdown resource. These representations are determined by the URL, independently of the client.
-- The locale-neutral resource prefers an English (`en`) source, then the site's default locale source. If neither exists, that resource is unavailable; no other locale is substituted. English need not be the default locale for human pages.
-- Localized HTML requires the source for the requested locale; another language does not substitute for a missing variant.
+- Extensionless localized publication URLs expose human-facing HTML projections; the extensionless locale-neutral URL is the canonical agent-facing Markdown resource. Explicit Markdown and HTML addresses expose the same publication without changing these canonical identities. The URL determines representation independently of the client.
+- The locale-neutral Markdown resource prefers an English (`en`) source, then the site's default locale source. If neither exists, that resource is unavailable; no other locale is substituted. English need not be the default locale for human pages.
+- Explicit localized Markdown and all localized HTML require the source for the requested locale; another language does not substitute for a missing variant. Neutral HTML uses only the site default locale source and is unavailable without a maintained default locale or its valid source.
 - The host selects the template engine and supplies the website's templates.
   TeqCMS owns CMS-specific publication and communication settings.
 - Agents create and maintain translations as ordinary version-controlled, locale-specific Markdown files. The CMS does not call an LLM API, run automatic translation jobs, or store translation state.

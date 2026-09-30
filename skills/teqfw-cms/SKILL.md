@@ -74,16 +74,19 @@ Configured families expose `/{prefix}/{route}` as canonical raw Markdown and
 `/{locale}/{prefix}/{route}` as exact-locale server-rendered HTML. For example:
 
 ```text
-/docs/foo       → raw Markdown, source preference en → default
-/en/docs/foo    → English HTML
-/ru/docs/foo    → Russian HTML
+/docs/foo       → canonical raw Markdown, source preference en → default
+/docs/foo.md    → neutral Markdown alias
+/en/docs/foo.md → exact English Markdown
+/en/docs/foo    → canonical English HTML
+/en/docs/foo.html → English HTML alias
+/docs/foo.html  → HTML from the exact tmpl default locale
 ```
 
 Read sources at `tmpl/web/{locale}/{prefix}/{route}.md`. Agents maintain locale
 variants directly; TeqCMS does not translate or call an LLM API. The neutral
 resource prefers the maintained `en` source, then tmpl's default locale, then
 404. English need not be the human default. Localized HTML returns 404 when
-its exact source or readable, nonempty presentation template is absent. Localized `.md` URLs are unavailable. Routing is
+its exact source or readable, nonempty presentation template is absent. Localized `.md` serves the exact valid source without a presentation. Localized `.html` renders that same source; neutral `.html` uses only the maintained tmpl default locale and returns 404 if it or its valid source is absent. HTTP removes one terminal lowercase representation suffix before strict logical-route validation; Source APIs remain extensionless. Routing is
 independent of User-Agent and client identity and preserves ordinary HTML
 routes. Markdown includes the authored front matter.
 
@@ -92,7 +95,7 @@ Presentation data supplies the HTML projection's `canonicalUrl`,
 the neutral resource when available. HTML links and the sitemap share the
 presentation availability check with HTTP; neutral discovery is independent
 of presentation availability. `llms.txt` lists each neutral resource
-once; the sitemap lists available localized HTML independently. Source and
+once; the sitemap lists available localized HTML independently. Canonical and HTML alternate links stay extensionless for every alias; discovery omits suffix aliases, neutral HTML aliases, and localized Markdown URLs. Source and
 catalog share source selection with HTTP and discovery. See the published
 [publication guide](../../docs/publications.md) for configuration and templates.
 

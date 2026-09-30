@@ -7,6 +7,8 @@ import path from 'node:path';
 import http2 from 'node:http2';
 import {parseDocument} from 'yaml';
 import {marked} from 'marked';
+import * as mustache from 'mustache';
+import Mustache from '../../node_modules/@flancer32/teq-tmpl/src/Back/Service/Engine/Mustache.js';
 import Find from '../../node_modules/@flancer32/teq-tmpl/src/Back/Act/File/Find.js';
 import FileLoad from '../../node_modules/@flancer32/teq-tmpl/src/Back/Act/File/Load.js';
 import Locale from '../../node_modules/@flancer32/teq-tmpl/src/Back/Helper/Locale.js';
@@ -23,6 +25,7 @@ import Respond from '../../node_modules/@teqfw/web/src/Back/Helper/Respond.mjs';
 
 const locales = ['en', 'de', 'ru'];
 const family = {prefix: 'journal', presentation: 'publication.html'};
+const presentation = '<link rel="canonical" href="{{{canonicalUrl}}}"><article>{{{publication.html}}}</article>';
 const logger = {forSource: () => ({error() {}, info() {}, warn() {}, trace() {}})};
 const info = {create: value => value};
 const STAGE = {INIT: 'INIT', PROCESS: 'PROCESS', FINALIZE: 'FINALIZE'};
@@ -35,12 +38,12 @@ function response() {
     };
 }
 
-async function fixture({presentationLocale = 'de'} = {}) {
+async function fixture({presentationLocale = 'de', defaultLocale} = {defaultLocale: 'de'}) {
     const root = await fs.mkdtemp(path.join(os.tmpdir(), 'teq-cms-publication-'));
     const tmplConfig = {
         getRootPath: () => root,
         getAvailableLocales: () => locales,
-        getDefaultLocale: () => 'de',
+        getDefaultLocale: () => defaultLocale,
     };
     const config = {
         getPublicationFamilies: () => [family],
@@ -55,10 +58,8 @@ async function fixture({presentationLocale = 'de'} = {}) {
     const catalog = new Catalog({fs, path, tmplConfig, config, source, dtoTarget, load});
     const presentationFile = path.join(root, 'tmpl/web', presentationLocale, family.presentation);
     await fs.mkdir(path.dirname(presentationFile), {recursive: true});
-    await fs.writeFile(presentationFile, '<article>Publication</article>');
-    const render = new Render({log: logger, actFind, actLoad, engine: {
-        render: async ({data}) => ({resultCode: 'SUCCESS', content: `<article>${data.publication.html}</article>`}),
-    }});
+    await fs.writeFile(presentationFile, presentation);
+    const render = new Render({log: logger, actFind, actLoad, engine: new Mustache({mustache, log: logger})});
     const generator = new Generator({config, catalog, tmplConfig, fs, path});
     const respond = new Respond({http2});
     const rendered = [];
@@ -130,16 +131,16 @@ describe('Markdown publication through the CMS plugin and web pipeline', () => {
             assert.equal(raw.status, 200);
             assert.equal(raw.headers['content-type'], 'text/markdown; charset=utf-8');
             assert.equal(raw.body, '---\ntitle: en title\ndescription: en description\ndate: 2026-09-23\n---\n# en body\n');
-            assert.equal((await app.send('/en/journal/2026/hello.md')).status, 404);
+            assert.equal((await app.send('/en/journal/2026/hello.md')).body, raw.body);
             assert.equal(app.rendered.length, 3);
             for (const userAgent of ['Mozilla/5.0', 'ExampleAgent/1.0']) {
                 const result = await app.send('/journal/2026/hello', {'user-agent': userAgent});
                 assert.equal(result.body, raw.body);
                 assert.equal(result.headers['content-type'], raw.headers['content-type']);
             }
-            assert.equal((await app.send('/de/journal/2026/hello.md')).status, 404);
-            assert.equal((await app.send('/ru/journal/2026/hello.md')).status, 404);
-            assert.equal((await app.send('/journal/2026/hello.md')).status, 404);
+            assert.equal((await app.send('/de/journal/2026/hello.md')).status, 200);
+            assert.equal((await app.send('/ru/journal/2026/hello.md')).status, 200);
+            assert.equal((await app.send('/journal/2026/hello.md')).body, raw.body);
             assert.equal((await app.send('/en/journal/2026/hello%2emd')).status, 404);
             assert.equal((await app.send('/en/journal/2026/hello.md/')).status, 404);
             assert.equal((await app.send('/de//journal/2026/hello.md')).status, 404);
@@ -149,6 +150,71 @@ describe('Markdown publication through the CMS plugin and web pipeline', () => {
             assert.deepEqual(app.calls, ['template', 'static']);
         } finally {
             await fs.rm(app.root, {recursive: true, force: true});
+        }
+    });
+
+    it('serves the six URL forms from logical sources with stable canonical links and discovery', async () => {
+        const app = await fixture();
+        try {
+            const route = 'journal/nested/page';
+            const text = locale => `---\ntitle: ${locale}\ndescription: Test\ndate: 2026-09-30\n---\n# ${locale} source\n`;
+            for (const locale of locales) await app.write(locale, route, text(locale));
+            const before = await app.generator.build();
+            for (const suffix of ['', '.md']) {
+                const result = await app.send(`/${route}${suffix}?tracking=1`);
+                assert.equal(result.status, 200);
+                assert.equal(result.headers['content-type'], 'text/markdown; charset=utf-8');
+                assert.equal(result.body, text('en'));
+            }
+            for (const locale of locales) {
+                const markdown = await app.send(`/${locale}/${route}.md`);
+                assert.equal(markdown.status, 200);
+                assert.equal(markdown.headers['content-type'], 'text/markdown; charset=utf-8');
+                assert.equal(markdown.body, text(locale));
+                for (const suffix of ['', '.html']) {
+                    const result = await app.send(`/${locale}/${route}${suffix}`);
+                    assert.equal(result.status, 200);
+                    assert.equal(result.headers['content-type'], 'text/html; charset=utf-8');
+                    const input = app.rendered.at(-1);
+                    assert.equal(input.template, presentation);
+                    assert.equal(input.target.name, family.presentation);
+                    assert.equal(input.data.publication.source, markdown.body);
+                    assert.equal(input.data.publication.route, route);
+                    assert.equal(input.data.locale, locale);
+                    assert.equal(input.data.canonicalUrl, `https://example.test/${locale}/${route}`);
+                    assert.match(result.body, new RegExp(`<h1>${locale} source</h1>`));
+                    assert.ok(result.body.includes(`<link rel="canonical" href="${input.data.canonicalUrl}">`));
+                    assert.deepEqual(input.data.alternateUrls, Object.fromEntries(locales.map(value => [value, `https://example.test/${value}/${route}`])));
+                    assert.equal(input.data.markdownAlternateUrl, `https://example.test/${route}`);
+                }
+            }
+            const neutralHtml = await app.send(`/${route}.html`);
+            assert.equal(neutralHtml.status, 200);
+            assert.equal(neutralHtml.headers['content-type'], 'text/html; charset=utf-8');
+            assert.match(neutralHtml.body, /<h1>de source<\/h1>/);
+            assert.equal(app.rendered.at(-1).data.publication.source, text('de'));
+            assert.equal(app.rendered.at(-1).data.canonicalUrl, `https://example.test/de/${route}`);
+            assert.deepEqual(await app.generator.build(), before);
+            assert.deepEqual(before.llms.split('\n').filter(line => line.startsWith('- ')), [`- https://example.test/${route}`]);
+            assert.deepEqual([...before.sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(match => match[1]),
+                ['de', 'en', 'ru'].map(locale => `https://example.test/${locale}/${route}`));
+            assert.deepEqual(app.calls, []);
+        } finally {
+            await fs.rm(app.root, {recursive: true, force: true});
+        }
+    });
+
+    it('requires a maintained default locale for neutral HTML without changing neutral Markdown', async () => {
+        for (const defaultLocale of [undefined, 'xx']) {
+            const app = await fixture({defaultLocale, presentationLocale: 'en'});
+            try {
+                await app.write('en', 'journal/page', '---\ntitle: English\ndescription: Test\ndate: 2026-09-30\n---\nEnglish body\n');
+                assert.equal((await app.send('/journal/page.html')).status, 404);
+                assert.equal((await app.send('/journal/page.md')).status, 200);
+                assert.equal((await app.send('/en/journal/page.html')).status, 200);
+            } finally {
+                await fs.rm(app.root, {recursive: true, force: true});
+            }
         }
     });
 
@@ -163,9 +229,15 @@ describe('Markdown publication through the CMS plugin and web pipeline', () => {
             assert.equal((await app.send('/journal/default-only')).body, text('de'));
             assert.equal((await app.send('/journal/shared')).body, text('en'));
             assert.equal((await app.send('/journal/other-only')).status, 404);
-            assert.equal((await app.send('/journal/missing')).status, 404);
+            for (const suffix of ['', '.md', '.html']) assert.equal((await app.send(`/journal/missing${suffix}`)).status, 404);
+            assert.equal((await app.send('/journal/other-only.md')).status, 404);
+            assert.equal((await app.send('/journal/other-only.html')).status, 404);
+            await app.write('en', 'journal/english-only', text('en'));
+            assert.equal((await app.send('/journal/english-only.html')).status, 404);
+            assert.equal((await app.send('/journal/english-only.md')).body, text('en'));
+            await fs.rm(path.join(app.root, 'tmpl/web/en/journal/english-only.md'));
             for (const url of ['/en/journal/default-only', '/de/journal/other-only', '/ru/journal/shared']) {
-                assert.equal((await app.send(url)).status, 404);
+                for (const suffix of ['', '.md', '.html']) assert.equal((await app.send(`${url}${suffix}`)).status, 404);
             }
             assert.equal((await app.send('/de/journal/default-only')).status, 200);
             assert.deepEqual(app.rendered.at(-1).data.alternateUrls, {
@@ -195,7 +267,7 @@ describe('Markdown publication through the CMS plugin and web pipeline', () => {
     });
 
     it('uses real tmpl lookup to exclude missing and empty presentations and supports default fallback', async () => {
-        const app = await fixture({presentationLocale: 'en'});
+        const app = await fixture({presentationLocale: 'en', defaultLocale: 'de'});
         try {
             for (const locale of locales) {
                 await app.write(locale, 'journal/presentation', `---\ntitle: ${locale}\ndescription: Test\ndate: 2026-09-30\n---\n# ${locale} body\n`);
@@ -204,7 +276,12 @@ describe('Markdown publication through the CMS plugin and web pipeline', () => {
             const checkUnavailable = async () => {
                 assert.equal((await app.send('/en/journal/presentation')).status, 200);
                 assert.deepEqual(app.rendered.at(-1).data.alternateUrls, {en: 'https://example.test/en/journal/presentation'});
-                for (const locale of ['de', 'ru']) assert.equal((await app.send(`/${locale}/journal/presentation`)).status, 404);
+                for (const locale of ['de', 'ru']) {
+                    for (const suffix of ['', '.html']) assert.equal((await app.send(`/${locale}/journal/presentation${suffix}`)).status, 404);
+                    assert.equal((await app.send(`/${locale}/journal/presentation.md`)).status, 200);
+                }
+                assert.equal((await app.send('/journal/presentation.html')).status, 404);
+                assert.equal((await app.send('/journal/presentation.md')).status, 200);
                 const files = await app.generator.build();
                 assert.deepEqual([...files.sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(match => match[1]), ['https://example.test/en/journal/presentation']);
                 assert.match(files.llms, /- https:\/\/example.test\/journal\/presentation/);
@@ -213,7 +290,7 @@ describe('Markdown publication through the CMS plugin and web pipeline', () => {
             await checkUnavailable();
             await fs.writeFile(defaultTemplate, '   \n');
             await checkUnavailable();
-            await fs.writeFile(defaultTemplate, '<article>Default presentation</article>');
+            await fs.writeFile(defaultTemplate, presentation);
             const result = await app.send('/ru/journal/presentation');
             assert.equal(result.status, 200);
             assert.match(result.body, /<h1>ru body<\/h1>/);
@@ -251,16 +328,23 @@ describe('Markdown publication through the CMS plugin and web pipeline', () => {
         const secret = await fs.mkdtemp(path.join(os.tmpdir(), 'teq-cms-secret-'));
         try {
             await app.write('en', 'journal/broken', '---\ntitle: No date\ndescription: Missing date\n---\nSecret body\n');
-            assert.equal((await app.send('/journal/broken')).status, 404);
+            for (const prefix of ['', '/en']) {
+                for (const suffix of ['', '.md', '.html']) assert.equal((await app.send(`${prefix}/journal/broken${suffix}`)).status, 404);
+            }
+            for (const url of ['/xx/journal/broken.md', '/xx/journal/broken.html', '/en/journal/../private/inside.html', '/en/journal//broken.html', '/en/journal/broken.html/', '/en/journal/broken.md.html', '/journal/broken.html.md', '/journal/broken.txt', '/journal/.md', '/journal/.html', '/en/journal/./broken.md', '/journal/broken%2ehtml']) {
+                assert.equal((await app.send(url)).status, 404);
+            }
             assert.equal((await app.send('/en/journal/%2e%2e/hidden')).status, 404);
             assert.equal((await app.send('/journal/%ZZ')).status, 404);
             await fs.writeFile(path.join(secret, 'outside.md'), '---\ntitle: Outside\ndescription: Outside\ndate: 2026-09-23\n---\nSECRET\n');
             await fs.symlink(path.join(secret, 'outside.md'), path.join(app.root, 'tmpl', 'web', 'en', 'journal', 'outside.md'));
-            assert.equal((await app.send('/journal/outside')).status, 404);
+            for (const prefix of ['', '/en']) {
+                for (const suffix of ['', '.md', '.html']) assert.equal((await app.send(`${prefix}/journal/outside${suffix}`)).status, 404);
+            }
             await app.write('en', 'private/inside', '---\ntitle: Inside\ndescription: Private\ndate: 2026-09-23\n---\nPRIVATE\n');
             await fs.symlink(path.join(app.root, 'tmpl', 'web', 'en', 'private', 'inside.md'),
                 path.join(app.root, 'tmpl', 'web', 'en', 'journal', 'inside.md'));
-            assert.equal((await app.send('/en/journal/inside')).status, 404);
+            for (const suffix of ['', '.md', '.html']) assert.equal((await app.send(`/en/journal/inside${suffix}`)).status, 404);
             await assert.rejects(app.source.read({locale: 'en', route: '../outside'}));
         } finally {
             await fs.rm(app.root, {recursive: true, force: true});

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import Handler from '../../../../src/Back/Publication/Handler.mjs';
 import path from 'node:path';
 
-it('blocks localized Markdown before source or template access', async () => {
+it('blocks invalid locales and unsafe logical routes before source or template access', async () => {
     const calls = [];
     const handler = new Handler({
         config: {
@@ -11,7 +11,7 @@ it('blocks localized Markdown before source or template access', async () => {
             getBaseUrl: () => 'https://example.test',
         },
         tmplConfig: {getAvailableLocales: () => ['en', 'de'], getDefaultLocale: () => 'de'},
-        source: {getFamily: route => /^[A-Za-z0-9_/-]+$/.test(route) ? {prefix: 'notes', presentation: 'page.html'} : undefined, readAvailable: async () => { calls.push('read'); }},
+        source: {getFamily: route => /^[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*$/.test(route) ? {prefix: 'notes', presentation: 'page.html'} : undefined, readAvailable: async () => { calls.push('read'); }},
         catalog: {getPresentation: async () => { calls.push('presentation'); return null; }},
         render: {perform: async () => { calls.push('render'); return {resultCode: 'SUCCESS', content: ''}; }},
         respond: {
@@ -25,7 +25,7 @@ it('blocks localized Markdown before source or template access', async () => {
     });
     assert.deepEqual(handler.getRegistrationInfo().before,
         ['Fl32_Cms_Back_Web_Handler_Template', 'TeqFw_Web_Back_Handler_Static']);
-    for (const url of ['/en/notes/story.md', '/xx/notes/story', '/de/notes/story.md', '/notes/story.md', '/en/notes/%2e%2e/story.md', '/en/notes/story%2emd']) {
+    for (const url of ['/xx/notes/story', '/xx/notes/story.md', '/xx/notes/story.html', '/en/notes/story.txt', '/en/notes/story.md.html', '/notes/story.html.md', '/en/notes/story.MD', '/en/notes/.md', '/notes/.html', '/en/notes/%2e%2e/story.md', '/en/notes/story%2emd']) {
         const context = {request: {url}, response: {}, completed: false};
         await handler.handle(context);
         assert.equal(context.response.status, 404);

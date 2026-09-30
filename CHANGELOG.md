@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Support explicit publication `.md` and `.html` addresses while preserving extensionless routes and canonical discovery. Localized Markdown serves the exact source; neutral HTML renders only the maintained tmpl default locale source.
+- Cover the full representation matrix, host presentation input, canonical links, discovery without aliases, and unsafe suffix rejection with regression tests (issue #30).
+
 ## [0.9.0] - 2026-09-30
 
 ### Changed
