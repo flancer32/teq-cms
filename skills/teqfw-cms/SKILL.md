@@ -89,16 +89,17 @@ Sources reside at `tmpl/web/{route}.md` or `tmpl/web/{locale}/{route}.md`.
 An unlocalized source has `locale: ''`. Neutral Markdown prefers unlocalized,
 then maintained `en`, then tmpl default. A found invalid higher-priority source
 returns 404 instead of silently selecting another language. Localized Markdown
-and HTML require exact locale sources. Neutral `.html` uses only the maintained
-default locale source. Presentation-template fallback never changes content language.
+and HTML require exact locale sources. HTML language uses URL locale, then supported `Accept-Language`, then tmpl default,
+including neutral `.html`. Neutral HTML in site mode prefers authored unlocalized
+content; otherwise it requires the exact selected locale source. Presentation-template fallback never changes content language.
 
 ```text
-/about          → negotiated HTML or Markdown from the neutral source
+/about          → negotiated HTML (human language) or neutral Markdown
 /about.md       → guaranteed neutral Markdown
 /en/about.md    → exact English Markdown
 /en/about       → negotiated English HTML or Markdown
 /en/about.html  → English HTML alias
-/about.html     → default-locale HTML alias
+/about.html     → HTML using the preferred human language
 /               → negotiated neutral home HTML or Markdown
 /index.md       → guaranteed neutral home Markdown
 /en/            → negotiated exact English home HTML or Markdown
@@ -109,11 +110,12 @@ explicit. Only supported terminal lowercase representation suffixes are removed
 at the HTTP boundary. Source APIs accept strict logical routes. Keep traversal,
 source symlink, locale, and metadata validation intact.
 
-Explicit `.md` or `.html` overrides headers. Extensionless publication URLs use
+Explicit `.md` or `.html` selects the format ahead of `Accept` and `User-Agent`; it does not override `Accept-Language`. Extensionless publication URLs use
 explicit `Accept` preference, then `User-Agent` hints: Markdown for agents, HTML
 for people, with HTML as the ambiguous-client default. Send `Vary: Accept, User-Agent`
-for negotiated responses. Extensionless neutral HTML projects the same neutral
-source as Markdown; explicit neutral `.html` retains exact default-locale selection.
+for negotiated responses, adding `Accept-Language` for neutral addresses. Neutral
+`.html` varies by `Accept-Language`. Neutral Markdown ignores language headers;
+HTML never substitutes another localized source for a missing selected language.
 
 HTTP source order is Markdown, ordinary templates, then `web/` static delivery, then
 404. A wholly absent Markdown route continues to lower tiers; an authored but

@@ -77,7 +77,7 @@ async function fixture(options = {}) {
     const catalog = new Catalog({config, routing, tmplConfig, source, fs, path, dtoTarget, load});
     const respond = new Respond({http2});
     const rendered = [];
-    const handPublication = new Publication({config, routing, representation: new Representation(), tmplConfig, source, catalog, respond, dtoInfo, STAGE, logger, path,
+    const handPublication = new Publication({config, routing, helpWeb: new Web({http2, tmplConfig}), representation: new Representation(), tmplConfig, source, catalog, respond, dtoInfo, STAGE, logger, path,
         render: {perform: async params => { rendered.push(params); return render.perform(params); }}});
     const handStatic = new Static({registry: new Registry({configFactory: new StaticConfig({path}), logger}),
         fileService: new FileService({fs: fsSync, http2, path, logger, helpMime: new Mime(), resolver: new Resolver({path}), fallback: new Fallback({fs: fsSync, path})}),
@@ -139,7 +139,7 @@ it('publishes top-level and nested Markdown with the same corpus and canonical l
                 assert.equal(data.markdownAlternateUrl, 'https://example.test/about.md');
             }
         }
-        assert.match((await app.send('/about.html')).body, /<h1>de<\/h1>/);
+        assert.match((await app.send('/about.html')).body, /<h1>Neutral<\/h1>/);
         assert.match((await app.send('/en/docs/nested/page.html')).body, /<section><h1>docs-en<\/h1>/);
         assert.equal(app.rendered.at(-1).target.name, 'documentation.html');
         assert.equal((await app.send('/ru/about.html')).status, 404);
@@ -172,8 +172,8 @@ it('uses Markdown, then HTML templates, then web static files for root and ordin
         }
         assert.equal((await app.send('/en/index.md')).body, text('English home'));
         await app.write('tmpl/web/de/index.md', text('German home'));
-        assert.match((await app.send('/index.html')).body, /German home/);
-        assert.equal(app.rendered.at(-1).data.canonicalUrl, 'https://example.test/de/');
+        assert.match((await app.send('/index.html')).body, /ROOT MARKDOWN/);
+        assert.equal(app.rendered.at(-1).data.canonicalUrl, 'https://example.test/');
         const files = await app.generator.build();
         assert.deepEqual(files.llms.split('\n').filter(line => line.startsWith('- ')), ['- https://example.test/index.md']);
         assert.match(files.sitemap, /<loc>https:\/\/example.test\/en\/<\/loc>/);
@@ -288,12 +288,13 @@ it('selects format by explicit suffix before headers for both home and localized
         for (const url of ['/', '/index', '/en', '/en/', '/en/index']) {
             const human = await app.send(url, browser);
             assert.equal(human.headers['content-type'], 'text/html; charset=utf-8', url);
-            assert.match(human.body, /<h1>English home<\/h1>/);
-            assert.equal(human.headers.vary, 'Accept, User-Agent');
-            assert.equal(app.rendered.at(-1).data.canonicalUrl, 'https://example.test/en/');
+            const neutral = ['/', '/index'].includes(url);
+            assert.match(human.body, neutral ? /German home/ : /English home/);
+            assert.equal(human.headers.vary, neutral ? 'Accept, User-Agent, Accept-Language' : 'Accept, User-Agent');
+            assert.equal(app.rendered.at(-1).data.canonicalUrl, neutral ? 'https://example.test/de/' : 'https://example.test/en/');
             const machine = await app.send(url, agent);
             assert.equal(machine.body, text('English home'), url);
-            assert.equal(machine.headers.vary, 'Accept, User-Agent');
+            assert.equal(machine.headers.vary, neutral ? 'Accept, User-Agent, Accept-Language' : 'Accept, User-Agent');
             assert.equal((await app.send(url, {...browser, accept: 'text/markdown'})).body, text('English home'));
             assert.equal((await app.send(url, {...agent, accept: 'text/html'})).headers['content-type'], 'text/html; charset=utf-8');
         }
@@ -306,15 +307,62 @@ it('selects format by explicit suffix before headers for both home and localized
             const res = await app.send(url, {...agent, accept: 'text/markdown'});
             assert.equal(res.headers['content-type'], 'text/html; charset=utf-8');
             assert.match(res.body, new RegExp(`<h1>${label}</h1>`));
-            assert.equal(res.headers.vary, undefined);
+            assert.equal(res.headers.vary, url === '/index.html' ? 'Accept-Language' : undefined);
         }
         const rejected = await app.send('/', {accept: 'text/markdown;q=0,text/html;q=0'});
         assert.equal(rejected.status, 406);
-        assert.equal(rejected.headers.vary, 'Accept, User-Agent');
+        assert.equal(rejected.headers.vary, 'Accept, User-Agent, Accept-Language');
         await app.write('tmpl/web/de/publication.html', '');
         const unavailable = await app.send('/', browser);
         assert.equal(unavailable.status, 404);
-        assert.equal(unavailable.headers.vary, 'Accept, User-Agent');
+        assert.equal(unavailable.headers.vary, 'Accept, User-Agent, Accept-Language');
         assert.equal((await app.send('/', agent)).status, 200);
     } finally { await fs.rm(app.root, {recursive: true, force: true}); }
+});
+
+
+it('selects human publication language from URL, then Accept-Language, then default without changing agent sources', async () => {
+    for (const defaultLocale of ['en', 'ru']) {
+        const app = await fixture({defaultLocale, locales: ['en', 'ru']});
+        try {
+            await app.write('tmpl/web/publication.html', presentation);
+            for (const locale of ['en', 'ru']) {
+                for (const route of ['index', 'about']) await app.write(`tmpl/web/${locale}/${route}.md`, text(locale));
+            }
+            const browser = {accept: 'text/html', 'user-agent': 'Mozilla/5.0'};
+            for (const route of ['/', '/index', '/index.html', '/about', '/about.html']) {
+                for (const [header, expected] of [
+                    ['ru-RU,ru;q=0.9,en;q=0.8', 'ru'], ['en-US,en;q=0.9,ru;q=0.8', 'en'],
+                    ['en;q=0.2,ru;q=0.9', 'ru'], ['RU-ru', 'ru'],
+                    ['', defaultLocale], ['fr-FR', defaultLocale], ['*', defaultLocale],
+                    ['en;q=0,ru;q=0.5', 'ru'], ['en;q=invalid,ru;q=0.5', 'ru'],
+                ]) {
+                    const res = await app.send(route, {...browser, 'accept-language': header});
+                    assert.equal(res.status, 200, `${defaultLocale} ${route} ${header}`);
+                    assert.equal(app.rendered.at(-1).data.publication.locale, expected);
+                    assert.equal(app.rendered.at(-1).data.canonicalUrl,
+                        `https://example.test/${expected}/${route.includes('about') ? 'about' : ''}`);
+                    assert.equal(res.headers.vary, route.endsWith('.html') ? 'Accept-Language' : 'Accept, User-Agent, Accept-Language');
+                }
+            }
+            for (const url of ['/en/', '/en/index.html', '/en/about', '/en/about.html']) {
+                await app.send(url, {...browser, 'accept-language': 'ru'});
+                assert.equal(app.rendered.at(-1).data.locale, 'en');
+            }
+            for (const url of ['/', '/index.md', '/about', '/about.md']) {
+                const res = await app.send(url, {accept: 'text/markdown', 'accept-language': 'ru'});
+                assert.equal(res.body, text('en'));
+            }
+            await fs.rm(path.join(app.root, 'tmpl/web/ru/about.md'));
+            for (const url of ['/about', '/about.html', '/ru/about']) {
+                assert.equal((await app.send(url, {...browser, 'accept-language': 'ru'})).status, 404);
+            }
+            await app.write('tmpl/web/ru/about.md', 'INVALID');
+            assert.equal((await app.send('/about', {...browser, 'accept-language': 'ru'})).status, 404);
+            await app.write('tmpl/web/index.md', text('Unlocalized'));
+            assert.match((await app.send('/', {...browser, 'accept-language': 'ru'})).body, /Unlocalized/);
+            await app.write('tmpl/web/index.md', 'INVALID');
+            assert.equal((await app.send('/', {...browser, 'accept-language': 'ru'})).status, 404);
+        } finally { await fs.rm(app.root, {recursive: true, force: true}); }
+    }
 });

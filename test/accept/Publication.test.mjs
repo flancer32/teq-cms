@@ -1,3 +1,4 @@
+import Web from '../../src/Back/Helper/Web.mjs';
 import {describe, it} from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -70,7 +71,7 @@ async function fixture({presentationLocale = 'de', defaultLocale} = {defaultLoca
     const respond = new Respond({http2});
     const rendered = [];
     const handler = new Handler({
-        config, routing, representation: new Representation(), tmplConfig, source, catalog, respond, dtoInfo: info, STAGE, logger, path,
+        config, routing, helpWeb: new Web({http2, tmplConfig}), representation: new Representation(), tmplConfig, source, catalog, respond, dtoInfo: info, STAGE, logger, path,
         render: {perform: async value => {
             rendered.push(value);
             return render.perform(value);
@@ -146,8 +147,14 @@ describe('Markdown publication through the CMS plugin and web pipeline', () => {
             }
             const human = await app.send('/journal/2026/hello', {'user-agent': 'Mozilla/5.0'});
             assert.equal(human.headers['content-type'], 'text/html; charset=utf-8');
-            assert.equal(human.headers.vary, 'Accept, User-Agent');
-            assert.equal(app.rendered.at(-1).data.publication.source, raw.body);
+            assert.equal(human.headers.vary, 'Accept, User-Agent, Accept-Language');
+            assert.match(app.rendered.at(-1).data.publication.source, /de body/);
+            for (const url of ['/journal/2026/hello', '/journal/2026/hello.html']) {
+                const res = await app.send(url, {accept: 'text/html', 'accept-language': 'ru-RU,en;q=0.5'});
+                assert.equal(res.status, 200);
+                assert.equal(app.rendered.at(-1).data.locale, 'ru');
+                assert.equal(app.rendered.at(-1).data.canonicalUrl, 'https://example.test/ru/journal/2026/hello');
+            }
             assert.equal((await app.send('/ru/journal/2026/hello', {'user-agent': 'ExampleBot'})).body,
                 '---\ntitle: ru title\ndescription: ru description\ndate: 2026-09-23\n---\n# ru body\n');
             assert.equal((await app.send('/de/journal/2026/hello.md')).status, 200);

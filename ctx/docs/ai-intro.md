@@ -29,7 +29,8 @@ The primary audience is agents building and maintaining websites, followed by de
 ## Distinguishing Characteristics
 
 - Markdown is the primary authored content; HTML pages are derived presentations. Source priority does not select the HTTP response format.
-- Explicit `.md` or `.html` overrides headers. Extensionless publication URLs use `Accept`, then `User-Agent` hints: Markdown for agents, HTML for people, with HTML as the ambiguous-client default. See `architecture/publication.md`.
+- Explicit `.md` or `.html` selects the format ahead of `Accept` and `User-Agent`; it does not override `Accept-Language`. Extensionless publication URLs use `Accept`, then `User-Agent` hints: Markdown for agents, HTML for people, with HTML as the ambiguous-client default. See `architecture/publication.md`.
+- HTML language uses explicit URL locale, then supported `Accept-Language`, then `TEQFW_TMPL__DEFAULT_LOCALE`, including `.html` aliases. Authored unlocalized sources keep neutral HTML priority; otherwise the exact selected locale is required. Neutral Markdown retains unlocalized → English → default source preference.
 - Translations are version-controlled locale-specific Markdown files maintained by agents; TeqCMS has no LLM API translation service or translation state.
 - The CLI is the composition root.
 - A finite CLI command generates discovery files; an optional web handler saves agent messages for the owner.

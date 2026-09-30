@@ -32,18 +32,18 @@ Learn more at [cms.teqfw.com](https://cms.teqfw.com).
 Everything under `tmpl/web/` is public. Markdown publication spans the site by default, without route-family registration. Agents maintain unlocalized and locale-specific sources directly in Git:
 
 ```text
-/about          → headers select HTML or Markdown; source: unlocalized → en → default
+/about          → negotiated HTML (human language) or neutral Markdown
 /about.md       → guaranteed neutral Markdown
 /en/about.md    → exact English Markdown
 /en/about       → headers select English HTML or Markdown
 /en/about.html  → English HTML alias
-/about.html     → HTML from the exact maintained default locale
+/about.html     → HTML using the preferred human language
 /               → headers select index.md as HTML or Markdown
 /index.md       → guaranteed neutral home Markdown
 /en/            → headers select English home HTML or Markdown
 ```
 
-Explicit `.md` or `.html` overrides HTTP headers. Extensionless publication URLs use explicit `Accept` preference first, then `User-Agent` hints: agents receive Markdown, people receive HTML, and ambiguous clients default to HTML. Responses vary by `Accept, User-Agent`.
+Explicit `.md` or `.html` selects the format ahead of `Accept` and `User-Agent`; it does not override `Accept-Language`. Extensionless publication URLs use explicit `Accept` preference first, then `User-Agent` hints: agents receive Markdown, people receive HTML, and ambiguous clients default to HTML. Responses vary by `Accept, User-Agent`, plus `Accept-Language` for neutral addresses. HTML language uses URL locale, then supported `Accept-Language`, then `TEQFW_TMPL__DEFAULT_LOCALE`; this also applies to `.html`. An authored unlocalized source retains priority for neutral HTML in site mode. Neutral Markdown keeps its stable source preference.
 
 Markdown sources take priority over ordinary templates, then static files in `web/`, then 404. A found invalid source or unavailable requested representation returns 404. Static prefixes such as `/assets/` bypass templating and use only `web/assets/`; missing files return 404.
 

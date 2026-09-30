@@ -31,11 +31,15 @@ export default class Fl32_Cms_Back_Helper_Web {
             if (!header) return [];
             return header
                 .split(',')
-                .map(part => {
-                    const [lang, q] = part.trim().split(';q=');
-                    return {lang, q: parseFloat(q) || 1.0};
+                .map((part, index) => {
+                    const [lang, ...parameters] = part.trim().split(';');
+                    const weight = parameters.find(value => /^\s*q\s*=/i.test(value));
+                    const raw = weight?.split('=')[1]?.trim();
+                    const q = raw === undefined ? 1 : /^(?:0(?:\.\d{0,3})?|1(?:\.0{0,3})?)$/.test(raw) ? Number(raw) : 0;
+                    return {lang: lang.toLowerCase(), q, index};
                 })
-                .sort((a, b) => b.q - a.q)
+                .filter(entry => entry.q > 0)
+                .sort((a, b) => b.q - a.q || a.index - b.index)
                 .map(entry => entry.lang);
         }
 
@@ -45,12 +49,15 @@ export default class Fl32_Cms_Back_Helper_Web {
          * @returns {string} - Resolved locale code (e.g. "en", "ru", etc.).
          */
         function resolveFromAcceptLanguage(header) {
+            /** @type {string[]} */
             const allowed = tmplConfig.getAvailableLocales();
             const accepted = parseAcceptLanguage(header);
             for (const lang of accepted) {
-                if (allowed.includes(lang)) return lang;
+                const exact = allowed.find(value => value.toLowerCase() === lang);
+                if (exact) return exact;
                 const short = lang.split('-')[0];
-                if (allowed.includes(short)) return short;
+                const base = allowed.find(value => value.toLowerCase() === short);
+                if (base) return base;
             }
             return tmplConfig.getDefaultLocale();
         }

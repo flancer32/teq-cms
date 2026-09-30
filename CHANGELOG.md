@@ -18,6 +18,8 @@
 
 ### Fixed
 
+- Select HTML language by explicit URL locale, then supported weighted Accept-Language, then tmpl default, including neutral `.html`; preserve unlocalized source priority and stable neutral Markdown, and vary caches by language.
+
 - Separate Markdown source priority from response format: explicit `.md`/`.html` overrides headers; extensionless publication URLs use Accept, then User-Agent hints, returning Markdown to agents and HTML to people with cache variation.
 - Use explicit `.md` URLs for Markdown alternates and llms.txt, including `/index.md` for home; include available unlocalized HTML in sitemap.xml.
 

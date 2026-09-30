@@ -11,6 +11,7 @@ export default class Fl32_Cms_Back_Publication_Handler {
      * @param {object} deps
      * @param {Fl32_Cms_Back_Config} deps.config
      * @param {Fl32_Cms_Back_Publication_Routing} deps.routing
+     * @param {Fl32_Cms_Back_Helper_Web} deps.helpWeb
      * @param {Fl32_Cms_Back_Publication_Representation} deps.representation
      * @param {Fl32_Tmpl_Back_Config} deps.tmplConfig
      * @param {Fl32_Cms_Back_Publication_Source} deps.source
@@ -22,7 +23,7 @@ export default class Fl32_Cms_Back_Publication_Handler {
      * @param {TeqFw_Log_Provider} deps.logger
      * @param {typeof import('node:path')} deps.path
      */
-    constructor({config, routing, representation, tmplConfig, source, catalog, render, respond, dtoInfo, STAGE, logger, path}) {
+    constructor({config, routing, helpWeb, representation, tmplConfig, source, catalog, render, respond, dtoInfo, STAGE, logger, path}) {
         const log = logger.forSource('Fl32_Cms_Back_Publication_Handler');
         const info = dtoInfo.create({
             name: 'Fl32_Cms_Back_Publication_Handler',
@@ -101,7 +102,14 @@ export default class Fl32_Cms_Back_Publication_Handler {
             const selected = representation.select({suffix: suffix?.[1], headers: req.headers ?? {}});
             const html = selected === 'html';
             if (!suffix) representationHeaders = {vary: 'Accept, User-Agent'};
-            const locale = neutral && suffix?.[1] === 'html' ? tmplConfig.getDefaultLocale() : requestedLocale;
+            // HTML language: URL, Accept-Language, then tmpl default; Markdown stays neutral.
+            // See ctx/docs/architecture/publication.md#html-language-selection.
+            const locale = neutral && html ? helpWeb.extractLocale({req}) : requestedLocale;
+            if (neutral) {
+                representationHeaders = suffix?.[1] === 'html'
+                    ? {vary: 'Accept-Language'}
+                    : !suffix ? {vary: 'Accept, User-Agent, Accept-Language'} : {};
+            }
             const family = source.getFamily(route);
             // Non-publication file types continue to ordinary delivery.
             if (!family && routing.isSite() && !suffix && /\.[A-Za-z0-9]+$/.test(resource)) return;
@@ -117,11 +125,12 @@ export default class Fl32_Cms_Back_Publication_Handler {
                     context.completed = true;
                     return;
                 }
-                if ((locale !== undefined && !locales.includes(locale)) || (suffix?.[1] === 'html' && neutral && !locale)) {
+                if (!neutral && locale !== undefined && !locales.includes(locale)) {
                     fail();
                     return;
                 }
-                const item = locale === undefined ? await source.readNeutral({route}) : await source.readAvailable({locale, route});
+                const item = neutral && html ? await source.readHtml({locale, route})
+                    : locale === undefined ? await source.readNeutral({route}) : await source.readAvailable({locale, route});
                 if (!item) {
                     fail();
                     return;
@@ -181,6 +190,7 @@ export const __deps__ = Object.freeze({
     default: Object.freeze({
         config: 'Fl32_Cms_Back_Config$',
         routing: 'Fl32_Cms_Back_Publication_Routing$',
+        helpWeb: 'Fl32_Cms_Back_Helper_Web$',
         representation: 'Fl32_Cms_Back_Publication_Representation$',
         tmplConfig: 'Fl32_Tmpl_Back_Config$',
         source: 'Fl32_Cms_Back_Publication_Source$',

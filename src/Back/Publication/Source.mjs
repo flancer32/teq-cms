@@ -72,6 +72,28 @@ export default class Fl32_Cms_Back_Publication_Source {
         };
 
         /**
+         * Unlocalized authored content keeps priority; localized HTML uses the selected human language.
+         * Never substitute another localized source when that language is unavailable.
+         * @see https://github.com/flancer32/teq-cms/blob/main/ctx/docs/architecture/publication.md#html-language-selection
+         * @param {object} deps
+         * @param {string|undefined} deps.locale
+         * @param {string} deps.route
+         * @returns {Promise<Fl32_Cms_Back_Publication_Item|null>}
+         */
+        this.readHtml = async ({locale, route}) => {
+            if (!this.getFamily(route)) return null;
+            if (routing.isSite()) {
+                try {
+                    await fs.lstat(path.join(root, `${route}.md`));
+                    return this.readAvailable({locale: '', route});
+                } catch (error) {
+                    if (!(error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT')) return null;
+                }
+            }
+            return locale && locales.includes(locale) ? this.readAvailable({locale, route}) : null;
+        };
+
+        /**
          * Detect an authored route even when its source is invalid or a symlink.
          * @param {object} deps
          * @param {string} deps.route

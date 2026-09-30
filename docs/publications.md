@@ -45,18 +45,30 @@ Authored Markdown and embedded HTML are trusted public site content. TeqCMS does
 
 | URL | Representation | Source selection |
 | --- | --- | --- |
-| `/about` | Negotiated HTML or Markdown | Unlocalized, then maintained `en`, then tmpl default |
-| `/about.md` | Guaranteed neutral Markdown | Same selection |
+| `/about` | Negotiated HTML or Markdown | Markdown: unlocalized → maintained `en` → default; HTML: human language selection |
+| `/about.md` | Guaranteed neutral Markdown | Unlocalized → maintained `en` → default |
 | `/en/about.md` | Exact English Markdown | `tmpl/web/en/about.md` only |
 | `/en/about` | Negotiated English HTML or Markdown | Same exact English source |
 | `/en/about.html` | English HTML alias | Same exact English source |
-| `/about.html` | Default-locale HTML alias | Exact maintained tmpl default source only |
+| `/about.html` | HTML alias | Same human language selection |
 
-Nested paths use the same rules. Markdown responses include the entire authored file, including front matter, with `text/markdown; charset=utf-8`. HTML uses `text/html; charset=utf-8`. Available aliases return 200 directly, without redirects. Explicit `.md` or `.html` always overrides headers. For extensionless publication URLs, `Accept` preference for `text/markdown` versus `text/html` or `application/xhtml+xml` selects the format by `q` weight (default `1`). Equal, missing, or wildcard-only preferences use `User-Agent`: recognized bots, agents, and command-line clients receive Markdown; browsers and unknown clients receive HTML. For example, `curl -H 'Accept: text/html' https://example.com/` renders HTML despite curl's agent hint. `curl -H 'Accept: text/markdown' https://example.com/` returns the authored home source.
+Nested paths use the same rules. Markdown responses include the entire authored file, including front matter, with `text/markdown; charset=utf-8`. HTML uses `text/html; charset=utf-8`. Available aliases return 200 directly, without redirects. Explicit `.md` or `.html` selects the format ahead of `Accept` and `User-Agent`; it does not override `Accept-Language`. For extensionless publication URLs, `Accept` preference for `text/markdown` versus `text/html` or `application/xhtml+xml` selects the format by `q` weight (default `1`). Equal, missing, or wildcard-only preferences use `User-Agent`: recognized bots, agents, and command-line clients receive Markdown; browsers and unknown clients receive HTML. For example, `curl -H 'Accept: text/html' https://example.com/` renders HTML despite curl's agent hint. `curl -H 'Accept: text/markdown' https://example.com/` returns the authored home source.
 
-A supported representation explicitly rejected with `q=0` is excluded; rejecting both returns 406. Extensionless publication responses send `Vary: Accept, User-Agent`, including representation-unavailable 404 and negotiation 406. Client classification is a delivery hint, not access control.
+A supported representation explicitly rejected with `q=0` is excluded; rejecting both returns 406. Extensionless publication responses send `Vary: Accept, User-Agent` (plus `Accept-Language` for neutral URLs); neutral `.html` sends `Vary: Accept-Language`, including representation-unavailable 404 and negotiation 406. Client classification is a delivery hint, not access control.
 
-Extensionless neutral requests select the same neutral source for either format; HTML therefore can render an unlocalized or English source even with another default locale. Unlocalized content does not substitute for a missing requested locale. Neutral `.html` returns 404 if the default locale is absent, unmaintained, or has no valid source. HTML also requires a readable, nonempty presentation; the presentation template may use tmpl's normal template fallback, which does not substitute Markdown content.
+HTML selects its language by explicit URL locale, then supported `Accept-Language`, then `TEQFW_TMPL__DEFAULT_LOCALE`. This applies to both extensionless HTML and `.html` aliases: the suffix controls format only. Header preferences use positive `q` weights in descending order, stable ties, case-insensitive exact tags then primary languages (for example `ru-RU` → `ru`); malformed and zero weights are excluded. Unsupported or absent preferences use the default. In site mode an authored unlocalized source keeps priority for neutral HTML; otherwise the exact selected maintained locale source is required. Missing or invalid selected content returns 404 without substituting English or another locale. Explicit localized URLs never substitute unlocalized content. Neutral Markdown ignores `Accept-Language` and retains unlocalized → English → default selection. HTML also requires a readable, nonempty presentation; the presentation template may use tmpl's normal template fallback, which does not substitute Markdown content.
+
+For a bilingual site with default `ru`, these requests demonstrate independent format and language selection:
+
+```bash
+curl -H 'Accept: text/html' -H 'Accept-Language: en-US,en;q=0.9' https://example.com/
+curl -H 'Accept: text/html' -H 'Accept-Language: ru-RU,ru;q=0.9' https://example.com/
+curl -H 'Accept: text/html' https://example.com/
+curl -H 'Accept-Language: en' https://example.com/index.html
+curl -H 'Accept: text/markdown' -H 'Accept-Language: ru' https://example.com/
+```
+
+Without an unlocalized home source, the first two return English and Russian HTML, the third returns default Russian HTML, the fourth returns English HTML regardless of curl's agent hint, and the last returns neutral English Markdown. Locale settings are loaded at process startup; restart the server after changing them or updating the package.
 
 A found corrupt, unreadable, or unsafe highest-priority neutral source returns 404 instead of silently falling through to another language. A missing neutral candidate proceeds to the next candidate. Missing exact sources and unavailable HTML representations return 404 when the publication exists in another eligible source locale.
 
@@ -64,7 +76,7 @@ Only one terminal lowercase `.md` or `.html` representation suffix is supported.
 
 ## Main page and delivery priority
 
-In site mode `/` addresses `index.md` and negotiates HTML or Markdown; `/index.md` guarantees neutral Markdown. Human requests to `/{locale}/` render localized HTML; agent requests read the exact localized source. Unlocalized HTML uses canonical `/`. `/index`, `/index.md`, `/index.html`, and localized `/index` forms are aliases. `/{locale}` and `/{locale}/` both address the localized home projection. `/index.html` retains the neutral HTML default-locale policy. Nested `docs/index.md` has the explicit route `/docs/index`; no implicit nested directory index publication is introduced.
+In site mode `/` addresses `index.md` and negotiates HTML or Markdown; `/index.md` guarantees neutral Markdown. Human requests to `/{locale}/` render localized HTML; agent requests read the exact localized source. Unlocalized HTML uses canonical `/`. `/index`, `/index.md`, `/index.html`, and localized `/index` forms are aliases. `/{locale}` and `/{locale}/` both address the localized home projection. `/index.html` uses the same human language selection as `/`. Nested `docs/index.md` has the explicit route `/docs/index`; no implicit nested directory index publication is introduced.
 
 For ordinary requests the order is:
 
