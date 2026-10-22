@@ -30,6 +30,9 @@ it('serves normal responses and localized errors through real CLI startup and HT
         await write('tmpl/web/en/publication.html', '<main>{{ publication.html | safe }}</main>');
         await write('tmpl/web/en/about.md', '---\ntitle: About\ndescription: Test\ndate: 2026-09-30\n---\n# About\n');
         await write('tmpl/web/en/ordinary.html', '<h1>Ordinary</h1>');
+        const home = '---\ntitle: Home\ndescription: Preview test\ndate: 2026-10-22\n---\n# Home\n';
+        await write('tmpl/web/index.md', home);
+        await write('tmpl/web/en/publication.html', '<html><head><meta property="og:image" content="https://example.test/assets/social-preview.jpg"><meta name="twitter:card" content="summary_large_image"><link rel="canonical" href="{{ canonicalUrl }}"></head><body>{{ publication.html | safe }}</body></html>');
         await write('web/assets/ok.txt', 'Static');
         await write('tmpl/web/en/broken.md', 'invalid');
         let output = '';
@@ -53,6 +56,38 @@ it('serves normal responses and localized errors through real CLI startup and HT
             try { await request('/assets/ok.txt'); ready = true; break; } catch { await delay(50); }
         }
         assert.ok(ready, `CLI did not start: ${output}`);
+        // Canonical home previews must expose the host's SSR metadata over actual HTTP.
+        for (const ua of ['TelegramBot (like TwitterBot)', 'Twitterbot/1.0', 'facebookexternalhit/1.1', 'Mozilla/5.0', 'UnknownClient']) {
+            for (const accept of [undefined, '*/*', 'text/markdown,text/html']) {
+                const headers = {'user-agent': ua, ...(accept === undefined ? {} : {accept})};
+                const res = await request('/', 'GET', headers);
+                assert.equal(res.status, 200, ua);
+                assert.equal(res.headers['content-type'], 'text/html; charset=utf-8');
+                assert.match(res.body, /<meta property="og:image"/);
+                assert.match(res.body, /<meta name="twitter:card"/);
+                assert.match(res.body, /<link rel="canonical" href="https:\/\/example.test\/">/);
+                assert.equal(res.headers.vary, 'Accept, User-Agent, Accept-Language');
+                assert.equal(res.headers.location, undefined);
+            }
+            for (const [url, accept, expected] of [
+                ['/', 'text/markdown', 'markdown'], ['/index.md', 'text/html', 'markdown'],
+                ['/', 'text/html', 'html'], ['/index.html', 'text/markdown', 'html'],
+            ]) {
+                const res = await request(url, 'GET', {'user-agent': ua, accept});
+                assert.equal(res.status, 200);
+                assert.equal(res.headers['content-type'], `text/${expected}; charset=utf-8`);
+                if (expected === 'markdown') assert.equal(res.body, home);
+            }
+        }
+        for (const ua of ['ChatGPT-User', 'GPTBot', 'ClaudeBot', 'curl/8.0', 'wget/1.0', 'ExampleBot']) {
+            for (const accept of [undefined, '*/*']) {
+                const res = await request('/', 'GET', {'user-agent': ua, ...(accept === undefined ? {} : {accept})});
+                assert.equal(res.status, 200);
+                assert.equal(res.headers['content-type'], 'text/markdown; charset=utf-8');
+                assert.equal(res.body, home);
+                assert.equal(res.headers.vary, 'Accept, User-Agent, Accept-Language');
+            }
+        }
         assert.equal((await request('/en/missing')).body, 'Not Found');
         for (const locale of ['en', 'ru']) await write(`tmpl/web/${locale}/404.html`,
             `{% extends "layout.html" %}{% block content %}<h1>${locale} missing</h1>{% if canonicalUrl or alternateUrls or markdownAlternateUrl or publication %}BAD_METADATA{% endif %}{% endblock %}`);

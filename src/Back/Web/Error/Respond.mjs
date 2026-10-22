@@ -24,7 +24,7 @@ export default class Respond {
          * @param {object} deps
          * @param {TeqFw_Web_Back_Pipeline_RequestContext} deps.context
          * @param {number} [deps.status]
-         * @param {'static'|'page'} [deps.kind]
+         * @param {Fl32_Cms_Back_Web_Error_Respond_Kind} [deps.kind]
          * @param {Record<string, string>} [deps.headers]
          * @returns {Promise<void>}
          */

@@ -31,9 +31,9 @@ export default class Fl32_Cms_Back_Publication_Handler {
             stage: STAGE.PROCESS,
             before: ['Fl32_Cms_Back_Web_Handler_Template', 'TeqFw_Web_Back_Handler_Static'],
         });
-        /** @type {Fl32_Cms_Back_Publication_Family[]} */
+        /** @type {Array<Fl32_Cms_Back_Publication_Family>} */
         const families = routing.getFamilies();
-        /** @type {string[]} */
+        /** @type {Array<string>} */
         const locales = tmplConfig.getAvailableLocales();
         if (families.length) {
             let base;

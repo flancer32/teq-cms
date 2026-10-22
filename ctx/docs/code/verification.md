@@ -1,7 +1,11 @@
 # Code Verification
 
 - Path: `ctx/docs/code/verification.md`
-- Changed: `20260930`
+- Changed: `20261022`
+
+Runtime callable JSDoc uses `Array<T>` for arrays and named aliases from the root
+`types.d.ts` for unions, literal sets, nullable values and callbacks. Preserve the
+exact type contracts when adapting annotations to validator-supported syntax.
 
 The current project checks are:
 
@@ -15,7 +19,7 @@ The current project checks are:
 - `teqfw-platform .` — source-to-unit-test topology validation.
 - `adsm-ctx validate .` — cognitive-context structure validation.
 
-Representation tests verify explicit suffix priority, supported Accept weights and rejection, User-Agent hints, and the HTML default. HTML language tests verify URL precedence, weighted and regional Accept-Language, default fallback, rejection of unavailable selected content, and stable neutral Markdown. Site-publication tests verify negotiated home and localized delivery, `Vary`, and explicit Markdown discovery links, and exercise real tmpl rendering, the ordinary template adapter, static-file delivery, host policy, root priority, and HTTP/discovery agreement. CLI tests verify host DI substitution as well as legacy-family generation. Publication and agent-message acceptance tests exercise the CMS plugin with the real web pipeline. Generator unit tests verify discovery output and refusal to replace symlink targets. A local `web:start` smoke check can verify the CLI host, template engine, static delivery, and HTTP content types when sockets are available.
+Representation tests verify explicit suffix priority, supported Accept weights and rejection, social preview HTML before generic User-Agent hints, explicit overrides and rejection for social clients, and the HTML default. Real CLI HTTP tests verify SSR Open Graph/Twitter metadata and canonical identity on `/` for social previews with absent, wildcard or tied Accept, while AI/CLI clients retain Markdown. HTML language tests verify URL precedence, weighted and regional Accept-Language, default fallback, rejection of unavailable selected content, and stable neutral Markdown. Site-publication tests verify negotiated home and localized delivery, `Vary`, and explicit Markdown discovery links, and exercise real tmpl rendering, the ordinary template adapter, static-file delivery, host policy, root priority, and HTTP/discovery agreement. CLI tests verify host DI substitution as well as legacy-family generation. Publication and agent-message acceptance tests exercise the CMS plugin with the real web pipeline. Generator unit tests verify discovery output and refusal to replace symlink targets. A local `web:start` smoke check can verify the CLI host, template engine, static delivery, and HTTP content types when sockets are available.
 
 Error tests cover terminal ordering independent of registration order, host handlers
 before the terminal handler, URL/default error locales, template default/shared

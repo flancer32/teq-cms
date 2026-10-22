@@ -6,7 +6,7 @@
  */
 
 /**
- * @returns {Function}
+ * @returns {Fl32_Cms_Back_Di_Preprocessor_Callback}
  */
 export default function Fl32_Cms_Back_Di_Preprocessor() {
     const replacements = new Map([

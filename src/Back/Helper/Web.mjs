@@ -25,7 +25,7 @@ export default class Fl32_Cms_Back_Helper_Web {
         /**
          * Parses Accept-Language header into a prioritized language list.
          * @param {string} header - Raw value of the Accept-Language header, e.g. "en-US,en;q=0.9,ru;q=0.8".
-         * @returns {string[]} Language codes sorted by descending quality factor.
+         * @returns {Array<string>} Language codes sorted by descending quality factor.
          */
         function parseAcceptLanguage(header) {
             if (!header) return [];
@@ -49,7 +49,7 @@ export default class Fl32_Cms_Back_Helper_Web {
          * @returns {string} - Resolved locale code (e.g. "en", "ru", etc.).
          */
         function resolveFromAcceptLanguage(header) {
-            /** @type {string[]} */
+            /** @type {Array<string>} */
             const allowed = tmplConfig.getAvailableLocales();
             const accepted = parseAcceptLanguage(header);
             for (const lang of accepted) {
@@ -65,7 +65,7 @@ export default class Fl32_Cms_Back_Helper_Web {
         /**
          * Extracts locale code from the URL path if present.
          * @param {string} path - Raw URL path (e.g. "/en/about" or "/ru/blog/2024").
-         * @returns {string|null} - Extracted locale code if present in the path; otherwise, null.
+         * @returns {Fl32_Cms_NullableString} - Extracted locale code if present in the path; otherwise, null.
          */
         function extractFromUrlPath(path) {
             const trimmed = path.replace(/^\/+|\/+$/g, '');
@@ -93,7 +93,7 @@ export default class Fl32_Cms_Back_Helper_Web {
          *
          * @param {object} deps - Parameters object.
          * @param {string} deps.path - Raw URL path
-         * @param {string[]} deps.allowedLocales - List of supported locales
+         * @param {Array<string>} deps.allowedLocales - List of supported locales
          * @param {string} deps.fallbackLocale - Locale used when none found in path
          * @returns {Fl32_Cms_Back_Helper_Web_RoutingInfo}
          */

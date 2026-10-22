@@ -44,7 +44,7 @@ export default class Fl32_Cms_Back_Helper_File {
          * @param {object} deps - Parameters object.
          * @param {string} deps.baseDir - Directory used as base for resolution
          * @param {string} deps.cleanPath - Clean path extracted from URL
-         * @returns {Promise<string|undefined>} Resolved template name or undefined
+         * @returns {Promise<Fl32_Cms_OptionalString>} Resolved template name or undefined
          */
         this.resolveTemplateName = async function ({baseDir, cleanPath}) {
             const trimmed = (cleanPath ?? '').replace(/^\/+|\/+$/g, '');

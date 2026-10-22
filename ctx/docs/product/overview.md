@@ -1,7 +1,7 @@
 # Product Overview
 
 - Path: `ctx/docs/product/overview.md`
-- Changed: `20260930`
+- Changed: `20261022`
 
 ## Product Identity
 
@@ -28,7 +28,7 @@ Content and locale variants remain transparent, reproducible, and version-contro
 - Markdown files are authored sources. Their HTML projections are derived pages rendered by the server; HTML templates remain supported for layout and existing pages.
 - A publication is one content resource with explicit locale-specific Markdown sources. Locale selects content language; representation selects Markdown or HTML.
 - Source priority and response representation are independent decisions. An authored Markdown source takes priority over an HTML template or static file; this does not imply that the HTTP response contains raw Markdown.
-- An explicit `.md` or `.html` suffix selects the representation ahead of `Accept` and `User-Agent`; it does not override language selection. Without a representation suffix, headers select Markdown for agents and HTML for people. Explicit format preference in `Accept` takes priority over `User-Agent` classification; ambiguous clients default to HTML.
+- An explicit `.md` or `.html` suffix selects the representation ahead of `Accept` and `User-Agent`; it does not override language selection. Without a representation suffix, headers select Markdown for agents and HTML for people. Explicit format preference in `Accept` takes priority over `User-Agent` classification; social link-preview crawlers receive HTML when format preferences are ambiguous; other ambiguous clients default to HTML.
 - A locale segment selects an exact source locale independently of representation. HTML language selection uses the explicit URL locale, then the supported preference in `Accept-Language`, then `TEQFW_TMPL__DEFAULT_LOCALE`. This applies both to negotiated HTML and explicit `.html`; an extension selects format, never language. Guaranteed neutral Markdown addresses have a `.md` suffix; home uses `/index.md`.
 - In site mode the locale-neutral Markdown resource prefers an unlocalized source, then an English (`en`) source, then the site's default locale source. Legacy families retain the English then default preference. If no eligible candidate exists, that resource is unavailable; no other locale is substituted. English need not be the default locale for human pages.
 - Explicit localized Markdown and all localized HTML require the source for the requested locale; another language does not substitute for a missing variant. For neutral HTML, an authored unlocalized source keeps priority in site mode; otherwise the exact selected human locale source is required. An unavailable selected locale source returns 404, without English or other localized substitution. The English preference belongs only to neutral Markdown.

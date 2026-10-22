@@ -1,14 +1,8 @@
 declare global {
-  type Fl32_Cms_Back_Web_Error_Policy = import("./src/Back/Web/Error/Policy.mjs").default;
-  type Fl32_Cms_Back_Web_Error_Policy__Class = typeof import("./src/Back/Web/Error/Policy.mjs").default;
-  type Fl32_Cms_Back_Web_Error_Respond = import("./src/Back/Web/Error/Respond.mjs").default;
-  type Fl32_Cms_Back_Web_Error_Respond__Class = typeof import("./src/Back/Web/Error/Respond.mjs").default;
-  type Fl32_Cms_Back_Web_Handler_NotFound = import("./src/Back/Web/Handler/NotFound.mjs").default;
-  type Fl32_Cms_Back_Web_Handler_NotFound__Class = typeof import("./src/Back/Web/Handler/NotFound.mjs").default;
-
   type Fl32_Cms_Back_Agent_Inbox = import("./src/Back/Agent/Inbox.mjs").default;
   type Fl32_Cms_Back_Agent_Inbox__Class = typeof import("./src/Back/Agent/Inbox.mjs").default;
   type Fl32_Cms_Back_Api_Adapter = import("./src/Back/Api/Adapter.mjs").default;
+  type Fl32_Cms_Back_Api_Adapter_Error = Error;
   type Fl32_Cms_Back_Api_Adapter_RenderData = {target?: object; data?: object; options?: object};
   type Fl32_Cms_Back_Api_Adapter__Class = typeof import("./src/Back/Api/Adapter.mjs").default;
   type Fl32_Cms_Back_Cli_Command_Generate = import("./src/Back/Cli/Command/Generate.mjs").default;
@@ -16,8 +10,10 @@ declare global {
   type Fl32_Cms_Back_Cli_Plugin = import("./src/Back/Cli/Plugin.mjs").default;
   type Fl32_Cms_Back_Cli_Plugin__Class = typeof import("./src/Back/Cli/Plugin.mjs").default;
   type Fl32_Cms_Back_Config = import("./src/Back/Config.mjs").default;
+  type Fl32_Cms_Back_Config_SitemapRepresentations = 'html'|'markdown'|'both';
   type Fl32_Cms_Back_Config__Class = typeof import("./src/Back/Config.mjs").default;
   type Fl32_Cms_Back_Di_Preprocessor = typeof import("./src/Back/Di/Preprocessor.mjs").default;
+  type Fl32_Cms_Back_Di_Preprocessor_Callback = (depId: TeqFw_Di_Dto_DepId) => TeqFw_Di_Dto_DepId;
   type Fl32_Cms_Back_Di_Replace_Adapter = import("./src/Back/Di/Replace/Adapter.mjs").default;
   type Fl32_Cms_Back_Di_Replace_Adapter_Request = {url?: string; headers: {[key: string]: string|undefined}; socket?: {remoteAddress?: string}};
   type Fl32_Cms_Back_Di_Replace_Adapter__Class = typeof import("./src/Back/Di/Replace/Adapter.mjs").default;
@@ -30,6 +26,7 @@ declare global {
   type Fl32_Cms_Back_Discovery_Generator__Class = typeof import("./src/Back/Discovery/Generator.mjs").default;
   type Fl32_Cms_Back_Helper_Cast = import("./src/Back/Helper/Cast.mjs").default;
   type Fl32_Cms_Back_Helper_Cast_Enum_Options = {lower?: boolean; upper?: boolean};
+  type Fl32_Cms_Back_Helper_Cast_ItemCaster = (value: any) => any;
   type Fl32_Cms_Back_Helper_Cast__Class = typeof import("./src/Back/Helper/Cast.mjs").default;
   type Fl32_Cms_Back_Helper_File = import("./src/Back/Helper/File.mjs").default;
   type Fl32_Cms_Back_Helper_File__Class = typeof import("./src/Back/Helper/File.mjs").default;
@@ -42,22 +39,39 @@ declare global {
   type Fl32_Cms_Back_Publication_Handler = import("./src/Back/Publication/Handler.mjs").default;
   type Fl32_Cms_Back_Publication_Handler__Class = typeof import("./src/Back/Publication/Handler.mjs").default;
   type Fl32_Cms_Back_Publication_Item = {locale: string; route: string; family: Fl32_Cms_Back_Publication_Family; source: string; metadata: {[key: string]: unknown}; markdown: string; html: string};
+  type Fl32_Cms_Back_Publication_NullableItem = Fl32_Cms_Back_Publication_Item|null;
+  type Fl32_Cms_Back_Publication_NullablePresentation = Fl32_Cms_Back_Publication_Presentation|null;
+  type Fl32_Cms_Back_Publication_OptionalFamily = Fl32_Cms_Back_Publication_Family|undefined;
   type Fl32_Cms_Back_Publication_Policy = import("./src/Back/Publication/Policy.mjs").default;
+  type Fl32_Cms_Back_Publication_Policy_Mode = 'site'|'families';
   type Fl32_Cms_Back_Publication_Policy__Class = typeof import("./src/Back/Publication/Policy.mjs").default;
   type Fl32_Cms_Back_Publication_Presentation = {target: Fl32_Tmpl_Back_Dto_Target__DTO; template: string};
-  type Fl32_Cms_Back_Publication_Resource = {item: Fl32_Cms_Back_Publication_Item; representation: 'html'|'markdown'; url: string};
   type Fl32_Cms_Back_Publication_Representation = import("./src/Back/Publication/Representation.mjs").default;
+  type Fl32_Cms_Back_Publication_Representation_Format = 'md'|'html'|null;
   type Fl32_Cms_Back_Publication_Representation__Class = typeof import("./src/Back/Publication/Representation.mjs").default;
+  type Fl32_Cms_Back_Publication_Resource = {item: Fl32_Cms_Back_Publication_Item; representation: 'html'|'markdown'; url: string};
   type Fl32_Cms_Back_Publication_Routing = import("./src/Back/Publication/Routing.mjs").default;
   type Fl32_Cms_Back_Publication_Routing__Class = typeof import("./src/Back/Publication/Routing.mjs").default;
   type Fl32_Cms_Back_Publication_Source = import("./src/Back/Publication/Source.mjs").default;
   type Fl32_Cms_Back_Publication_Source__Class = typeof import("./src/Back/Publication/Source.mjs").default;
+  type Fl32_Cms_Back_Web_Error_Policy = import("./src/Back/Web/Error/Policy.mjs").default;
+  type Fl32_Cms_Back_Web_Error_Policy__Class = typeof import("./src/Back/Web/Error/Policy.mjs").default;
+  type Fl32_Cms_Back_Web_Error_Respond = import("./src/Back/Web/Error/Respond.mjs").default;
+  type Fl32_Cms_Back_Web_Error_Respond_Kind = 'static'|'page';
+  type Fl32_Cms_Back_Web_Error_Respond__Class = typeof import("./src/Back/Web/Error/Respond.mjs").default;
   type Fl32_Cms_Back_Web_Handler_AgentMessage = import("./src/Back/Web/Handler/AgentMessage.mjs").default;
   type Fl32_Cms_Back_Web_Handler_AgentMessage__Class = typeof import("./src/Back/Web/Handler/AgentMessage.mjs").default;
+  type Fl32_Cms_Back_Web_Handler_NotFound = import("./src/Back/Web/Handler/NotFound.mjs").default;
+  type Fl32_Cms_Back_Web_Handler_NotFound__Class = typeof import("./src/Back/Web/Handler/NotFound.mjs").default;
   type Fl32_Cms_Back_Web_Handler_StaticRoute = import("./src/Back/Web/Handler/StaticRoute.mjs").default;
   type Fl32_Cms_Back_Web_Handler_StaticRoute__Class = typeof import("./src/Back/Web/Handler/StaticRoute.mjs").default;
   type Fl32_Cms_Back_Web_Handler_Template = import("./src/Back/Web/Handler/Template.mjs").default;
   type Fl32_Cms_Back_Web_Handler_Template__Class = typeof import("./src/Back/Web/Handler/Template.mjs").default;
+  type Fl32_Cms_HeaderValue = string|string[]|undefined;
+  type Fl32_Cms_NullableString = string|null;
+  type Fl32_Cms_OptionalBoolean = boolean|undefined;
+  type Fl32_Cms_OptionalNumber = number|undefined;
+  type Fl32_Cms_OptionalString = string|undefined;
 }
 
 export {};

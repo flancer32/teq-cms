@@ -1,7 +1,7 @@
 # Markdown Publication
 
 - Path: `ctx/docs/architecture/publication.md`
-- Changed: `20260930`
+- Changed: `20261022`
 
 ## Ownership
 
@@ -45,7 +45,7 @@ Here `route` includes the configured prefix in families mode. Source selection a
 Explicit lowercase `.md` and `.html` select the format ahead of `Accept` and `User-Agent`; they do not override `Accept-Language`. Without either suffix:
 
 1. `Accept` explicitly preferring `text/markdown` selects Markdown. `text/html` or `application/xhtml+xml` selects HTML. Supported types are compared by their greatest declared `q` weight (default `1`); malformed weights are treated as `0`. A greater positive weight wins.
-2. Equal, missing, wildcard-only, or otherwise ambiguous preferences use `User-Agent` hints. Case-insensitive `bot`, `crawler`, `spider`, `agent`, `chatgpt`, `claude`, `anthropic`, `curl/`, `wget/`, `python-requests`, `python-httpx`, `aiohttp`, `scrapy`, and `libwww` identify agent requests. Other clients default to HTML.
+2. Equal, missing, wildcard-only, or otherwise ambiguous preferences use `User-Agent` hints. Known social link-preview crawlers (TelegramBot, Twitterbot, facebookexternalhit, Facebot, LinkedInBot, Slackbot, Discordbot, WhatsApp, Pinterestbot, and SkypeUriPreview, case-insensitive) select HTML before generic agent hints. Case-insensitive `bot`, `crawler`, `spider`, `agent`, `chatgpt`, `claude`, `anthropic`, `curl/`, `wget/`, `python-requests`, `python-httpx`, `aiohttp`, `scrapy`, and `libwww` identify agent requests. Other clients default to HTML.
 3. An explicitly rejected supported representation (`q=0`) is not selected; if both are explicitly rejected, the publication returns 406. This selection covers the supported publication formats, not general-purpose HTTP media negotiation.
 
 Extensionless publication responses, including representation-unavailable 404 and negotiation 406, send `Vary: Accept, User-Agent`; neutral addresses also include `Accept-Language`. Neutral `.html` sends `Vary: Accept-Language`. Explicit localized suffix responses and neutral `.md` do not vary by these headers. Classification is a public delivery hint, not authentication or a privacy boundary. Static exclusions and ordinary non-publication delivery keep their own contracts.

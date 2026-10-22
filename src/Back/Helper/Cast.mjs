@@ -14,9 +14,9 @@ export default class Fl32_Cms_Back_Helper_Cast {
         /**
          * Converts input to array. Applies optional item caster.
          *
-         * @param {*} data
-         * @param {function(*): *} [itemCast]
-         * @returns {Array<*>}
+         * @param {any} data
+         * @param {Fl32_Cms_Back_Helper_Cast_ItemCaster} [itemCast]
+         * @returns {Array<any>}
          */
         this.array = function (data, itemCast) {
             let arr = [];
@@ -35,8 +35,8 @@ export default class Fl32_Cms_Back_Helper_Cast {
         /**
          * Converts input to boolean.
          *
-         * @param {*} data
-         * @returns {boolean|undefined}
+         * @param {any} data
+         * @returns {Fl32_Cms_OptionalBoolean}
          */
         this.bool = function (data) {
             if (data === true || data === 'true' || data === 1 || data === '1' || data === 'yes') return true;
@@ -47,8 +47,8 @@ export default class Fl32_Cms_Back_Helper_Cast {
         /**
          * Converts input to float number.
          *
-         * @param {*} data
-         * @returns {number|undefined}
+         * @param {any} data
+         * @returns {Fl32_Cms_OptionalNumber}
          */
         this.decimal = function (data) {
             const res = Number.parseFloat(data);
@@ -58,10 +58,10 @@ export default class Fl32_Cms_Back_Helper_Cast {
         /**
          * Converts input to enum value. Supports case normalization.
          *
-         * @param {*} data
+         * @param {any} data
          * @param {object} enu
          * @param {Fl32_Cms_Back_Helper_Cast_Enum_Options} [options]
-         * @returns {string|undefined}
+         * @returns {Fl32_Cms_OptionalString}
          */
         this.enum = function (data, enu, options = {}) {
             const {lower, upper} = options;
@@ -80,8 +80,8 @@ export default class Fl32_Cms_Back_Helper_Cast {
         /**
          * Converts input to integer.
          *
-         * @param {*} data
-         * @returns {number|undefined}
+         * @param {any} data
+         * @returns {Fl32_Cms_OptionalNumber}
          */
         this.int = function (data) {
             const norm = (typeof data === 'string') ? data.trim() : data;
@@ -92,8 +92,8 @@ export default class Fl32_Cms_Back_Helper_Cast {
         /**
          * Converts input to string.
          *
-         * @param {*} data
-         * @returns {string|undefined}
+         * @param {any} data
+         * @returns {Fl32_Cms_OptionalString}
          */
         this.string = function (data) {
             if (typeof data === 'string') {

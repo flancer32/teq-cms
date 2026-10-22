@@ -112,8 +112,8 @@ at the HTTP boundary. Source APIs accept strict logical routes. Keep traversal,
 source symlink, locale, and metadata validation intact.
 
 Explicit `.md` or `.html` selects the format ahead of `Accept` and `User-Agent`; it does not override `Accept-Language`. Extensionless publication URLs use
-explicit `Accept` preference, then `User-Agent` hints: Markdown for agents, HTML
-for people, with HTML as the ambiguous-client default. Send `Vary: Accept, User-Agent`
+explicit `Accept` preference, then `User-Agent` hints: HTML for known social preview
+crawlers before generic Markdown agent hints, HTML for people, with HTML as the ambiguous-client default. Send `Vary: Accept, User-Agent`
 for negotiated responses, adding `Accept-Language` for neutral addresses. Neutral
 `.html` varies by `Accept-Language`. Neutral Markdown ignores language headers;
 HTML never substitutes another localized source for a missing selected language.

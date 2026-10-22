@@ -59,7 +59,7 @@ export default class Generator {
             return {robots, llms, sitemap};
         };
 
-        /** @returns {Promise<string[]>} */
+        /** @returns {Promise<Array<string>>} */
         this.write = async () => {
             const content = await this.build();
             const root = path.resolve(tmplConfig.getRootPath());

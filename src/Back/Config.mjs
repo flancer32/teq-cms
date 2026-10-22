@@ -44,15 +44,15 @@ export default class Fl32_Cms_Back_Config {
         if (prefixes.some(prefix => tmplConfig.getAvailableLocales().includes(prefix.split('/')[0]))) {
             throw new Error('Publication prefixes must not begin with a maintained locale.');
         }
-        /** @returns {string|undefined} Canonical CMS base URL. */
+        /** @returns {Fl32_Cms_OptionalString} Canonical CMS base URL. */
         this.getBaseUrl = () => baseUrl;
-        /** @returns {'html'|'markdown'|'both'} Formats included in the sitemap. */
-        this.getSitemapRepresentations = () => /** @type {'html'|'markdown'|'both'} */ (sitemapRepresentations);
+        /** @returns {Fl32_Cms_Back_Config_SitemapRepresentations} Formats included in the sitemap. */
+        this.getSitemapRepresentations = () => /** @type {Fl32_Cms_Back_Config_SitemapRepresentations} */ (sitemapRepresentations);
         /** @returns {boolean} Whether the agent message route is registered. */
         this.getAgentMessageEnabled = () => agentMessageEnabled;
-        /** @returns {string|undefined} Optional shared token for agent messages. */
+        /** @returns {Fl32_Cms_OptionalString} Optional shared token for agent messages. */
         this.getAgentMessageToken = () => agentMessageToken;
-        /** @returns {Fl32_Cms_Back_Publication_Family[]} */
+        /** @returns {Array<Fl32_Cms_Back_Publication_Family>} */
         this.getPublicationFamilies = () => publicationFamilies;
     }
 }

@@ -33,7 +33,7 @@ export default class Routing {
         this.isPublicRoute = route => /^[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*$/.test(route) &&
             !this.isStatic(`/${route}`) && !this.isEndpoint(`/${route}`) &&
             (mode !== 'site' || !tmplConfig.getAvailableLocales().includes(route.split('/')[0]));
-        /** @returns {Fl32_Cms_Back_Publication_Family[]} */
+        /** @returns {Array<Fl32_Cms_Back_Publication_Family>} */
         this.getFamilies = () => mode === 'site' ? [{prefix: '', presentation: 'publication.html'}] : families;
         /**
          * Stable Markdown address; headers cannot change its representation.

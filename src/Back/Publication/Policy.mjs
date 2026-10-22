@@ -10,9 +10,9 @@ export default class Policy {
      * @param {Fl32_Cms_Back_Config} deps.config
      */
     constructor({config}) {
-        /** @returns {'site'|'families'} */
+        /** @returns {Fl32_Cms_Back_Publication_Policy_Mode} */
         this.getMode = () => config.getPublicationFamilies().length ? 'families' : 'site';
-        /** @returns {string[]} URL prefixes delivered exclusively from web/. */
+        /** @returns {Array<string>} URL prefixes delivered exclusively from web/. */
         this.getStaticPrefixes = () => ['/assets/'];
         /**
          * @param {object} deps

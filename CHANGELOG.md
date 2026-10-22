@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Normalize runtime JSDoc to validator-supported array syntax and canonical named type aliases without changing runtime behavior.
+- Serve HTML to known social link-preview crawlers when Accept is ambiguous, retaining explicit format overrides and Markdown defaults for AI/CLI clients (issue #34).
+
 ## [0.10.0] - 2026-09-30
 
 ### Added

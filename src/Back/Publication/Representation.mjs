@@ -10,12 +10,12 @@ export default class Representation {
     constructor() {
         // Durable contract: ctx/docs/product/overview.md, Product Model.
         // Explicit suffix overrides headers; extensionless agent requests get Markdown,
-        // human requests get HTML. Markdown authorship never implies a Markdown response.
+        // social preview and human requests get HTML. Markdown authorship never implies a Markdown response.
         /**
          * @param {object} deps
          * @param {string} [deps.suffix]
-         * @param {Record<string, string|string[]|undefined>} deps.headers
-         * @returns {'md'|'html'|null}
+         * @param {Record<string, Fl32_Cms_HeaderValue>} deps.headers
+         * @returns {Fl32_Cms_Back_Publication_Representation_Format}
          */
         this.select = ({suffix, headers}) => {
             if (suffix === 'md' || suffix === 'html') return suffix;
@@ -41,6 +41,8 @@ export default class Representation {
             // Wildcards, absent headers and equal explicit preferences do not identify a format.
             // This is a public delivery hint, not authentication or a privacy boundary.
             const ua = typeof headers['user-agent'] === 'string' ? headers['user-agent'] : '';
+            const socialPreview = /telegrambot|twitterbot|facebookexternalhit|facebot|linkedinbot|slackbot|discordbot|whatsapp|pinterestbot|skypeuripreview/i.test(ua);
+            if (socialPreview) return 'html';
             const agent = /bot|crawler|spider|agent|chatgpt|claude|anthropic|curl\/|wget\/|python-requests|python-httpx|aiohttp|scrapy|libwww/i.test(ua);
             return agent ? 'md' : 'html';
         };

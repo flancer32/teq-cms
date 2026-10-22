@@ -26,7 +26,7 @@ export default class Fl32_Cms_Back_Api_Adapter {
      * @param {object} deps - Parameters object.
      * @param {object} deps.req - The HTTP(S) request object.
      * @returns {Promise<Fl32_Cms_Back_Api_Adapter_RenderData>} Rendering context for the template engine.
-     * @throws {Error} If the method is not implemented by the application.
+     * @throws {Fl32_Cms_Back_Api_Adapter_Error} If the method is not implemented by the application.
      */
     async getRenderData({req}) {
         throw new Error('Method not implemented');

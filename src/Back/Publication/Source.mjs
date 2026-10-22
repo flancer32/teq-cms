@@ -17,14 +17,14 @@ export default class Fl32_Cms_Back_Publication_Source {
      */
     constructor({fs, path, tmplConfig, routing, policy, parseDocument, marked}) {
         const locales = tmplConfig.getAvailableLocales();
-        /** @type {Fl32_Cms_Back_Publication_Family[]} */
+        /** @type {Array<Fl32_Cms_Back_Publication_Family>} */
         const families = routing.getFamilies();
         const root = path.resolve(tmplConfig.getRootPath(), 'tmpl', 'web');
         /** @param {unknown} route @returns {boolean} */
         const safeRoute = route => typeof route === 'string' &&
             /^(?:[a-zA-Z0-9_-]+)(?:\/[a-zA-Z0-9_-]+)*$/.test(route);
 
-        /** @param {string} route @returns {Fl32_Cms_Back_Publication_Family|undefined} */
+        /** @param {string} route @returns {Fl32_Cms_Back_Publication_OptionalFamily} */
         this.getFamily = route => families.find(family =>
             (family.prefix === '' || route.startsWith(`${family.prefix}/`)) && safeRoute(route) && routing.isPublicRoute(route)
         );
@@ -35,7 +35,7 @@ export default class Fl32_Cms_Back_Publication_Source {
          * @param {object} deps
          * @param {string} deps.locale
          * @param {string} deps.route
-         * @returns {Promise<Fl32_Cms_Back_Publication_Item|null>}
+         * @returns {Promise<Fl32_Cms_Back_Publication_NullableItem>}
          */
         this.readAvailable = async ({locale, route}) => {
             try {
@@ -49,7 +49,7 @@ export default class Fl32_Cms_Back_Publication_Source {
          * Select the canonical Markdown source using the site's maintained locales.
          * @param {object} deps
          * @param {string} deps.route
-         * @returns {Promise<Fl32_Cms_Back_Publication_Item|null>}
+         * @returns {Promise<Fl32_Cms_Back_Publication_NullableItem>}
          */
         this.readNeutral = async ({route}) => {
             if (!this.getFamily(route)) return null;
@@ -76,9 +76,9 @@ export default class Fl32_Cms_Back_Publication_Source {
          * Never substitute another localized source when that language is unavailable.
          * @see https://github.com/flancer32/teq-cms/blob/main/ctx/docs/architecture/publication.md#html-language-selection
          * @param {object} deps
-         * @param {string|undefined} deps.locale
+         * @param {Fl32_Cms_OptionalString} deps.locale
          * @param {string} deps.route
-         * @returns {Promise<Fl32_Cms_Back_Publication_Item|null>}
+         * @returns {Promise<Fl32_Cms_Back_Publication_NullableItem>}
          */
         this.readHtml = async ({locale, route}) => {
             if (!this.getFamily(route)) return null;
@@ -116,7 +116,7 @@ export default class Fl32_Cms_Back_Publication_Source {
          * @param {object} deps
          * @param {string} deps.locale
          * @param {string} deps.route
-         * @returns {Promise<Fl32_Cms_Back_Publication_Item|null>}
+         * @returns {Promise<Fl32_Cms_Back_Publication_NullableItem>}
          */
         this.read = async ({locale, route}) => {
             if ((locale === '' ? !routing.isSite() : !/^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{2,8})*$/.test(locale) ||

@@ -22,7 +22,7 @@ export default class Fl32_Cms_Back_Publication_Catalog {
          * Resolve the presentation with tmpl's normal lookup and fallback rules.
          * @param {object} deps
          * @param {Fl32_Cms_Back_Publication_Item} deps.item
-         * @returns {Promise<Fl32_Cms_Back_Publication_Presentation|null>}
+         * @returns {Promise<Fl32_Cms_Back_Publication_NullablePresentation>}
          */
         this.getPresentation = async ({item}) => {
             const target = dtoTarget.create({
@@ -41,7 +41,7 @@ export default class Fl32_Cms_Back_Publication_Catalog {
          * Enumerate structurally available HTML projections for a locale.
          * @param {object} deps
          * @param {string} deps.locale
-         * @returns {Promise<Fl32_Cms_Back_Publication_Item[]>}
+         * @returns {Promise<Array<Fl32_Cms_Back_Publication_Item>>}
          */
         this.listHtml = async ({locale}) => {
             const items = [];
@@ -53,14 +53,14 @@ export default class Fl32_Cms_Back_Publication_Catalog {
 
         /**
          * Enumerate each available neutral resource once using HTTP source selection.
-         * @returns {Promise<Fl32_Cms_Back_Publication_Item[]>}
+         * @returns {Promise<Array<Fl32_Cms_Back_Publication_Item>>}
          */
         this.listNeutral = async () => {
             const routes = new Set();
             for (const locale of [...(routing.isSite() ? [''] : []), ...tmplConfig.getAvailableLocales()]) {
                 for (const item of await this.list({locale})) routes.add(item.route);
             }
-            /** @type {Fl32_Cms_Back_Publication_Item[]} */
+            /** @type {Array<Fl32_Cms_Back_Publication_Item>} */
             const items = [];
             for (const route of [...routes].sort()) {
                 const item = await source.readNeutral({route});
@@ -73,11 +73,11 @@ export default class Fl32_Cms_Back_Publication_Catalog {
          * Inventory distinct source/representation identities using runtime availability.
          * Neutral Markdown keeps its existing explicit address; other sources use exact locale URLs.
          * @see https://github.com/flancer32/teq-cms/blob/main/ctx/docs/architecture/publication.md#discovery
-         * @returns {Promise<Fl32_Cms_Back_Publication_Resource[]>}
+         * @returns {Promise<Array<Fl32_Cms_Back_Publication_Resource>>}
          */
         this.listRepresentations = async () => {
             const neutral = new Map((await this.listNeutral()).map(item => [item.route, item.locale]));
-            /** @type {Fl32_Cms_Back_Publication_Resource[]} */
+            /** @type {Array<Fl32_Cms_Back_Publication_Resource>} */
             const resources = [];
             for (const locale of [...(routing.isSite() ? [''] : []), ...tmplConfig.getAvailableLocales()]) {
                 for (const item of await this.list({locale})) {
@@ -99,7 +99,7 @@ export default class Fl32_Cms_Back_Publication_Catalog {
          * Enumerate a source locale's public publications with validated metadata.
          * @param {object} deps
          * @param {string} deps.locale
-         * @returns {Promise<Fl32_Cms_Back_Publication_Item[]>}
+         * @returns {Promise<Array<Fl32_Cms_Back_Publication_Item>>}
          */
         this.list = async ({locale}) => {
             if (locale === '' ? !routing.isSite() : !/^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{2,8})*$/.test(locale) ||
@@ -113,7 +113,7 @@ export default class Fl32_Cms_Back_Publication_Catalog {
                 if (error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') return [];
                 throw error;
             }
-            /** @type {Fl32_Cms_Back_Publication_Item[]} */
+            /** @type {Array<Fl32_Cms_Back_Publication_Item>} */
             const publications = [];
             for (const family of routing.getFamilies()) {
                 const directory = path.join(root, locale, family.prefix);

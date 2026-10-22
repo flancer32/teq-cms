@@ -10,9 +10,9 @@ export default class Policy {
         /**
          * @param {object} deps
          * @param {number} deps.status
-         * @param {string|undefined} deps.locale
+         * @param {Fl32_Cms_OptionalString} deps.locale
          * @param {string} deps.path Safe pathname without query parameters.
-         * @returns {string|undefined}
+         * @returns {Fl32_Cms_OptionalString}
          */
         this.getTemplateName = ({status, locale, path}) => {
             void locale;
