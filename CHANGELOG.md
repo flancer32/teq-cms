@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.10.1] - 2026-10-22
+
 ### Fixed
 
 - Normalize runtime JSDoc to validator-supported array syntax and canonical named type aliases without changing runtime behavior.
