@@ -1,45 +1,46 @@
 # Cognitive Context
 
 - Path: `ctx/AGENTS.md`
-- Template Version: `20260702`
-- Changed: `20260807`
+- Template Version: `20261024`
+- Changed: `20261024`
 
 ## Purpose
 
-This file marks `ctx/` as the project cognitive context.
+This directory contains the project's cognitive context.
 
-Use this branch for project knowledge and keep detailed ADSM methodology outside the project-facing context.
+`docs/` holds authoritative project definitions, `agent/` holds project-local agent operations, and `assets/` holds non-authoritative supporting materials.
 
-## Bootstrap Marker
-
-- This context follows ADSM conventions.
-- Use skill `adsm-ctx` for structure validation, upgrade logic, and methodology rules.
+Keep generic ADSM methodology outside the project context.
 
 ## Level Map
 
-- `agent/` — project-local agent and tool materials outside the reusable ADSM baseline.
-- `assets/` — visual, generated, rendered, or auxiliary artifacts that support documentation without defining authoritative meaning.
-- `docs/` — project-facing documentation and constraints.
-- `AGENTS.md` — level definition for `ctx/`.
-- `README.md` — short entry note for the cognitive context.
-- `adsm.json` — context metadata for versioning and upgrade eligibility.
+- `agent/` — project-local agent and tool materials.
+- `assets/` — visual, generated, and auxiliary documentation assets.
+- `docs/` — authoritative project documentation and constraints.
+- `AGENTS.md` — context boundary and navigation rules.
+- `README.md` — introductory context information.
+- `adsm.json` — context metadata and versioning.
 
 ## Level Boundary
 
 Defines:
 
-- `ctx/` as the project cognitive context boundary.
-- The split between project-facing documentation and project-local agent materials.
-- The local entry points agents should read before deeper work.
+- The boundary of the project's cognitive context.
+- Separation of authoritative documentation, agent operations, and supporting assets.
+- Navigation to the appropriate context branch.
 
 Does NOT define:
 
-- Product-specific meaning that belongs in subordinate product and architecture documents.
-- Implementation structure outside the cognitive context.
-- Detailed ADSM methodology that belongs to the skill and its references.
+- Product, architecture, environment, or code meaning; these belong under `docs/`.
+- Project-local agent workflows; these belong under `agent/`.
+- Generic ADSM methodology; use the `adsm-ctx` skill when available.
 
 ## Local Reading Map
 
-- Read `README.md` for a short entry note.
-- Read `docs/filesystem.md` for the top-level repository map.
-- Read `docs/` for project documentation.
+- For initial project orientation, read `docs/ai-intro.md` when needed.
+- For repository topology, consult `docs/filesystem.md`.
+- For product, architecture, environment, or code work, follow `docs/AGENTS.md` and read only task-relevant documentation.
+- For project-local agent operations, follow `agent/AGENTS.md`.
+- For context lifecycle work, use the `adsm-ctx` skill when available.
+
+Read `README.md` only when additional orientation is needed. Avoid rereading unchanged context within a session.
