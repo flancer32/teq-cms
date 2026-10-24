@@ -1,8 +1,8 @@
 # Root Level
 
 - Path: `AGENTS.md`
-- Template Version: `20260702`
-- Changed: `20260807`
+- Template Version: `20260720`
+- Changed: `YYYYMMDD`
 
 ## Purpose
 
@@ -67,7 +67,7 @@ In a one-repository topology, the software product and the cognitive context are
 
 In a two-repository topology, the software product and the cognitive context are independent version-controlled repositories, and the cognitive context repository is mounted under `./ctx/`.
 
-The Agent must detect whether `./ctx/` is part of the current repository or an independent version-controlled repository.
+The Agent must detect whether `./ctx/` is part of the current repository or an independent repository.
 
 The Agent must preserve repository boundaries.
 
@@ -95,7 +95,7 @@ The Agent may modify the software product when required by the assigned task and
 
 Additional `AGENTS.md` files may exist in subdirectories.
 
-The effective working context of the Agent is the aggregate of all `AGENTS.md` files located along the path from the repository root to the target directory.
+The effective working context of the agent is the aggregate of all `AGENTS.md` files located along the path from the repository root to the target directory.
 
 Rules:
 
@@ -107,4 +107,14 @@ Rules:
 
 This file defines root-level project control rules.
 
-The Agent must not modify, replace, delete, relocate, or reinterpret this file unless explicitly instructed by the Human.
+The agent must not modify, replace, delete, relocate, or reinterpret this file unless explicitly instructed by the human.
+
+Violation of this rule constitutes an execution error.
+
+## Secret Handling
+
+The Agent must never read, load, print, search for, or expose secret-bearing project files, including `.env` and `.env.*` files, credentials, private keys, tokens, or secret stores. This rule applies even when a file is Git-ignored and includes broad search or command output that could reveal its contents.
+
+The Agent may use a non-secret example template such as `.env.example` only to learn the configuration shape. It must not infer or request the value of any secret.
+
+If secret data is exposed accidentally, the Agent must stop handling that value, must not repeat it, and must tell the Human that the secret should be rotated or revoked.
