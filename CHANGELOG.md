@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Added
+
+- Allow an application adapter to set `redirectLocale: false` for template routes that must retain an unlocalized URL.
+
+### Fixed
+
+- Send ordinary rendered HTML with `Content-Type: text/html; charset=utf-8` instead of the invalid `Content-Encoding: utf-8` header.
+- Handle template targets without locale preferences when evaluating locale redirects.
+
 ## [0.10.1] - 2026-10-22
 
 ### Fixed
