@@ -194,12 +194,8 @@ itself.
 
 ## Commands and lifecycle
 
-For an embedded template-only application, host DI may replace
-`Fl32_Cms_Back_Cli_Policy$` with a policy returning `template` from `getMode()`.
-Only the CMS template handler is registered; the host owns other handlers and
-fallback. The default `site` mode retains the complete CMS pipeline. The
-application adapter may set `redirectLocale: false` for a route whose URL must
-remain unlocalized. The host still binds the adapter and template engine.
+An application adapter may set `redirectLocale: false` for a route whose URL
+must remain unlocalized. The host binds the adapter and template engine.
 
 Declare command descriptors in `package.json` under `teqfw.fw.cli.commands`.
 The descriptor's `id` is the public command name. A finite command implements

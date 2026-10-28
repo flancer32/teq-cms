@@ -9,8 +9,6 @@ declare global {
   type Fl32_Cms_Back_Cli_Command_Generate__Class = typeof import("./src/Back/Cli/Command/Generate.mjs").default;
   type Fl32_Cms_Back_Cli_Plugin = import("./src/Back/Cli/Plugin.mjs").default;
   type Fl32_Cms_Back_Cli_Plugin__Class = typeof import("./src/Back/Cli/Plugin.mjs").default;
-  type Fl32_Cms_Back_Cli_Policy = import("./src/Back/Cli/Policy.mjs").default;
-  type Fl32_Cms_Back_Cli_Policy__Class = typeof import("./src/Back/Cli/Policy.mjs").default;
   type Fl32_Cms_Back_Config = import("./src/Back/Config.mjs").default;
   type Fl32_Cms_Back_Config_SitemapRepresentations = 'html'|'markdown'|'both';
   type Fl32_Cms_Back_Config__Class = typeof import("./src/Back/Config.mjs").default;

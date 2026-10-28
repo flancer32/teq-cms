@@ -95,7 +95,7 @@ async function fixture({presentationLocale = 'de', defaultLocale} = {defaultLoca
     const pipeline = new Pipeline({
         dtoRequestContextFactory: {create: () => ({})}, logger, respond, helpOrder: new Kahn(), STAGE,
     });
-    const plugin = new Plugin({policy: {getMode: () => 'site'}, handNotFound,
+    const plugin = new Plugin({handNotFound,
         pipeline, handLog: {getRegistrationInfo: () => ({name: 'log', stage: STAGE.INIT}), handle: async () => {}},
         handStatic: staticHandler, handStaticRoute: new StaticRoute({routing, handStatic: staticHandler, respond, errors, dtoInfo: info, STAGE, path}), handTmpl: templateHandler, handPublication: handler,
         handAgentMessage: {},
