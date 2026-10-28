@@ -17,6 +17,7 @@ describe('Fl32_Cms_Back_Cli_Plugin', () => {
             dtoSource: {create: value => { calls.push(['source', value]); return 'source'; }},
             tmplConfig: {getRootPath: () => '/application'},
             config: {getPublicationFamilies: () => [], getAgentMessageEnabled: () => false},
+            policy: {getMode: () => 'site'},
             path: {join: (...parts) => parts.join('/')},
         });
 
@@ -32,5 +33,13 @@ describe('Fl32_Cms_Back_Cli_Plugin', () => {
             ['handler', 'publication'],
             ['handler', 'not-found'],
         ]);
+    });
+
+    it('mounts only the template handler when selected by the host', async () => {
+        const handlers = [];
+        const plugin = new Plugin({pipeline: {addHandler: handler => handlers.push(handler)},
+            handTmpl: 'template', policy: {getMode: () => 'template'}});
+        await plugin.onStartup();
+        assert.deepEqual(handlers, ['template']);
     });
 });

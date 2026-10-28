@@ -36,7 +36,7 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
         const {constants: H2} = http2;
         const log = logger.forSource('Fl32_Cms_Back_Web_Handler_Template');
         const {
-            HTTP2_HEADER_CONTENT_ENCODING,
+            HTTP2_HEADER_CONTENT_TYPE,
             HTTP2_HEADER_CONTENT_LENGTH,
             HTTP_STATUS_FOUND,
         } = H2;
@@ -56,7 +56,7 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
             if (!respond.isWritable(res)) return;
 
             try {
-                const {target, data, options} = await adapter.getRenderData({req});
+                const {target, data, options, redirectLocale = true} = await adapter.getRenderData({req});
                 if (!target) return;
                 const typedTarget = /** @type {Fl32_Tmpl_Back_Dto_Target__DTO} */ (target);
                 const {template} = await servTmplLoad.perform({target: typedTarget});
@@ -69,9 +69,9 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
                         }
                     );
 
-                    if (!hasLocale && (typedTarget.locales.user || tmplConfig.getDefaultLocale())) {
+                    if (redirectLocale && !hasLocale && (typedTarget.locales?.user || tmplConfig.getDefaultLocale())) {
                         // TODO: move this code to TeqFw_Web_Back_Helper_Respond
-                        const loc = typedTarget.locales.user ?? tmplConfig.getDefaultLocale();
+                        const loc = typedTarget.locales?.user ?? tmplConfig.getDefaultLocale();
                         const newLoc = url.startsWith('/') ? `/${loc}${url}` : `/${loc}/${url}`;
                         res.writeHead(HTTP_STATUS_FOUND, {location: newLoc});
                         res.end();
@@ -88,7 +88,7 @@ export default class Fl32_Cms_Back_Web_Handler_Template {
                     if (content) {
                         const bodyBuffer = Buffer.from(content, 'utf-8');
                         const headers = {
-                            [HTTP2_HEADER_CONTENT_ENCODING]: 'utf-8',
+                            [HTTP2_HEADER_CONTENT_TYPE]: 'text/html; charset=utf-8',
                             [HTTP2_HEADER_CONTENT_LENGTH]: bodyBuffer.length,
                         };
                         respond.code200_Ok({res, headers, body: content});

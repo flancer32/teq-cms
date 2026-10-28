@@ -25,6 +25,8 @@ export default class Fl32_Cms_Back_Api_Adapter {
      *
      * @param {object} deps - Parameters object.
      * @param {object} deps.req - The HTTP(S) request object.
+     * An adapter may set `redirectLocale: false` for routes whose URL is not
+     * locale-prefixed; the default preserves ordinary site redirects.
      * @returns {Promise<Fl32_Cms_Back_Api_Adapter_RenderData>} Rendering context for the template engine.
      * @throws {Fl32_Cms_Back_Api_Adapter_Error} If the method is not implemented by the application.
      */

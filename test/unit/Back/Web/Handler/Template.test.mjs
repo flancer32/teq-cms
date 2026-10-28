@@ -6,7 +6,7 @@ function createHandler(overrides = {}) {
     const calls = [];
     const handler = new Handler({
         http2: {constants: {
-            HTTP2_HEADER_CONTENT_ENCODING: 'content-encoding',
+            HTTP2_HEADER_CONTENT_TYPE: 'content-type',
             HTTP2_HEADER_CONTENT_LENGTH: 'content-length',
             HTTP_STATUS_FOUND: 302,
         }},
@@ -49,6 +49,18 @@ describe('Fl32_Cms_Back_Web_Handler_Template', () => {
 
         assert.equal(calls[0][0], 'ok');
         assert.equal(calls[0][1].body, 'Hello');
+        assert.equal(calls[0][1].headers['content-type'], 'text/html; charset=utf-8');
+        assert.equal(calls[0][1].headers['content-encoding'], undefined);
+        assert.equal(context.completed, true);
+    });
+
+    it('renders without a locale redirect when the adapter opts out', async () => {
+        const {handler, calls} = createHandler({adapter: {getRenderData: async () => ({
+            target: {locales: {}}, data: {}, options: {}, redirectLocale: false,
+        })}});
+        const context = {request: {url: '/app/'}, response: {}};
+        await handler.handle(context);
+        assert.equal(calls[0][0], 'ok');
         assert.equal(context.completed, true);
     });
 

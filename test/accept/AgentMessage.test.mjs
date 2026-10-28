@@ -25,7 +25,7 @@ it('accepts an agent message through the CMS web pipeline before page handlers',
     const pipeline = new Pipeline({
         dtoRequestContextFactory: {create: () => ({})}, logger, respond, helpOrder: new Kahn(), STAGE,
     });
-    const plugin = new Plugin({
+    const plugin = new Plugin({policy: {getMode: () => 'site'},
         handNotFound: {getRegistrationInfo: () => ({name: 'Fl32_Cms_Back_Web_Handler_NotFound', stage: STAGE.PROCESS, after: ['Fl32_Cms_Back_Web_Handler_AgentMessage']}), handle: async () => { throw new Error('Unexpected terminal handler'); }},
         pipeline, config, handAgentMessage,
         handLog: {getRegistrationInfo: () => ({name: 'log', stage: STAGE.INIT}), handle: async () => {}},

@@ -18,15 +18,22 @@ export default class Fl32_Cms_Back_Cli_Plugin {
      * @param {TeqFw_Web_Back_Dto_Source__Factory} deps.dtoSource
      * @param {Fl32_Tmpl_Back_Config} deps.tmplConfig
      * @param {Fl32_Cms_Back_Config} deps.config
+     * @param {Fl32_Cms_Back_Cli_Policy} deps.policy
      * @param {typeof import('node:path')} deps.path
      */
-    constructor({pipeline, handLog, handStatic, handStaticRoute, handTmpl, handPublication, handAgentMessage, handNotFound, dtoSource, tmplConfig, config, path}) {
+    constructor({pipeline, handLog, handStatic, handStaticRoute, handTmpl, handPublication, handAgentMessage, handNotFound, dtoSource, tmplConfig, config, policy, path}) {
         /**
          * Registers CMS handlers before the web command starts.
          *
          * @returns {Promise<void>}
          */
         this.onStartup = async function () {
+            const mode = policy.getMode();
+            if (mode === 'template') {
+                pipeline.addHandler(handTmpl);
+                return;
+            }
+            if (mode !== 'site') throw new Error('Unsupported CMS pipeline mode');
             const source = dtoSource.create({
                 root: path.join(tmplConfig.getRootPath(), 'web'),
                 prefix: '/',
@@ -65,6 +72,7 @@ export const __deps__ = Object.freeze({
         dtoSource: 'TeqFw_Web_Back_Dto_Source__Factory$',
         tmplConfig: 'Fl32_Tmpl_Back_Config$',
         config: 'Fl32_Cms_Back_Config$',
+        policy: 'Fl32_Cms_Back_Cli_Policy$',
         path: 'node:path',
     }),
 });

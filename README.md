@@ -49,6 +49,8 @@ Markdown sources take priority over ordinary templates, then static files in `we
 
 The host defines static prefixes and presentation selection in code by substituting `Fl32_Cms_Back_Publication_Policy$` through DI. The default presentation is `publication.html`. Localized content is exact; presentation templates may use normal tmpl fallback. Markdown includes front matter. HTML canonical and locale links stay extensionless. Markdown alternate links and `llms.txt` use explicit `.md` addresses; the sitemap defaults to available canonical HTML. Set `TEQ_CMS__SITEMAP_REPRESENTATIONS=markdown` or `both` to include every distinct eligible Markdown language variant without alias duplicates. `indexable: false` excludes a source from generated discovery while keeping it public.
 
+An application embedding only the ordinary template handler can substitute `Fl32_Cms_Back_Cli_Policy$` through host DI with a policy whose `getMode()` returns `template`. This mode registers only the template handler; the host owns static delivery, remaining routes, and fallback. The host also selects the template adapter and engine. The adapter can return `redirectLocale: false` for routes that must keep an unlocalized URL.
+
 A nonempty legacy `PUBLICATION_FAMILIES` list retains the previous selected-section mode. Run `teq cms:generate` to generate discovery files. See the [publication guide](docs/publications.md) for host policy, main-page behavior, source validation, migration, and the optional private agent inbox.
 
 ## Agent-Driven Development

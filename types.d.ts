@@ -3,12 +3,14 @@ declare global {
   type Fl32_Cms_Back_Agent_Inbox__Class = typeof import("./src/Back/Agent/Inbox.mjs").default;
   type Fl32_Cms_Back_Api_Adapter = import("./src/Back/Api/Adapter.mjs").default;
   type Fl32_Cms_Back_Api_Adapter_Error = Error;
-  type Fl32_Cms_Back_Api_Adapter_RenderData = {target?: object; data?: object; options?: object};
+  type Fl32_Cms_Back_Api_Adapter_RenderData = {target?: object; data?: object; options?: object; redirectLocale?: boolean};
   type Fl32_Cms_Back_Api_Adapter__Class = typeof import("./src/Back/Api/Adapter.mjs").default;
   type Fl32_Cms_Back_Cli_Command_Generate = import("./src/Back/Cli/Command/Generate.mjs").default;
   type Fl32_Cms_Back_Cli_Command_Generate__Class = typeof import("./src/Back/Cli/Command/Generate.mjs").default;
   type Fl32_Cms_Back_Cli_Plugin = import("./src/Back/Cli/Plugin.mjs").default;
   type Fl32_Cms_Back_Cli_Plugin__Class = typeof import("./src/Back/Cli/Plugin.mjs").default;
+  type Fl32_Cms_Back_Cli_Policy = import("./src/Back/Cli/Policy.mjs").default;
+  type Fl32_Cms_Back_Cli_Policy__Class = typeof import("./src/Back/Cli/Policy.mjs").default;
   type Fl32_Cms_Back_Config = import("./src/Back/Config.mjs").default;
   type Fl32_Cms_Back_Config_SitemapRepresentations = 'html'|'markdown'|'both';
   type Fl32_Cms_Back_Config__Class = typeof import("./src/Back/Config.mjs").default;

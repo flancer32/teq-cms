@@ -95,7 +95,7 @@ async function fixture(options = {}) {
     const accepted = [];
     const handAgentMessage = new AgentMessage({config, inbox: {accept: async record => accepted.push(record)}, dtoInfo, STAGE, logger});
     const pipeline = new Pipeline({dtoRequestContextFactory: {create: () => ({})}, logger, respond, helpOrder: new Kahn(), STAGE});
-    const plugin = new Plugin({handNotFound,pipeline, config, tmplConfig, path, dtoSource: {create: value => value}, handStatic, handTmpl, handPublication,
+    const plugin = new Plugin({policy: {getMode: () => 'site'}, handNotFound,pipeline, config, tmplConfig, path, dtoSource: {create: value => value}, handStatic, handTmpl, handPublication,
         handStaticRoute: new StaticRoute({routing, handStatic, respond, errors, dtoInfo, STAGE, path}), handAgentMessage,
         handLog: {getRegistrationInfo: () => ({name: 'log', stage: STAGE.INIT}), handle: async () => {}}});
     await plugin.onStartup();
